@@ -29,7 +29,7 @@
 	--gd-rule      : #4a1410;                 /* rules, underlines        */
 	--gd-ash       : #4d4336;                 /* captions, footers        */
 	--gd-panel     : rgba(88, 60, 32, .20);   /* note / monster plate     */
-	--gd-stripe    : rgba(70, 44, 22, .17);   /* table zebra              */
+	--gd-stripe    : rgba(70, 44, 22, .10);   /* table zebra              */
 	--gd-burn      : rgba(34, 18, 7, .62);    /* scorched page edges      */
 	--gd-bone      : #e6dcc2;                 /* light text on dark       */
 	--gd-iron      : #24201d;                 /* cover / ribbon black     */
@@ -37,7 +37,7 @@
 	--gd-ink-bleed : rgba(28, 14, 6, .45);
 
 	/* swap to `none` to switch the colour-grading of artwork off */
-	--gd-art-grade : saturate(.5) contrast(1.12) sepia(.3) brightness(.88);
+	--gd-art-grade : saturate(.35) contrast(1.12) sepia(.55) brightness(.88);
 
 	/* textures (generated inline SVG) */
 	--gd-grain     : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'420'%20height%3D'420'%3E%3Cfilter%20id%3D'g'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.75'%20numOctaves%3D'3'%20seed%3D'11'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.20%200%200%200%200%20.16%200%200%200%200%20.11%201.1%200%200%200%20-.42'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'420'%20height%3D'420'%20filter%3D'url(%23g)'%2F%3E%3C%2Fsvg%3E");
@@ -46,7 +46,6 @@
 	--gd-frame     : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'120'%20height%3D'120'%20viewBox%3D'0%200%20120%20120'%3E%3Cfilter%20id%3D'r'%20x%3D'-10%25'%20y%3D'-10%25'%20width%3D'120%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.05'%20numOctaves%3D'2'%20seed%3D'4'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'6'%20xChannelSelector%3D'R'%20yChannelSelector%3D'G'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'none'%20stroke%3D'%231a130e'%20filter%3D'url(%23r)'%3E%3Crect%20x%3D'14'%20y%3D'14'%20width%3D'92'%20height%3D'92'%20stroke-width%3D'3.2'%2F%3E%3Crect%20x%3D'21'%20y%3D'21'%20width%3D'78'%20height%3D'78'%20stroke-width%3D'.9'%20opacity%3D'.75'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
 	--gd-frame-red : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'120'%20height%3D'120'%20viewBox%3D'0%200%20120%20120'%3E%3Cfilter%20id%3D'r'%20x%3D'-10%25'%20y%3D'-10%25'%20width%3D'120%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.05'%20numOctaves%3D'2'%20seed%3D'4'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'6'%20xChannelSelector%3D'R'%20yChannelSelector%3D'G'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'none'%20stroke%3D'%236a100d'%20filter%3D'url(%23r)'%3E%3Crect%20x%3D'14'%20y%3D'14'%20width%3D'92'%20height%3D'92'%20stroke-width%3D'3.2'%2F%3E%3Crect%20x%3D'21'%20y%3D'21'%20width%3D'78'%20height%3D'78'%20stroke-width%3D'.9'%20opacity%3D'.75'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
 	--gd-dagger    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'600'%20height%3D'28'%20viewBox%3D'0%200%20600%2028'%20preserveAspectRatio%3D'none'%3E%3Cg%20fill%3D'%236a100d'%3E%3Cpolygon%20points%3D'4%2C14%20276%2C11.6%20276%2C16.4'%2F%3E%3Cpolygon%20points%3D'596%2C14%20324%2C11.6%20324%2C16.4'%2F%3E%3Cpolygon%20points%3D'282%2C14%20286%2C10.5%20290%2C14%20286%2C17.5'%2F%3E%3Cpolygon%20points%3D'318%2C14%20314%2C10.5%20310%2C14%20314%2C17.5'%2F%3E%3Cpolygon%20points%3D'295.5%2C9%20304.5%2C9%20300%2C27.5'%2F%3E%3Crect%20x%3D'288'%20y%3D'5.6'%20width%3D'24'%20height%3D'3.4'%20rx%3D'1.2'%2F%3E%3Crect%20x%3D'298.7'%20y%3D'0.6'%20width%3D'2.6'%20height%3D'5.2'%2F%3E%3Ccircle%20cx%3D'300'%20cy%3D'1.4'%20r%3D'2'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-	--gd-drip      : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'600'%20height%3D'18'%20viewBox%3D'0%200%20600%2018'%20preserveAspectRatio%3D'none'%3E%3Cfilter%20id%3D'r'%20x%3D'-2%25'%20y%3D'-20%25'%20width%3D'104%25'%20height%3D'140%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.04%20.3'%20numOctaves%3D'2'%20seed%3D'9'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'3'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'%236a100d'%20filter%3D'url(%23r)'%3E%3Cpolygon%20points%3D'0%2C2%20150%2C3%20400%2C4.2%20600%2C4.9%20600%2C5.3%20400%2C6%20150%2C7.6%200%2C8.6'%2F%3E%3Cpolygon%20points%3D'58%2C6%2061%2C6%2060.6%2C13%2059.4%2C13'%2F%3E%3Ccircle%20cx%3D'60'%20cy%3D'14'%20r%3D'2.1'%2F%3E%3Cpolygon%20points%3D'212%2C5.4%20214.4%2C5.4%20214%2C10%20213%2C10'%2F%3E%3Ccircle%20cx%3D'213.5'%20cy%3D'10.8'%20r%3D'1.5'%2F%3E%3Cpolygon%20points%3D'96%2C6.6%2098%2C6.6%2097.6%2C9%2096.4%2C9'%2F%3E%3Ccircle%20cx%3D'97'%20cy%3D'9.6'%20r%3D'1.2'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
 	--gd-torn      : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'816'%20height%3D'330'%20viewBox%3D'0%200%20816%20330'%20preserveAspectRatio%3D'none'%3E%3Cfilter%20id%3D'r'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.09'%20numOctaves%3D'3'%20seed%3D'2'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'9'%2F%3E%3C%2Ffilter%3E%3Cpath%20d%3D'M0%200H816V292L794.4%20287.0L785.9%20287.8L766.8%20295.5L753.2%20288.3L733.3%20287.1L713.3%20295.0L695.3%20292.2L689.3%20283.7L662.9%20287.2L653.7%20291.6L627.4%20288.0L619.6%20288.5L596.0%20285.4L580.9%20292.4L559.2%20292.9L532.8%20290.1L515.8%20287.0L494.4%20292.0L468.8%20299.8L458.0%20282.2L448.5%20293.4L440.3%20288.8L416.0%20289.0L389.1%20292.5L375.5%20301.9L353.4%20296.6L337.4%20298.2L329.9%20288.4L321.7%20329.6L309.7%20284.4L287.4%20318.6L271.7%20290.9L266.1%20281.9L253.8%20301.9L234.8%20293.6L215.1%20295.4L206.7%20285.5L198.3%20302.8L173.8%20302.9L158.6%20300.9L141.5%20294.7L126.6%20290.2L107.4%20288.1L96.5%20321.3L81.9%20300.7L63.5%20293.4L41.6%20300.4L35.8%20287.3L11.9%20288.8L0.0%20290.4Z'%20fill%3D'%23000'%20filter%3D'url(%23r)'%2F%3E%3C%2Fsvg%3E");
 	--gd-torn-sm   : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'816'%20height%3D'230'%20viewBox%3D'0%200%20816%20230'%20preserveAspectRatio%3D'none'%3E%3Cfilter%20id%3D'r'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.08'%20numOctaves%3D'3'%20seed%3D'8'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'8'%2F%3E%3C%2Ffilter%3E%3Cpath%20d%3D'M0%200H816V204L808.0%20196.8L801.2%20231.6L792.2%20210.2L770.8%20202.8L760.8%20209.7L736.1%20211.1L710.1%20207.7L683.6%20209.2L668.6%20199.8L660.0%20195.2L653.2%20205.2L640.4%20203.1L631.9%20200.8L618.7%20204.2L600.3%20212.5L593.0%20199.6L581.8%20196.8L567.6%20208.1L554.9%20201.4L542.7%20202.8L533.3%20208.4L527.4%20212.3L514.5%20240.2L502.2%20195.0L476.8%20211.1L452.8%20225.9L432.5%20195.9L425.5%20203.0L402.2%20204.1L396.2%20204.0L379.5%20204.3L352.8%20196.8L330.9%20205.9L306.4%20207.6L298.2%20210.4L285.1%20212.1L268.6%20204.2L246.6%20195.3L237.7%20199.6L226.7%20233.4L218.0%20208.4L212.8%20206.3L190.9%20210.9L185.5%20198.1L167.2%20209.7L140.3%20207.1L121.3%20209.8L107.0%20202.1L82.2%20202.9L61.9%20208.8L46.4%20207.5L29.0%20233.1L2.1%20210.5L0.0%20203.1Z'%20fill%3D'%23000'%20filter%3D'url(%23r)'%2F%3E%3C%2Fsvg%3E");
 	--gd-ribbon    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'620'%20height%3D'90'%20viewBox%3D'0%200%20620%2090'%20preserveAspectRatio%3D'none'%3E%3Cfilter%20id%3D'r'%20x%3D'-3%25'%20y%3D'-10%25'%20width%3D'106%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.06%20.12'%20numOctaves%3D'3'%20seed%3D'6'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'7'%2F%3E%3C%2Ffilter%3E%3Cpath%20d%3D'M6%206H614L604%2028%20614%2052%20606%2070%20614%2084H6L16%2062%206%2042%2014%2022Z'%20fill%3D'%23000'%20filter%3D'url(%23r)'%2F%3E%3C%2Fsvg%3E");
@@ -67,12 +66,12 @@
 .page.reliquary {
 	--gd-paper     : #15110f;
 	--gd-text      : #cdc1a3;
-	--gd-head      : #c23a2e;
-	--gd-hot       : #e5604f;
+	--gd-head      : #d9584a;
+	--gd-hot       : #e8836f;
 	--gd-rule      : #8a2018;
 	--gd-ash       : #9a907c;
 	--gd-grain     : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'420'%20height%3D'420'%3E%3Cfilter%20id%3D'g'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.8'%20numOctaves%3D'3'%20seed%3D'11'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.80%200%200%200%200%20.72%200%200%200%200%20.60%20.55%200%200%200%20-.21'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'420'%20height%3D'420'%20filter%3D'url(%23g)'%2F%3E%3C%2Fsvg%3E");
-	--gd-stains    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'816'%20height%3D'1056'%3E%3Cfilter%20id%3D's'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.004%20.006'%20numOctaves%3D'5'%20seed%3D'41'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.26%200%200%200%200%20.06%200%200%200%200%20.04%201.1%200%200%200%20-.50'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'816'%20height%3D'1056'%20filter%3D'url(%23s)'%2F%3E%3C%2Fsvg%3E");
+	--gd-stains    : none;
 	--gd-foxing    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'380'%20height%3D'380'%3E%3Cfilter%20id%3D'f'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.3'%20numOctaves%3D'2'%20seed%3D'9'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.58%200%200%200%200%20.52%200%200%200%200%20.42%200%207%200%200%20-5.5'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'380'%20height%3D'380'%20filter%3D'url(%23f)'%2F%3E%3C%2Fsvg%3E");
 	--gd-panel     : rgba(255, 238, 205, .055);
 	--gd-stripe    : rgba(255, 238, 205, .06);
@@ -81,7 +80,6 @@
 	--gd-frame     : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'120'%20height%3D'120'%20viewBox%3D'0%200%20120%20120'%3E%3Cfilter%20id%3D'r'%20x%3D'-10%25'%20y%3D'-10%25'%20width%3D'120%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.05'%20numOctaves%3D'2'%20seed%3D'4'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'6'%20xChannelSelector%3D'R'%20yChannelSelector%3D'G'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'none'%20stroke%3D'%23a89c82'%20filter%3D'url(%23r)'%3E%3Crect%20x%3D'14'%20y%3D'14'%20width%3D'92'%20height%3D'92'%20stroke-width%3D'3.2'%2F%3E%3Crect%20x%3D'21'%20y%3D'21'%20width%3D'78'%20height%3D'78'%20stroke-width%3D'.9'%20opacity%3D'.75'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
 	--gd-frame-red : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'120'%20height%3D'120'%20viewBox%3D'0%200%20120%20120'%3E%3Cfilter%20id%3D'r'%20x%3D'-10%25'%20y%3D'-10%25'%20width%3D'120%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.05'%20numOctaves%3D'2'%20seed%3D'4'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'6'%20xChannelSelector%3D'R'%20yChannelSelector%3D'G'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'none'%20stroke%3D'%23a3231b'%20filter%3D'url(%23r)'%3E%3Crect%20x%3D'14'%20y%3D'14'%20width%3D'92'%20height%3D'92'%20stroke-width%3D'3.2'%2F%3E%3Crect%20x%3D'21'%20y%3D'21'%20width%3D'78'%20height%3D'78'%20stroke-width%3D'.9'%20opacity%3D'.75'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
 	--gd-dagger    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'600'%20height%3D'28'%20viewBox%3D'0%200%20600%2028'%20preserveAspectRatio%3D'none'%3E%3Cg%20fill%3D'%23d9cdb0'%3E%3Cpolygon%20points%3D'4%2C14%20276%2C11.6%20276%2C16.4'%2F%3E%3Cpolygon%20points%3D'596%2C14%20324%2C11.6%20324%2C16.4'%2F%3E%3Cpolygon%20points%3D'282%2C14%20286%2C10.5%20290%2C14%20286%2C17.5'%2F%3E%3Cpolygon%20points%3D'318%2C14%20314%2C10.5%20310%2C14%20314%2C17.5'%2F%3E%3Cpolygon%20points%3D'295.5%2C9%20304.5%2C9%20300%2C27.5'%2F%3E%3Crect%20x%3D'288'%20y%3D'5.6'%20width%3D'24'%20height%3D'3.4'%20rx%3D'1.2'%2F%3E%3Crect%20x%3D'298.7'%20y%3D'0.6'%20width%3D'2.6'%20height%3D'5.2'%2F%3E%3Ccircle%20cx%3D'300'%20cy%3D'1.4'%20r%3D'2'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
-	--gd-drip      : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'600'%20height%3D'18'%20viewBox%3D'0%200%20600%2018'%20preserveAspectRatio%3D'none'%3E%3Cfilter%20id%3D'r'%20x%3D'-2%25'%20y%3D'-20%25'%20width%3D'104%25'%20height%3D'140%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.04%20.3'%20numOctaves%3D'2'%20seed%3D'9'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'3'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'%23a3231b'%20filter%3D'url(%23r)'%3E%3Cpolygon%20points%3D'0%2C2%20150%2C3%20400%2C4.2%20600%2C4.9%20600%2C5.3%20400%2C6%20150%2C7.6%200%2C8.6'%2F%3E%3Cpolygon%20points%3D'58%2C6%2061%2C6%2060.6%2C13%2059.4%2C13'%2F%3E%3Ccircle%20cx%3D'60'%20cy%3D'14'%20r%3D'2.1'%2F%3E%3Cpolygon%20points%3D'212%2C5.4%20214.4%2C5.4%20214%2C10%20213%2C10'%2F%3E%3Ccircle%20cx%3D'213.5'%20cy%3D'10.8'%20r%3D'1.5'%2F%3E%3Cpolygon%20points%3D'96%2C6.6%2098%2C6.6%2097.6%2C9%2096.4%2C9'%2F%3E%3Ccircle%20cx%3D'97'%20cy%3D'9.6'%20r%3D'1.2'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
 	--HB_Color_WatercolorStain : #5d1a12;
 }
 /* extra-heavy grime on any light page */
@@ -103,7 +101,6 @@
 	background-size     : 100% 100%, 816px 1056px, 380px 380px, 420px 420px, 100% 100%;
 	background-repeat   : no-repeat, no-repeat, repeat, repeat, no-repeat;
 	background-position : 0 0, 0 0, 0 0, 0 0, 0 0;
-	text-shadow         : 0 0 .55px var(--gd-ink-bleed);
 }
 .page:nth-child(even) {
 	background-size     : 100% 100%, 135% 135%, 380px 380px, 420px 420px, 100% 100%;
@@ -129,7 +126,7 @@
 .page:nth-child(even)::after { transform : none; }
 
 .page .footnote {
-	right          : 2.75cm;
+	right          : 3.3cm;
 	bottom         : .66cm;
 	width          : 9.5cm;
 	font-family    : 'IM Fell DW Pica SC', serif;
@@ -139,32 +136,23 @@
 	text-shadow    : none;
 	text-transform : none;
 }
-.page:nth-child(even) .footnote { left : 2.75cm; right : auto; }
+.page:nth-child(even) .footnote { left : 3.3cm; right : auto; }
 
 .page .pageNumber {
-	right           : 1.15cm;
-	bottom          : .55cm;
-	left            : auto;
-	z-index         : 160;
-	display         : grid;
-	place-items     : center;
-	width           : .98cm;
-	height          : .94cm;
-	font-family     : 'Pirata One', serif;
-	font-size       : .5cm;
-	line-height     : 1;
-	color           : var(--gd-bone);
-	text-shadow     : 0 -1px 0 rgba(0, 0, 0, .55);
-	border-radius   : 52% 47% 55% 45% / 47% 54% 46% 53%;
-	background      :
-		radial-gradient(circle at 36% 30%, rgba(255, 140, 110, .38), transparent 42%),
-		radial-gradient(circle at 50% 55%, #9b1b14, var(--gd-seal) 58%, #3d0907 100%);
-	box-shadow      :
-		inset 0 0 0 .07cm rgba(0, 0, 0, .22),
-		inset 0 0 .16cm rgba(0, 0, 0, .55),
-		.05cm .09cm .14cm rgba(0, 0, 0, .5);
+	right          : 1.9cm;
+	bottom         : .62cm;
+	left           : auto;
+	width          : auto;
+	font-family    : 'IM Fell DW Pica', serif;
+	font-size      : .42cm;
+	color          : var(--gd-ash);
+	text-align     : right;
+	text-shadow    : none;
 }
-.page:nth-child(even) .pageNumber { right : auto; left : 1.15cm; }
+.page .pageNumber::before,
+.page .pageNumber.auto::before { content : '†  '; color : var(--gd-hot); }
+.page .pageNumber.auto::after  { content : counter(page-numbers); }
+.page:nth-child(even) .pageNumber { right : auto; left : 1.9cm; text-align : left; }
 
 
 /* TYPOGRAPHY ______________________________________________________ */
@@ -174,14 +162,14 @@
 .page ol + p           { text-indent : 1.1em; }
 .page em               { font-style : italic; }
 
-/* Fell has no bold: use small-caps in blood instead of a faux-bold smear */
+/* Fell has no bold: emphasis is small caps, in ink – colour is kept for rules & labels */
 .page strong,
 .page :is(.note, .monster, .descriptive, .spellList, table) strong {
-	font-family    : 'IM Fell English SC', serif;
+	font-family    : 'IM Fell English', serif;
 	font-weight    : normal;
-	font-size      : 1.04em;
-	letter-spacing : .035em;
-	color          : var(--gd-hot);
+	font-variant   : small-caps;
+	letter-spacing : .04em;
+	color          : inherit;
 }
 
 .page caps                    { font-variant : small-caps; letter-spacing : .04em; }
@@ -202,7 +190,6 @@
 	break-after : avoid;
 	font-weight : normal;
 	color       : var(--gd-head);
-	text-shadow : 0 0 .7px var(--gd-ink-bleed);
 }
 .page h1 {
 	font-family    : 'Pirata One', serif;
@@ -211,16 +198,16 @@
 	letter-spacing : .02em;
 	margin-bottom  : .1cm;
 }
-.page .toc h1 { margin-bottom : .25cm; }
-/* blood-drip rule under every H1 */
+.page .toc h1 { margin-bottom : .2cm; }
+/* a plain rule under every H1 – tapers out, no gore */
 .page h1::after {
-	content           : '';
-	display           : block;
-	height            : .46cm;
-	margin-top        : .04cm;
-	margin-bottom     : -.1cm;
-	background        : var(--gd-drip) left top / 100% 100% no-repeat;
-	pointer-events    : none;
+	content        : '';
+	display        : block;
+	height         : 2px;
+	margin-top     : .1cm;
+	margin-bottom  : .12cm;
+	background     : linear-gradient(90deg, var(--gd-rule) 70%, transparent);
+	pointer-events : none;
 }
 .page h1 + * { margin-top : 0; }
 .page h2 {
@@ -231,7 +218,7 @@
 }
 .page h3 {
 	font-family    : 'IM Fell English SC', serif;
-	font-size      : .56cm;
+	font-size      : .64cm;
 	line-height    : 1em;
 	letter-spacing : .045em;
 	border-bottom  : 2px solid;
@@ -240,14 +227,16 @@
 }
 .page h4 {
 	font-family    : 'IM Fell DW Pica SC', serif;
-	font-size      : .46cm;
-	letter-spacing : .05em;
+	font-size      : .45cm;
+	letter-spacing : .06em;
+	color          : var(--gd-text);
 }
 .page h5 {
-	font-family    : 'IM Fell English SC', serif;
-	font-size      : .41cm;
-	letter-spacing : .06em;
-	color          : var(--gd-hot);
+	font-family    : 'IM Fell English', serif;
+	font-size      : .4cm;
+	font-style     : italic;
+	letter-spacing : .01em;
+	color          : var(--gd-head);
 }
 .page h5 + * { margin-top : .1cm; }
 
@@ -258,16 +247,16 @@
 .page h1 + p::first-letter,
 .page h1 + .quote::first-letter {
 	float                   : left;
-	padding                 : 0 .08cm 0 0;
-	margin                  : -.06cm 0 -.3cm -.02cm;
-	font-family             : 'UnifrakturMaguntia', serif;
-	font-size               : 2.05cm;
+	padding                 : 0;
+	margin                  : .02cm .1cm -.2cm -.02cm;
+	font-family             : 'Pirata One', serif;
+	font-size               : 1.75cm;
 	line-height             : 1em;
 	color                   : var(--gd-head);
 	background-image        : none;
 	-webkit-background-clip : border-box;
 	background-clip         : border-box;
-	text-shadow             : .5px .5px 0 rgba(0, 0, 0, .35), 0 0 .15cm rgba(100, 10, 8, .25);
+	text-shadow             : none;
 }
 
 /* visible horizontal rules (default theme hides them) */
@@ -294,11 +283,10 @@
 	font-weight    : normal;
 	letter-spacing : .05em;
 	color          : var(--gd-head);
-	padding        : .04cm .06cm .02cm;
+	padding        : .05cm .08cm .03cm;
 	border-bottom  : 1px solid var(--gd-rule);
-	box-shadow     : 0 2px 0 -1px var(--gd-paper), 0 3px 0 -1px var(--gd-rule);
 }
-.page table tbody td { padding : .015cm .06cm; }
+.page table tbody td { padding : .04cm .08cm; }
 
 /* QUOTE */
 .page .quote > p                       { font-style : italic; line-height : 1.22em; }
@@ -308,37 +296,30 @@
 .page .quote                           { padding-left : .35cm; border-left : 2px solid var(--gd-rule); }
 
 
-/* NOTE  ·  "inquisitor's dossier" ________________________________ */
+/* NOTE  ·  GM-facing aside – the only ragged-framed box ___________ */
 .page .note {
 	position            : relative;
+	margin-block        : .3cm;
 	padding             : .36cm .46cm .32cm;
-	font-family         : 'Special Elite', 'Courier New', monospace;
-	font-size           : .295cm;
-	line-height         : 1.3em;
+	font-family         : 'IM Fell DW Pica', serif;
+	font-size           : .345cm;
+	line-height         : 1.28em;
 	background-color    : var(--gd-panel);
-	background-image    :
-		radial-gradient(circle at 9px 9px,           #8e8678 0 1.6px, #1a130e 2.2px 3.2px, transparent 3.8px),
-		radial-gradient(circle at calc(100% - 9px) 9px, #8e8678 0 1.6px, #1a130e 2.2px 3.2px, transparent 3.8px),
-		radial-gradient(circle at 9px calc(100% - 9px), #8e8678 0 1.6px, #1a130e 2.2px 3.2px, transparent 3.8px),
-		radial-gradient(circle at calc(100% - 9px) calc(100% - 9px), #8e8678 0 1.6px, #1a130e 2.2px 3.2px, transparent 3.8px),
-		var(--gd-grain);
-	background-repeat   : no-repeat, no-repeat, no-repeat, no-repeat, repeat;
-	background-size     : auto, auto, auto, auto, 420px 420px;
+	background-image    : var(--gd-grain);
+	background-size     : 420px 420px;
 	border              : 1px solid transparent;
 	border-image        : var(--gd-frame) 24 / 24px / 14px stretch;
-	box-shadow          : .05cm .13cm .3cm rgba(0, 0, 0, .35);
-	text-shadow         : none;
+	box-shadow          : .05cm .13cm .3cm rgba(0, 0, 0, .3);
 }
-.page .note p                      { line-height : 1.3em; text-indent : 0; }
-.page .note h5                     { font-family : 'IM Fell English SC', serif; font-size : .43cm; letter-spacing : .06em; }
-.page .note strong                 { font-family : 'Special Elite', monospace; font-size : 1em; letter-spacing : 0; color : var(--gd-hot); }
-.page .note :is(em, i)             { font-style : normal; text-decoration : underline wavy; text-decoration-thickness : 1px; text-underline-offset : 2px; }
+.page .note p          { line-height : 1.28em; text-indent : 0; }
+.page .note h5         { font-size : .42cm; }
+.page .note strong     { color : var(--gd-head); }
 
 
 /* DESCRIPTIVE  ·  read-aloud text ________________________________ */
 .page .descriptive {
 	position         : relative;
-	padding          : .26cm .3cm .26cm .78cm;
+	padding          : .26cm .3cm .26cm .5cm;
 	font-family      : 'IM Fell English', serif;
 	font-size        : .372cm;
 	font-style       : italic;
@@ -349,22 +330,9 @@
 	border-image     : none;
 	box-shadow       : none;
 }
-.page .descriptive::before {
-	content     : '\201C';
-	position    : absolute;
-	top         : -.12cm;
-	left        : .1cm;
-	font-family : 'UnifrakturMaguntia', serif;
-	font-size   : 1.35cm;
-	line-height : 1em;
-	font-style  : normal;
-	color       : var(--gd-hot);
-	opacity     : .55;
-	pointer-events : none;
-}
 .page .descriptive p        { line-height : 1.3em; }
 .page .descriptive h5       { font-style : normal; }
-.page .descriptive strong   { font-style : normal; }
+.page .descriptive strong   { font-style : normal; font-size : 1em; }
 
 
 /* MONSTER STAT BLOCK ______________________________________________ */
@@ -373,16 +341,17 @@
 	font-size   : .345cm;
 }
 .page .monster.frame {
-	padding          : .34cm .44cm .36cm;
+	padding          : .24cm .3cm .28cm;
 	background-color : var(--gd-panel);
 	background-image :
 		radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(60, 10, 6, .18) 100%),
 		var(--gd-grain);
 	background-size  : 100% 100%, 420px 420px;
-	border           : 1px solid transparent;
-	border-image     : var(--gd-frame-red) 24 / 24px / 14px stretch;
-	box-shadow       : .05cm .15cm .35cm rgba(0, 0, 0, .4);
-	text-shadow      : none;
+	border           : 0;
+	border-image     : none;   /* PHB's ornate monster border */
+	border-top       : 3px solid var(--gd-rule);
+	border-bottom    : 3px solid var(--gd-rule);
+	box-shadow       : none;
 }
 .page .monster h2 {
 	font-family : 'Pirata One', serif;
@@ -393,22 +362,26 @@
 .page .monster h2 + p    { font-size : .31cm; letter-spacing : .02em; }
 .page .monster h3        { font-family : 'IM Fell English SC', serif; font-size : .46cm; border-bottom : 1.5px solid var(--gd-rule); }
 .page .monster p         { text-indent : 0; }
+.page .monster strong    { font-family : 'IM Fell DW Pica SC', serif; font-variant : normal; letter-spacing : .03em; color : var(--gd-head); }
+.page .monster em strong,
+.page .monster strong em { font-family : 'IM Fell DW Pica', serif; font-variant : normal; font-style : italic; letter-spacing : 0; color : var(--gd-text); }
 .page .monster hr {
-	height           : 5px;
-	background       : var(--gd-hot);
+	height           : 3px;
+	background       : var(--gd-head);
 	background-image : none;
 	-webkit-clip-path: polygon(0 0, 100% 50%, 0 100%);
 	clip-path        : polygon(0 0, 100% 50%, 0 100%);
-	opacity          : .85;
+	opacity          : 1;
 }
 
 
 /* CLASS TABLE _____________________________________________________ */
 .page .classTable.frame {
-	padding             : .38cm .46cm .3cm;
-	background-color    : var(--gd-panel);
-	border              : 1px solid transparent;
-	border-image        : var(--gd-frame) 24 / 24px / 14px stretch;
+	margin-block        : .3cm;
+	padding             : 0;
+	background-color    : transparent;
+	border              : 0;
+	border-image        : none;
 }
 .page .classTable table { border-top : 0; border-bottom : 0; }
 .page .classTable.decoration::before { display : none; }
@@ -505,6 +478,9 @@
 	background-color : #0d0a09;
 	--gd-grain       : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'420'%20height%3D'420'%3E%3Cfilter%20id%3D'g'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.8'%20numOctaves%3D'3'%20seed%3D'11'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.80%200%200%200%200%20.72%200%200%200%200%20.60%20.55%200%200%200%20-.21'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'420'%20height%3D'420'%20filter%3D'url(%23g)'%2F%3E%3C%2Fsvg%3E");
 	--gd-foxing      : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'380'%20height%3D'380'%3E%3Cfilter%20id%3D'f'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.3'%20numOctaves%3D'2'%20seed%3D'9'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.58%200%200%200%200%20.52%200%200%200%200%20.42%200%207%200%200%20-5.5'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'380'%20height%3D'380'%20filter%3D'url(%23f)'%2F%3E%3C%2Fsvg%3E");
+	--gd-head        : #d9584a;
+	--gd-hot         : #e8836f;
+	--gd-rule        : #8a2018;
 	background-image :
 		radial-gradient(ellipse 90% 70% at 50% 30%, rgba(120, 30, 20, .20), transparent 70%),
 		radial-gradient(ellipse 100% 90% at 50% 50%, transparent 40%, rgba(0, 0, 0, .9) 100%),
@@ -639,7 +615,7 @@
 	font-family : 'Pirata One', serif;
 	font-size   : 1.45cm;
 	line-height : 1.05em;
-	color       : var(--gd-hot);
+	color       : var(--gd-head);
 }
 .page:has(.backCover) h1::after { display : none; }
 .page:has(.backCover) p {
@@ -751,14 +727,14 @@
 .page .chapter + p::first-letter,
 .page .chapter + .quote::first-letter {
 	float         : left;
-	margin        : -.1cm 0 -.34cm -.02cm;
-	padding       : 0 .1cm 0 0;
-	font-family   : 'UnifrakturMaguntia', serif;
-	font-size     : 2.35cm;
+	margin        : .02cm .1cm -.2cm -.02cm;
+	padding       : 0;
+	font-family   : 'Pirata One', serif;
+	font-size     : 1.9cm;
 	line-height   : 1em;
 	color         : var(--gd-head);
 	background    : none;
-	text-shadow   : .5px .5px 0 rgba(0, 0, 0, .35), 0 0 .15cm rgba(100, 10, 8, .25);
+	text-shadow   : none;
 }
 .page h1 + .quote::first-letter,
 .page .chapter + .quote::first-letter { font-size : 88px; margin-left : -4px; }
@@ -789,27 +765,24 @@
 /* "TOMES"  ·  boxed lore ________________________________________ */
 .page .tome {
 	position         : relative;
-	margin           : 26px auto;
-	padding          : 16px 24px;
+	margin           : .3cm auto;
+	padding          : .3cm .4cm;
 	font-family      : 'IM Fell DW Pica', serif;
 	font-size        : .36cm;
 	background-color : var(--gd-panel);
-	background-image : var(--gd-grain);
-	background-size  : 420px 420px;
-	border           : 1px solid transparent;
-	border-image     : var(--gd-frame) 24 / 24px / 14px stretch;
-	box-shadow       : .05cm .13cm .3cm rgba(0, 0, 0, .3);
+	border-top       : 2px solid var(--gd-rule);
+	border-bottom    : 2px solid var(--gd-rule);
 }
 .page .tome.clear,
 .page .tome.empty  { background : none; box-shadow : none; }
-.page .tome.wide   { padding : 12px 10px; margin : 30px auto; }
+.page .tome.wide   { padding : .3cm .2cm; }
 .page .tome p:first-of-type { padding-top : 2px; }
 .page .tome p + p  { text-indent : 0; margin-top : 6px; }
 .page .tome h5     { font-size : .4cm; }
 .page .tome h1 + p::first-letter { padding-left : 0; font-size : 2.4cm; margin-left : 0; }
 .page .quote.tome p::first-line  { font-variant : small-caps; letter-spacing : .03em; font-size : 1.05em; }
 .page .quote.tome p + p::first-line { font-variant : unset; letter-spacing : inherit; font-size : inherit; }
-.page .quote.tome { border-left : 1px solid transparent; }
+.page .quote.tome { border-left : 0; padding-left : .4cm; }
 .page .quote.tome.author p:last-child { font-family : 'IM Fell English SC', serif; text-align : right; margin-top : 4px; color : var(--gd-hot); }
 
 
@@ -832,4 +805,14 @@
 	font-size  : 10px;
 	text-align : center;
 	transform  : translateX(-50%);
+}
+
+
+/* PRINT  ·  keeps the type and rules, drops the burnt-edge ink */
+@media print {
+	.page:not(:has(.frontCover, .backCover)) {
+		background-image : var(--gd-grain);
+		background-size  : 420px 420px;
+	}
+	.page.reliquary { background-image : none; }
 }

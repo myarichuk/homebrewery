@@ -4,7 +4,7 @@
 ## A Campaign of Ruin
 ___
 
-{{banner GRIMDARK}}
+{{banner THE ASHEN CROWN}}
 
 {{footnote
 The gods are dead. Their bones are still warm.
@@ -61,8 +61,6 @@ Beyond the road lies the village itself: forty roofs, one well, and a gibbet tha
 
 Do not reveal this before the party has lost at least one ally to the tower. Dread is a resource; spend it slowly.
 }}
-
-Ask any tavern-keeper between here and the coast and you will hear a different answer. Pay them in silver and they will tell you a better lie.
 
 | d6 | Rumour |
 |:--:|:-------|
