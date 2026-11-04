@@ -744,22 +744,27 @@
 	letter-spacing : .04em;
 }
 
-/* chapter art: first image on a chapter page, torn along the bottom */
+/* chapter art: images on a chapter page, torn along the bottom.
+   Crop with  ![](url){--art-x:80%,--art-y:40%}  (defaults: centred)        */
 .page:has(.chapter) img {
 	position      : absolute;
 	top           : 0;
 	left          : -7px;
 	width         : 102%;
+	height        : 310px;
+	object-fit    : cover;
+	object-position : var(--art-x, 50%) var(--art-y, 50%);
 	z-index       : -2;
 	-webkit-mask  : var(--gd-torn) top / 100% 310px no-repeat;
 	mask          : var(--gd-torn) top / 100% 310px no-repeat;
 }
 .page:has(.chapter.tall) img {
+	height            : 410px;
 	-webkit-mask-size : 100% 410px;
 	mask-size         : 100% 410px;
 }
 /* …but never mask logos or the front-credit plate */
-.page:has(.chapter) :is(.logo, .frontcredit) img { -webkit-mask : none; mask : none; }
+.page:has(.chapter) :is(.logo, .frontcredit) img { -webkit-mask : none; mask : none; height : auto; object-fit : fill; }
 
 
 /* "TOMES"  ·  boxed lore ________________________________________ */
