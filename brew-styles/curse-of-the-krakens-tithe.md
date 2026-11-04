@@ -51,6 +51,7 @@ Bound by blood spilled, cursed by magic - will you free the crew, or seal their 
   - #### [{{ Clues at a Glance}}{{ 12}}](#p12)
   - #### [{{ Handouts}}{{ 12}}](#p12)
 - ### [{{ Bestiary}}{{ 13}}](#p13)
+  - #### [{{ Suggested Stand-Ins}}{{ 13}}](#p13)
 }}
 
 # The Curse in Brief
@@ -547,12 +548,12 @@ Everything the party has gathered comes down to the captain's chest. The salt, t
 # Bestiary
 
 {{wide
-Pask's stat block is taken from your campaign. The Tithe-Keeper and the Drowned Crew are suggested stand-ins using the SRD skeleton and zombie, since the campaign file does not give them stats.
+Pask's stat block is taken from your campaign (the SRD 5.2.1 bandit captain). The campaign file gives no stats for the other creatures, so the table below suggests SRD 5.2.1 stand-ins that your Codex already holds.
 }}
 
 {{monster,frame,wide
 ## Oriel Pask
-*Medium or Small humanoid, neutral*
+*Medium or Small Humanoid, Neutral*
 ___
 **Armor Class** :: 15 (studded leather armor)
 **Hit Points** :: 52 (8d8 + 16)
@@ -564,73 +565,34 @@ ___
 ___
 **Saving Throws** :: Str +4, Dex +5, Wis +2
 **Skills** :: Athletics +4, Deception +4
+**Gear** :: Pistol, Scimitar, Studded Leather Armor
 **Senses** :: passive Perception 10
 **Languages** :: Common, Thieves' Cant
 **Challenge** :: 2 (450 XP)
 ___
 ### Actions
-***Multiattack.*** Pask makes two attacks, using his scimitar and pistol in any combination.
+***Multiattack.*** Pask makes two attacks, using Scimitar and Pistol in any combination.
 
-***Scimitar.*** *Melee Weapon Attack:* +5 to hit, reach 5 ft., one target. *Hit:* 6 (1d6 + 3) slashing damage.
+***Scimitar.*** *Melee Attack Roll:* +5, reach 5 ft. *Hit:* 6 (1d6 + 3) Slashing damage.
 
-***Pistol.*** *Ranged Weapon Attack:* +5 to hit, range 30/90 ft., one target. *Hit:* 8 (1d10 + 3) piercing damage.
+***Pistol.*** *Ranged Attack Roll:* +5, range 30/90 ft. *Hit:* 8 (1d10 + 3) Piercing damage.
 
 ### Reactions
-***Parry.*** Pask adds 2 to his AC against one melee attack that would hit him. To do so, he must see the attacker and be wielding a weapon.
-}}
-
-{{monster,frame,wide
-## Tithe-Keeper
-*Medium undead, lawful evil*
-___
-**Armor Class** :: 13 (armor scraps)
-**Hit Points** :: 13 (2d8 + 4)
-**Speed** :: 30 ft.
-___
-|STR|DEX|CON|INT|WIS|CHA|
-|:---:|:---:|:---:|:---:|:---:|:---:|
-|10 (+0)|14 (+2)|15 (+2)|6 (-2)|8 (-1)|5 (-3)|
-___
-**Damage Vulnerabilities** :: bludgeoning
-**Damage Immunities** :: poison
-**Condition Immunities** :: exhaustion, poisoned
-**Senses** :: darkvision 60 ft., passive Perception 9
-**Languages** :: understands the languages it knew in life but can't speak
-**Challenge** :: 1/4 (50 XP)
-___
-### Actions
-***Shortsword.*** *Melee Weapon Attack:* +4 to hit, reach 5 ft., one target. *Hit:* 5 (1d6 + 2) piercing damage.
-
-***Shortbow.*** *Ranged Weapon Attack:* +4 to hit, range 80/320 ft., one target. *Hit:* 5 (1d6 + 2) piercing damage.
-}}
-
-{{monster,frame,wide
-## Drowned Crew
-*Medium undead, neutral evil*
-___
-**Armor Class** :: 8
-**Hit Points** :: 22 (3d8 + 9)
-**Speed** :: 20 ft.
-___
-|STR|DEX|CON|INT|WIS|CHA|
-|:---:|:---:|:---:|:---:|:---:|:---:|
-|13 (+1)|6 (-2)|16 (+3)|3 (-4)|6 (-2)|5 (-3)|
-___
-**Saving Throws** :: Wis +0
-**Damage Immunities** :: poison
-**Condition Immunities** :: poisoned
-**Senses** :: darkvision 60 ft., passive Perception 8
-**Languages** :: understands the languages it knew in life but can't speak
-**Challenge** :: 1/4 (50 XP)
-___
-***Undead Fortitude.*** If damage reduces the drowned sailor to 0 hit points, it must make a Constitution saving throw with a DC of 5 + the damage taken, unless the damage is radiant or from a critical hit. On a success, it drops to 1 hit point instead.
-___
-### Actions
-***Slam.*** *Melee Weapon Attack:* +3 to hit, reach 5 ft., one target. *Hit:* 4 (1d6 + 1) bludgeoning damage.
+***Parry.*** *Trigger:* Pask is hit by a melee attack roll while holding a weapon. *Response:* Pask adds 2 to his AC against that attack, possibly causing it to miss.
 }}
 
 {{wide
-*This work includes material taken from the System Reference Document 5.1 ("SRD 5.1") by Wizards of the Coast LLC, available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.*
+## Suggested Stand-Ins
+
+| Creature | Where | Use |
+|:--|:--|:--|
+| **Tithe-Keeper** | The Pinned Captain, in the Captain's Cabin | The Skeleton. It rises when the paper is torn free roughly, and it cannot leave the cabin. |
+| **Drowned Crew** | The deck, the galley, the berths and the flooded hold | The Zombie, for the drowned sailors who rise from the bilge or the water to reclaim their share. |
+| **Mirror Double** | The Captain's Mirror | The Doppelganger, built from the victim's own stats at half their maximum hit points. It cannot leave the room, and it slides back into the glass when destroyed. |
+}}
+
+{{wide
+*This work includes material from the System Reference Document 5.2.1 ("SRD 5.2.1") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2.1 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.*
 }}
 
 {{footnote Bestiary}}
