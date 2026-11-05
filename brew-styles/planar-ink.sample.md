@@ -20,7 +20,7 @@ The streets coil around the inside of a ring that hangs over a spire without end
 
 {{pageNumber,auto}}
 
-\page
+\page {frame-thorn,crest-skull}
 
 # A Brief History<br>of the Blood War
 
@@ -46,7 +46,7 @@ Recorded by a scribe of the Fated, who asked not to be named.
 
 {{pageNumber,auto}}
 
-\page
+\page {frame-gothic,crest-blades}
 
 {{cartouche
 # The Great Wheel
@@ -72,7 +72,7 @@ Most travelers never see any of this. They pass through one door, then another, 
 
 {{pageNumber,auto}}
 
-\page {plain}
+\page {plain,frame-bone,crest-beetle}
 
 ## Gate-Town Rumors
 
@@ -97,6 +97,10 @@ Never tell a fiend your true name, and never accept a gift without asking what i
 }}
 
 {{rule}}
+
+{{rule,knot}}
+
+{{rule,barbed}}
 
 \column
 

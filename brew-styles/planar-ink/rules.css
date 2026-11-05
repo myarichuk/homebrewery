@@ -17,6 +17,11 @@
      plain    corners + crest only, no marginalia
      bare     no ink art at all: just the paper
      untorn   straight page edges (for printers that dislike the mask)
+     frame-classic / frame-thorn / frame-gothic / frame-bone   corner set
+     crest-compass / crest-classic / crest-skull / crest-blades /
+     crest-beetle / crest-none                                 page-top crest
+     (set them for the whole book with  .page { --pi-frame : var(--pi-frame-thorn); }
+      see "corners and crest" below)
 
    ARTWORK  (see "ARTWORK" below for the full workflow)
      ![](url){watercolor-mask}            image fades unevenly into the page
@@ -33,7 +38,7 @@
      {{dropcap ...}}          ink-wash initial on its first paragraph
                               (automatic for the paragraph after an H1)
      {{caption ...}}          small italic caption
-     {{rule}}                 thorn-vine divider
+     {{rule}}                 thorn-and-star divider; + vine / knot / barbed
      {{cartouche ... }}       thorn-and-leaf title frame (covers, chapter
                               openers); put an H1 inside
      {{orn ☠}}                inline ornament from Planar Thorn:
@@ -110,21 +115,48 @@
 }
 .page.untorn { -webkit-mask : none; mask : none; }
 
-/* corners and crest: one overlay underneath the text */
+/* corners and crest: one overlay underneath the text.
+
+   Both are switchable, for the whole book in the Style tab
+       .page { --pi-frame : var(--pi-frame-thorn); }
+   or per page on the \page line:   \page {frame-thorn, crest-skull}
+
+   frames  classic · thorn · gothic · bone
+   crests  compass (default) · classic · skull · blades · beetle · none
+   (planar-ink-lite.css carries only the classic frame and the compass
+    and classic crests.)                                                  */
+:root {
+	--pi-frame      : var(--pi-frame-classic);
+	--pi-crest      : var(--pi-p-crest-compass);
+	--pi-crest-size : 400px 114px;
+	--pi-crest-top  : 8px;
+}
+.page.frame-classic  { --pi-frame : var(--pi-frame-classic); }
+.page.frame-thorn    { --pi-frame : var(--pi-frame-thorn); }
+.page.frame-gothic   { --pi-frame : var(--pi-frame-gothic); }
+.page.frame-bone     { --pi-frame : var(--pi-frame-bone); }
+.page.crest-compass  { --pi-crest : var(--pi-p-crest-compass); --pi-crest-size : 400px 114px; --pi-crest-top : 8px; }
+.page.crest-classic  { --pi-crest : var(--pi-crest-classic);   --pi-crest-size : 313px 66px;  --pi-crest-top : 14px; }
+.page.crest-skull    { --pi-crest : var(--pi-p-crest-skull);   --pi-crest-size : 420px 78px;  --pi-crest-top : 22px; }
+.page.crest-blades   { --pi-crest : var(--pi-p-crest-blades);  --pi-crest-size : 400px 89px;  --pi-crest-top : 16px; }
+.page.crest-beetle   { --pi-crest : var(--pi-p-crest-beetle);  --pi-crest-size : 260px 113px; --pi-crest-top : 6px; }
+.page.crest-none     { --pi-crest : none; }
+
 .page::before {
-	content           : '';
-	position          : absolute;
-	inset             : 0;
-	z-index           : -1;
-	pointer-events    : none;
-	background-image  : var(--pi-frame);
-	background-size   : 100% 100%;
-	background-repeat : no-repeat;
+	content             : '';
+	position            : absolute;
+	inset               : 0;
+	z-index             : -1;
+	pointer-events      : none;
+	background-image    : var(--pi-crest), var(--pi-frame);
+	background-position : center var(--pi-crest-top), 0 0;
+	background-size     : var(--pi-crest-size), 100% 100%;
+	background-repeat   : no-repeat;
 }
 
 /* marginalia and ink splatter: a second overlay, laid out per page.
-   The positions come from the generated block above (3 layouts, 5 splatter
-   sets, 4 nudges, cycling over pages: no two pages in 60 alike).
+   The layers come from the generated block above (7 layouts, 5 splatter
+   sets, 4 nudges, cycling over pages: no two pages in 140 alike).
    Facing pages are mirrored so the layout reads from the outer edge.    */
 .page::after {
 	content             : '';
@@ -135,17 +167,14 @@
 	width               : auto;
 	height              : auto;
 	pointer-events      : none;
-	background-image    :
-		var(--pi-m-skull),   var(--pi-m-skull-tone),
-		var(--pi-m-skull-sm), var(--pi-m-skull-sm-tone),
-		var(--pi-m-dagger),  var(--pi-m-dagger-tone),
-		var(--pi-m-compass), var(--pi-m-compass-tone),
-		var(--pi-m-orrery),  var(--pi-m-orrery-tone),
-		var(--pi-splat-img);
+	background-image    : var(--pi-marg-img), var(--pi-splat-img);
 	background-position : var(--pi-marg-pos), var(--pi-splat-pos);
-	background-size     : auto, 55px 56px, auto, 32px 36px, auto, 43px 110px, auto, 68px 73px, auto, 49px 78px, var(--pi-splat-size);
+	background-size     : var(--pi-marg-size), var(--pi-splat-size);
 	background-repeat   : no-repeat;
 }
+.page:nth-child(even)::after { transform : scaleX(-1); }
+.page:is(.plain, .bare)::after { display : none; }
+.page.bare::before { display : none; }
 
 /* INK TEXTURE  ·  pen ink doesn't lay down flat: it skips over the tooth of
    the paper and drags in dry streaks. A seamless alpha tile breaks up the
@@ -162,9 +191,6 @@
 	-webkit-mask-repeat: repeat;
 	mask-repeat        : repeat;
 }
-.page:nth-child(even)::after { transform : scaleX(-1); }
-.page:is(.plain, .bare)::after { display : none; }
-.page.bare::before { display : none; }
 
 /* FOOTER __________________________________________________________ */
 .page .pageNumber,
@@ -308,13 +334,18 @@
 /* PHB blocks are inline-block + break-inside:avoid, i.e. unsplittable: let prose flow */
 .page .dropcap { display : block; break-inside : auto; }
 
-/* RULE  ·  {{rule}} */
+/* RULE  ·  {{rule}}  thorn and star (default)
+           {{rule,vine}} engraved vine · {{rule,knot}} · {{rule,barbed}}   */
 .page .rule {
-	display    : block;
-	height     : 16px;
-	margin     : .3cm 0;
-	background : var(--pi-vine) center / 100% 100% no-repeat;
+	display      : block;
+	aspect-ratio : 300 / 31;
+	max-height   : 1cm;
+	margin       : .3cm auto;
+	background   : var(--pi-p-rule-thorn) center / contain no-repeat;
 }
+.page .rule.vine   { aspect-ratio : 320 / 23; background-image : var(--pi-vine); }
+.page .rule.knot   { aspect-ratio : 300 / 65; background-image : var(--pi-p-rule-knot); }
+.page .rule.barbed { aspect-ratio : 300 / 51; background-image : var(--pi-p-rule-barbed); }
 
 /* CARTOUCHE  ·  {{cartouche ... }} around a title.
    Drawn at its own proportions (stretching smears the engraving), so it
@@ -518,9 +549,12 @@
 	font-family      : 'BookInsanityRemake', 'EB Garamond', serif;
 	font-size        : .33cm;
 	background-color : var(--pi-wash);
-	border           : 10px solid transparent;
-	border-image     : var(--pi-inkbox) 22 / 14px / 4px stretch;
+	background-image : none;                 /* the theme's texture is grey on parchment */
+	border           : 14px solid transparent;
+	border-image     : var(--pi-box-frame) 40 / 16px / 2px stretch;
 	box-shadow       : none;
+	-webkit-mask     : var(--pi-box-edge) 0 0 / 100% 100% no-repeat;
+	mask             : var(--pi-box-edge) 0 0 / 100% 100% no-repeat;
 }
 .page .note h5 { margin-bottom : .08cm; }
 .page .note p  { text-indent : 0; }
@@ -566,9 +600,12 @@
 	box-sizing       : border-box;
 	padding          : .2cm .26cm .24cm;
 	background-color : var(--pi-wash);
-	border           : 10px solid transparent;
-	border-image     : var(--pi-inkbox) 22 / 14px / 4px stretch;
+	background-image : none;                 /* the theme's texture is grey on parchment */
+	border           : 14px solid transparent;
+	border-image     : var(--pi-box-frame) 40 / 16px / 2px stretch;
 	box-shadow       : none;
+	-webkit-mask     : var(--pi-box-edge) 0 0 / 100% 100% no-repeat;
+	mask             : var(--pi-box-edge) 0 0 / 100% 100% no-repeat;
 }
 .page .monster h2 { font-size : .64cm; }
 .page .monster h3 {

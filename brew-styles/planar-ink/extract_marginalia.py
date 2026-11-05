@@ -31,7 +31,8 @@ the text at any zoom and in print. A bitmap layer at page size would have
 to be ~2550 px wide to hold up at 300 dpi; the vectors are smaller.
 
 Outputs (relative to this file):
-    art/frame.svg         four corner brackets + crest, 816 x 1056 viewBox
+    art/frame.svg         four corner brackets, 816 x 1056 viewBox
+    art/m-crest.svg       the page-top crest (one of several; see rules.css)
     art/m-*.svg           skulls, dagger, compass, orrery, splatters: one
                           file each, placed (and varied per page) by CSS
     art/m-*-tone.webp     grey watercolour shading under the skulls, dagger,
@@ -72,7 +73,6 @@ FRAME = [
 	dict(crop=CORNER_TOP,    at=(796, 18),   scale=CS, anchor='tr', mirror=True),
 	dict(crop=CORNER_BOTTOM, at=(20, 1038),  scale=CS, anchor='bl'),
 	dict(crop=CORNER_BOTTOM, at=(796, 1038), scale=CS, anchor='br', mirror=True),
-	dict(crop=(760, 352, 1282, 462), at=(408, 14), scale=0.6, anchor='tc'),      # crest
 ]
 
 # Marginalia are emitted one file per drawing (art/m-<name>.svg, sized in
@@ -87,6 +87,7 @@ PIECES = {
 	'splat-a'  : dict(crop=(395, 1628, 538, 1802), scale=0.32),
 	'splat-b'  : dict(crop=(588, 1618, 748, 1792), scale=0.3),
 	'splat-c'  : dict(crop=(205, 1808, 368, 1968), scale=0.26),
+	'crest'    : dict(crop=(760, 352, 1282, 462),  scale=0.6),    # the classic page-top crest
 }
 
 BLOT = (772, 1812, 902, 1952)

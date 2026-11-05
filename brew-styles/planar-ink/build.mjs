@@ -64,12 +64,6 @@ const webpUri = (file)=>`url("data:image/webp;base64,${fs.readFileSync(path.join
 // `extra` lets callers drop width/height (=> no intrinsic size, stretches to box)
 const svg = (w, h, body, extra = '', sized = true)=>`<svg xmlns="http://www.w3.org/2000/svg" ${sized ? `width="${w}" height="${h}"` : ''} viewBox="0 0 ${w} ${h}" ${extra}>${body}</svg>`;
 
-const wobble = (id, scale = 2.2, freq = 0.035, seed = 3)=>`
-	<filter id="${id}" x="-5%" y="-5%" width="110%" height="110%">
-		<feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="2" seed="${seed}" result="n"/>
-		<feDisplacementMap in="SourceGraphic" in2="n" scale="${scale}" xChannelSelector="R" yChannelSelector="G"/>
-	</filter>`;
-
 /* ---------- torn edges (page and artwork) ------------------------------ */
 // Both are plain vector polygons: no SVG filters. Filters are rasterised at
 // whatever resolution the renderer picks, which in PDF export is low and in
@@ -212,14 +206,6 @@ const buildInkFrame = (seed)=>{
 
 /* ---------- small pieces ------------------------------------------------- */
 
-// unsteady ink rectangle – border-image for text boxes (notes, stat blocks)
-const buildInkBox = ()=>svg(120, 120, `
-	${wobble('w', 3, 0.06, 6)}
-	<g fill="none" stroke="${INK}" filter="url(#w)" stroke-linecap="round">
-		<rect x="10" y="10" width="100" height="100" stroke-width="2.2"/>
-		<path d="M4,10.5 L14,10.5 M106,9.5 L116,9.5 M9.5,104 L10.5,116 M110,4 L110.5,16" stroke-width="1.2"/>
-	</g>`);
-
 const buildRule = ()=>svg(600, 18, `
 	<g fill="${INK}">
 		<path d="M290,9 C200,7 90,6 4,9 C90,11 200,11 290,9 Z"/>
@@ -237,96 +223,156 @@ const buildArrow = ()=>svg(60, 22, `
 /* ---------- marginalia scatter ------------------------------------------
    CSS has no random(), so the variation is precomputed here (seeded, so the
    output is stable) and selected per page with :nth-child cycles of
-   co-prime length: 3 marginalia layouts x 5 splatter sets x 4 small offsets
-   repeat only every 60 pages. Each drawing is embedded once; a layout is
-   just a list of background positions and sizes for the ::after overlay.
+   co-prime length: 7 marginalia layouts x 5 splatter sets x 4 small offsets
+   repeat only every 140 pages. Each drawing is embedded once; a layout is
+   just a list of background images, positions and sizes for .page::after.
 
-   Sizes are the pieces' CSS px sizes (see extract_marginalia.py PIECES).   */
-const PIECE = {
+   Pieces come from two sheets: the original asset sheet (vector line art +
+   a watercolour tone layer, extract_marginalia.py) and the second sheet
+   (3x bitmaps, extract_pieces.py, sizes in art/pieces.json).              */
+const manifest = JSON.parse(fs.readFileSync(path.join(here, 'art/pieces.json'), 'utf8'));
+const CLASSIC = {
 	'skull'   : [55, 56], 'skull-sm' : [32, 36], 'dagger' : [43, 110],
 	'compass' : [68, 73], 'orrery'   : [49, 78],
 	'splat-a' : [46, 56], 'splat-b'  : [48, 52], 'splat-c' : [42, 42]
 };
-const MARG  = ['skull', 'skull-sm', 'dagger', 'compass', 'orrery'];
-const SPLAT = ['splat-a', 'splat-b', 'splat-c'];
+const CLASSIC_MARG  = ['skull', 'skull-sm', 'dagger', 'compass', 'orrery'];
+const CLASSIC_SPLAT = ['splat-a', 'splat-b', 'splat-c'];
+
+const classicPiece = (n)=>({
+	name   : n,
+	w      : CLASSIC[n][0], h : CLASSIC[n][1],
+	layers : CLASSIC_MARG.includes(n) ? [`var(--pi-m-${n})`, `var(--pi-m-${n}-tone)`] : [`var(--pi-m-${n})`]
+});
+const sheetPiece = (n)=>({ name: n, w: manifest.pieces[n].w, h: manifest.pieces[n].h, layers: [`var(--pi-p-${n})`] });
+const byRole = (role)=>Object.keys(manifest.pieces).filter((n)=>manifest.pieces[n].role === role).map(sheetPiece);
+
+const MARG_POOL  = [...CLASSIC_MARG.map(classicPiece), ...byRole('marg')];
+const HANG_POOL  = byRole('hang');
+const SPLAT_POOL = [...CLASSIC_SPLAT.map(classicPiece), ...byRole('splat')];
+const WASH_POOL  = [...byRole('pool'), ...[1, 2, 3].map((i)=>({ name: `pool-${i}`, w: 70, h: 70, layers: [`var(--pi-pool-${i})`] }))];
+
+const LAYOUTS = 7, SETS = 5;
 const SPLATS_PER_PAGE = 7;
 const WASHES_PER_PAGE = 2;
+const MARGIN_TOP = 244, MARGIN_BOTTOM = 828;     // between the corner brackets
 
-// left / right margin bands between the corner brackets (page px)
-const band = (side, w)=>(side === 0 ? [26, 104 - w] : [714, 792 - w]);
+// left / right margin bands (page px)
+const band = (side, w)=>(side === 0 ? [26, Math.max(26, 104 - w)] : [Math.min(792 - w, 714), 792 - w]);
 
 const overlaps = (a, b, gap)=>a[0] < b[0] + b[2] + gap && b[0] < a[0] + a[2] + gap && a[1] < b[1] + b[3] + gap && b[1] < a[1] + a[3] + gap;
 
 const place = (r, taken, w, h, regions, gap)=>{
-	for (let tries = 0; tries < 400; tries++) {
+	for (let tries = 0; tries < 600; tries++) {
 		const [x0, x1, y0, y1] = regions[Math.floor(r() * regions.length)];
 		const box = [x0 + r() * Math.max(0, x1 - x0), y0 + r() * Math.max(0, y1 - y0 - h), w, h];
 		if (!taken.some((t)=>overlaps(box, t, gap))) { taken.push(box); return box; }
 	}
-	throw new Error('marginalia: no room left');
+	return null;
 };
 
-const marginaliaLayouts = (count)=>Array.from({ length: count }, (_, i)=>{
-	const r = mulberry32(SEED ^ (0x3A11 + i * 101));
-	const taken = [];
-	// the skulls travel together; everything else picks a side at random
-	const skullSide = i % 2;
-	return MARG.map((name)=>{
-		const [w, h] = PIECE[name];
-		const side = name.startsWith('skull') ? skullSide : (r() < .5 ? 0 : 1);
-		const [x0, x1] = band(side, w);
-		const near = name === 'skull-sm' ? taken[0] : null;     // small skull tucks under the big one
-		const regions = near ? [[near[0] + 4, near[0] + 22, near[1] + near[3] + 4, near[1] + near[3] + h + 30]] : [[x0, x1, 240, 900]];
-		const [x, y] = place(r, taken, w, h, regions, near ? 2 : 26);
-		return `${f(x)}px ${f(y)}px, ${f(x)}px ${f(y)}px`;        // line, then its wash
-	}).join(', ');
-});
+const shuffle = (r, list)=>{
+	const a = [...list];
+	for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+	return a;
+};
 
-const splatterSets = (count)=>Array.from({ length: count }, (_, i)=>{
+// flatten placed pieces into the three comma lists CSS wants
+const lists = (placed)=>{
+	const img = [], pos = [], size = [];
+	for (const { p, x, y, w, h } of placed) {
+		for (const layer of p.layers) {
+			img.push(layer);
+			pos.push(`${f(x)}px ${f(y)}px`);
+			size.push(`${f(w)}px ${f(h)}px`);
+		}
+	}
+	return { img: img.join(', '), pos: pos.join(', '), size: size.join(', ') };
+};
+
+const marginaliaLayout = (i)=>{
+	const r = mulberry32(SEED ^ (0x3A11 + i * 101));
+	const taken = [], placed = [];
+	const put = (p, regions, gap)=>{
+		const box = place(r, taken, p.w, p.h, regions, gap);
+		if (box) placed.push({ p, x: box[0], y: box[1], w: p.w, h: p.h });
+	};
+	// a pendant hangs from the top of one margin on most pages
+	if (r() < .65) {
+		const p = HANG_POOL[Math.floor(r() * HANG_POOL.length)];
+		const side = r() < .5 ? 0 : 1;
+		put(p, [[...band(side, p.w), MARGIN_TOP, MARGIN_TOP + p.h + 14]], 20);
+	}
+	const count = 3 + (r() < .5 ? 1 : 0);
+	for (const p of shuffle(r, MARG_POOL).slice(0, count)) {
+		put(p, [[...band(0, p.w), MARGIN_TOP, MARGIN_BOTTOM], [...band(1, p.w), MARGIN_TOP, MARGIN_BOTTOM]], 24);
+	}
+	return lists(placed);
+};
+
+const splatterSet = (i)=>{
 	const r = mulberry32(SEED ^ (0x5B1A + i * 211));
-	const taken = [];
-	const layers = Array.from({ length: SPLATS_PER_PAGE }, ()=>{
-		const name = SPLAT[Math.floor(r() * SPLAT.length)];
-		const [pw, ph] = PIECE[name];
-		const w = 14 + r() * r() * 50;                         // mostly small, the odd big one
-		const h = w * ph / pw;
+	const taken = [], placed = [];
+	for (let k = 0; k < SPLATS_PER_PAGE; k++) {
+		const p = SPLAT_POOL[Math.floor(r() * SPLAT_POOL.length)];
+		const w = 14 + r() * r() * 48;                          // mostly small, the odd big one
+		const h = w * p.h / p.w;
 		const regions = [
 			[...band(0, w), 200, 1010], [...band(1, w), 200, 1010],
-			[240, 560 - w, 990, 1036],                          // bottom margin, between corners
-			[150, 270 - w, 118, 196], [548, 668 - w, 118, 196]  // top margin, beside the crest
+			[240, 560 - w, 990, 1036],                           // bottom margin, between corners
+			[150, 250 - w, 118, 190], [566, 668 - w, 118, 190]   // top margin, beside the crest
 		];
-		const [x, y] = place(r, taken, w, h, regions, 10);
-		return { img: `var(--pi-m-${name})`, pos: `${f(x)}px ${f(y)}px`, size: `${f(w)}px ${f(h)}px` };
-	});
-	// soft grey watercolour pools, like the references' margin stains
-	for (let k = 0; k < WASHES_PER_PAGE; k++) {
-		const w = 46 + r() * 74, h = w;
-		const regions = [[...band(0, w * .7), 230, 960], [...band(1, w * .7), 230, 960]];
-		const [x, y] = place(r, taken, w, h, regions, -w * .3);
-		layers.push({ img: `var(--pi-pool-${1 + Math.floor(r() * 3)})`, pos: `${f(x)}px ${f(y)}px`, size: `${f(w)}px ${f(h)}px` });
+		const box = place(r, taken, w, h, regions, 10);
+		if (box) placed.push({ p, x: box[0], y: box[1], w, h });
 	}
-	return {
-		img  : layers.map((l)=>l.img).join(', '),
-		pos  : layers.map((l)=>l.pos).join(', '),
-		size : layers.map((l)=>l.size).join(', ')
-	};
-});
+	// grey watercolour pools, like the references' margin stains
+	for (let k = 0; k < WASHES_PER_PAGE; k++) {
+		const p = WASH_POOL[Math.floor(r() * WASH_POOL.length)];
+		const w = 46 + r() * 70, h = w * p.h / p.w;
+		const regions = [[...band(0, w * .7), 230, 960], [...band(1, w * .7), 230, 960]];
+		const box = place(r, taken, w, h, regions, -w * .3);
+		if (box) placed.push({ p, x: box[0], y: box[1], w, h });
+	}
+	return lists(placed);
+};
 
 const scatterCss = ()=>{
 	const out = [];
-	marginaliaLayouts(3).forEach((pos, i)=>out.push(`.page:nth-child(3n+${i + 1}) { --pi-marg-pos : ${pos}; }`));
-	splatterSets(5).forEach((s, i)=>out.push(`.page:nth-child(5n+${i + 1}) {\n\t--pi-splat-img  : ${s.img};\n\t--pi-splat-pos  : ${s.pos};\n\t--pi-splat-size : ${s.size};\n}`));
+	for (let i = 0; i < LAYOUTS; i++) {
+		const l = marginaliaLayout(i);
+		out.push(`.page:nth-child(${LAYOUTS}n+${i + 1}) {\n\t--pi-marg-img  : ${l.img};\n\t--pi-marg-pos  : ${l.pos};\n\t--pi-marg-size : ${l.size};\n}`);
+	}
+	for (let i = 0; i < SETS; i++) {
+		const s = splatterSet(i);
+		out.push(`.page:nth-child(${SETS}n+${i + 1}) {\n\t--pi-splat-img  : ${s.img};\n\t--pi-splat-pos  : ${s.pos};\n\t--pi-splat-size : ${s.size};\n}`);
+	}
 	[[0, 0], [5, -7], [-4, 6], [6, 4]].forEach(([x, y], i)=>out.push(`.page:nth-child(4n+${i + 1})::after { translate : ${x}px ${y}px; }`));
 	return out.join('\n');
 };
 
-/* ---------- emit --------------------------------------------------------- */
+/* ---------- emit ---------------------------------------------------------
+   Two sheets are written:
+     planar-ink.css       everything: 4 corner sets, 5 crests, 4 rules
+     planar-ink-lite.css  classic corners, classic + compass crests, thorn
+                          rule only: about half the size, for a lighter
+                          Style tab. Classes for the missing options just
+                          draw nothing.                                    */
 
-const assets = {
-	'--pi-frame'      : svgUri(fs.readFileSync(path.join(here, 'art/frame.svg'), 'utf8')),
-	...Object.fromEntries(['skull', 'skull-sm', 'dagger', 'compass', 'orrery', 'splat-a', 'splat-b', 'splat-c']
-		.map((n)=>[`--pi-m-${n}`, svgUri(fs.readFileSync(path.join(here, `art/m-${n}.svg`), 'utf8'))])),
-	...Object.fromEntries(MARG.map((n)=>[`--pi-m-${n}-tone`, webpUri(`art/m-${n}-tone.webp`)])),
+const readSvg = (file)=>svgUri(fs.readFileSync(path.join(here, file), 'utf8'));
+const EXTRA_FRAMES = Object.keys(manifest.frames);
+const CRESTS = Object.keys(manifest.pieces).filter((n)=>manifest.pieces[n].role === 'crest');
+const RULES  = Object.keys(manifest.pieces).filter((n)=>manifest.pieces[n].role === 'rule');
+const LITE_KEEP = new Set(['crest-compass', 'rule-thorn']);
+
+const buildAssets = (lite)=>({
+	'--pi-frame-classic' : readSvg('art/frame.svg'),
+	...Object.fromEntries((lite ? [] : EXTRA_FRAMES).map((n)=>[`--pi-frame-${n}`, readSvg(`art/frame-${n}.svg`)])),
+	'--pi-crest-classic' : readSvg('art/m-crest.svg'),
+	...Object.fromEntries([...CRESTS, ...RULES].filter((n)=>!lite || LITE_KEEP.has(n)).map((n)=>[`--pi-p-${n}`, webpUri(`art/p-${n}.webp`)])),
+	...Object.fromEntries(Object.keys(CLASSIC).map((n)=>[`--pi-m-${n}`, readSvg(`art/m-${n}.svg`)])),
+	...Object.fromEntries(CLASSIC_MARG.map((n)=>[`--pi-m-${n}-tone`, webpUri(`art/m-${n}-tone.webp`)])),
+	...Object.fromEntries([...byRole('marg'), ...byRole('hang'), ...byRole('splat'), ...byRole('pool')]
+		.map((p)=>[`--pi-p-${p.name}`, webpUri(`art/p-${p.name}.webp`)])),
 	// torn paper, slightly feathered
 	'--pi-wc-1'       : svgUri(buildArtMask({ seed: 4,  amp: 1,   layers: [[.35, 0], [1, 9]] })),
 	// rougher tear, deeper bites
@@ -334,7 +380,10 @@ const assets = {
 	// bleed: wide, soft watercolour rim, for unframed art (reference 2)
 	'--pi-wc-3'       : svgUri(buildArtMask({ seed: 33, octaves: BLEED, round: 260, tears: 0, step: 10,
 		layers: [[.07, 0], [.14, 12], [.22, 24], [.31, 36], [.41, 48], [.52, 60], [.64, 72], [.77, 84], [.9, 96], [1, 108]] })),
+	// subtle tear for text boxes: just enough to lose the ruler-straight edge
+	'--pi-box-edge'   : svgUri(buildArtMask({ seed: 57, amp: .45, layers: [[1, 0]], tears: 3, tearDepth: [4, 9] })),
 	'--pi-ink-frame'  : svgUri(buildInkFrame(71)),
+	'--pi-box-frame'  : svgUri(buildInkFrame(83)),
 	'--pi-edge'       : svgUri(buildEdgeMask()),
 	'--pi-burn'       : svgUri(buildEdgeBurn()),
 	'--pi-paper-tile' : webpUri('art/paper.webp'),
@@ -346,12 +395,11 @@ const assets = {
 	'--pi-vine'       : webpUri('art/vine.webp'),
 	'--pi-plaque'     : webpUri('art/plaque.webp'),
 	'--pi-cartouche'  : webpUri('art/cartouche.webp'),
-	'--pi-inkbox'     : svgUri(buildInkBox()),
 	'--pi-rule'       : svgUri(buildRule()),
 	'--pi-arrow'      : svgUri(buildArrow())
-};
+});
 
-const block = [
+const block = (lite)=>[
 	'/* GENERATED ART  ·  do not hand-edit; see planar-ink/build.mjs ______ */',
 	'@font-face {',
 	"\tfont-family  : 'Planar Thorn';",
@@ -359,7 +407,7 @@ const block = [
 	'\tfont-display : block;',
 	'}',
 	':root {',
-	...Object.entries(assets).map(([k, v])=>`\t${k.padEnd(16)} : ${v};`),
+	...Object.entries(buildAssets(lite)).map(([k, v])=>`\t${k.padEnd(18)} : ${v};`),
 	'}',
 	'/* per-page marginalia & splatter variation (generated) */',
 	scatterCss()
@@ -367,7 +415,9 @@ const block = [
 
 const rules = fs.readFileSync(path.join(here, 'rules.css'), 'utf8');
 if(!rules.includes('/* @@ASSETS@@ */')) throw new Error('rules.css is missing the /* @@ASSETS@@ */ marker');
-const out  = rules.replace('/* @@ASSETS@@ */', block);
-const dest = path.join(here, '..', 'planar-ink.css');
-fs.writeFileSync(dest, out);
-console.log(`wrote ${path.relative(process.cwd(), dest)}  (${(out.length / 1024).toFixed(1)} KiB)`);
+for (const [lite, file] of [[false, 'planar-ink.css'], [true, 'planar-ink-lite.css']]) {
+	const out  = rules.replace('/* @@ASSETS@@ */', block(lite));
+	const dest = path.join(here, '..', file);
+	fs.writeFileSync(dest, out);
+	console.log(`wrote ${path.relative(process.cwd(), dest)}  (${(out.length / 1024).toFixed(1)} KiB)`);
+}

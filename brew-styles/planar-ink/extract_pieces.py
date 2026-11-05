@@ -1,0 +1,211 @@
+"""
+PLANAR INK  ·  piece extractor for the second-generation sheets
+
+    python3 brew-styles/planar-ink/extract_pieces.py
+
+    source/marginalia-2.jpg   1493 x 2000   corners, marginalia, splatter,
+                                            washes, dividers
+    source/headers.jpg        2000 x 1493   page-top crests and the spiked
+                                            title banner
+
+Every piece is written as one bitmap, art/p-<name>.webp, at RES x its CSS
+size (2.5x = 240 dpi on a printed letter page), alpha carrying the ink tone.
+These drawings are dense cross-hatching: traced to vectors they come out
+at 10-30x the bytes of a 2.5x WebP that looks the same and also keeps the
+grey washes. Each corner set is an SVG that embeds its drawing once and
+<use>s it mirrored into the other corners, so a set costs one bitmap.
+
+art/pieces.json records each piece's CSS size and role; build.mjs reads it
+to emit the custom properties and the per-page marginalia layouts.
+
+Ink separation
+--------------
+These sheets are clean white, but some ink shapes (splats, blots) are far
+bigger than any local window, so the paper level is taken globally (99th
+percentile of the crop) rather than with a moving max-filter:
+
+    darkness = (paper - L) / paper
+    alpha    = smoothstep(0.06, 0.8, darkness) * strength
+"""
+
+import base64
+import io
+import json
+import os
+import sys
+
+import numpy as np
+from PIL import Image
+
+HERE    = os.path.dirname(os.path.abspath(__file__))
+INK     = (29, 23, 18)
+PAGE_W  = 816
+PAGE_H  = 1056
+RES     = 2.5          # 240 dpi on the printed page: past what ink-on-paper texture needs
+SHEETS  = {
+	'm' : ('source/marginalia-2.jpg', (1493, 2000)),
+	'h' : ('source/headers.jpg', (2000, 1493)),
+}
+
+# name: (sheet, crop, css width, role, options)
+#   role  marg   marginalia drawing, placed by the per-page layouts
+#         hang   marginalia that hangs from the top of a margin (pendants)
+#         splat  ink splatter, placed (and resized) per page
+#         pool   grey wash blot, tone only
+#         crest  page-top ornament
+#         rule   divider for {{rule}}
+#         plate  title banner
+PIECES = {
+	# ------------------------------------------------------------ marginalia
+	'compass2'   : ('m', (50, 795, 412, 1162),   74, 'marg'),
+	'fairy'      : ('m', (415, 808, 655, 1092),  66, 'marg'),
+	'mimic'      : ('m', (580, 1000, 772, 1132), 60, 'marg'),
+	'skull-a'    : ('m', (35, 1180, 186, 1352),  52, 'marg'),
+	'skull-b'    : ('m', (38, 1364, 172, 1526),  44, 'marg'),
+	'ram'        : ('m', (200, 1185, 402, 1372), 62, 'marg'),
+	'bull'       : ('m', (420, 1180, 612, 1386), 62, 'marg'),
+	'bird-a'     : ('m', (196, 1388, 370, 1528), 54, 'marg'),
+	'bird-b'     : ('m', (396, 1380, 630, 1522), 66, 'marg'),
+	'banner-a'   : ('m', (644, 1188, 792, 1516), 44, 'marg'),
+	'banner-b'   : ('m', (808, 1178, 972, 1528), 46, 'marg'),
+	'pend-skull' : ('m', (815, 812, 1002, 1137), 54, 'hang'),
+	'pend-moon'  : ('m', (1024, 812, 1206, 1178), 50, 'hang'),
+	'pend-hex'   : ('m', (1192, 812, 1332, 1212), 42, 'hang'),
+	'pend-star'  : ('m', (1342, 812, 1462, 1218), 36, 'hang'),
+	# ------------------------------------------------------------- splatter
+	'sp1' : ('m', (28, 1550, 172, 1668),  44, 'splat'),
+	'sp2' : ('m', (184, 1545, 322, 1668), 44, 'splat'),
+	'sp3' : ('m', (322, 1552, 482, 1668), 44, 'splat'),
+	'sp4' : ('m', (492, 1552, 612, 1668), 40, 'splat'),
+	'sp5' : ('m', (616, 1540, 772, 1668), 46, 'splat'),
+	'sp6' : ('m', (28, 1672, 172, 1822),  42, 'splat'),
+	'sp7' : ('m', (186, 1690, 312, 1818), 40, 'splat'),
+	'sp8' : ('m', (322, 1690, 472, 1818), 44, 'splat'),
+	'sp9' : ('m', (492, 1680, 612, 1822), 38, 'splat'),
+	'stars'  : ('m', (792, 1572, 1062, 1772), 70, 'splat'),
+	'specks' : ('m', (1292, 1556, 1488, 1764), 60, 'splat'),
+	# ------------------------------------------------------------ wash blots
+	'pool1' : ('m', (638, 1680, 772, 1820), 70, 'pool', {'strength': .5}),
+	'pool2' : ('m', (192, 1830, 332, 1966), 72, 'pool', {'strength': .5}),
+	'pool3' : ('m', (492, 1834, 628, 1960), 70, 'pool', {'strength': .5}),
+	'pool4' : ('m', (642, 1836, 772, 1958), 68, 'pool', {'strength': .5}),
+	# --------------------------------------------------------------- dividers
+	'rule-thorn'  : ('m', (18, 642, 1478, 795),   300, 'rule'),
+	'rule-knot'   : ('m', (988, 1188, 1468, 1292), 300, 'rule'),
+	'rule-barbed' : ('m', (988, 1292, 1462, 1372), 300, 'rule'),
+	# ---------------------------------------------------------------- crests
+	'crest-beetle'  : ('m', (688, 386, 1182, 600),   260, 'crest'),
+	'crest-compass' : ('h', (150, 12, 1852, 498),    400, 'crest',
+	                   {'clear': [(150, 418, 842, 498), (1158, 418, 1852, 498)]}),   # banner spikes below
+	'crest-skull'   : ('h', (118, 778, 1872, 1102),  420, 'crest'),
+	'crest-blades'  : ('h', (160, 1098, 1848, 1472), 400, 'crest'),
+}
+
+# Corner sets: (sheet, crop, which corner the drawing is, css width).
+# The other three corners are mirrored / flipped copies.
+#   tl, tr, bl, br  : where the drawing sits as drawn
+FRAMES = {
+	'thorn'  : dict(top=('m', (0, 0, 312, 338), 'tl', 150), bottom=('m', (24, 348, 308, 612), 'bl', 140)),
+	'gothic' : dict(top=('m', (328, 22, 588, 300), 'tl', 132), bottom=None),
+	'bone'   : dict(top=('m', (812, 86, 1338, 602), 'tr', 190), bottom=None,
+	                clear=[(812, 380, 1186, 602)]),          # the beetle crest sits inside this box
+}
+INSET = 18      # px from the page edge
+
+
+def load(sheet):
+	path, size = SHEETS[sheet]
+	im = Image.open(os.path.join(HERE, path)).convert('L')
+	if im.size != size:
+		sys.exit(f'{path}: expected {size}, got {im.size}; the crop tables would be wrong')
+	return im
+
+
+def darkness(img, crop, clear=()):
+	"""clear: sheet-space rectangles inside the crop that belong to a
+	neighbouring drawing and are blanked."""
+	L = np.asarray(img.crop(crop), np.float32)
+	P = max(np.percentile(L, 99), 1.0)
+	d = np.clip((P - L) / P, 0, 1)
+	for x0, y0, x1, y1 in clear:
+		d[max(0, y0 - crop[1]):max(0, y1 - crop[1]), max(0, x0 - crop[0]):max(0, x1 - crop[0])] = 0
+	return d
+
+
+def smooth(d, lo, hi):
+	t = np.clip((d - lo) / (hi - lo), 0, 1)
+	return t * t * (3 - 2 * t)
+
+
+def raster(d, w, h, strength=1.0, res=RES):
+	a = smooth(d, 0.06, 0.8) * strength
+	rgba = np.zeros((*a.shape, 4), np.uint8)
+	rgba[..., :3] = INK
+	rgba[..., 3] = (a * 255 + 0.5).astype(np.uint8)
+	img = Image.fromarray(rgba, 'RGBA')
+	return img.resize((max(1, round(w * res)), max(1, round(h * res))), Image.LANCZOS)
+
+
+def webp_bytes(img):
+	buf = io.BytesIO()
+	img.save(buf, 'WEBP', quality=78, alpha_quality=70, method=6)
+	return buf.getvalue()
+
+
+def write(name, data):
+	path = os.path.join(HERE, 'art', name)
+	with open(path, 'wb' if isinstance(data, bytes) else 'w') as fh:
+		fh.write(data)
+	return os.path.getsize(path)
+
+
+def main():
+	os.makedirs(os.path.join(HERE, 'art'), exist_ok=True)
+	sheets = {k: load(k) for k in SHEETS}
+	manifest = {'pieces': {}, 'frames': {}}
+	total = 0
+	for name, spec in PIECES.items():
+		sheet, crop, cw, role = spec[:4]
+		opt = spec[4] if len(spec) > 4 else {}
+		d = darkness(sheets[sheet], crop, opt.get('clear', ()))
+		k = cw / (crop[2] - crop[0])
+		w, h = round(cw, 1), round((crop[3] - crop[1]) * k, 1)
+		size = write(f'p-{name}.webp', webp_bytes(raster(d, w, h, opt.get('strength', 1.0))))
+		manifest['pieces'][name] = {'w': w, 'h': h, 'role': role}
+		total += size
+		print(f'{name:14s} {w:6.1f} x {h:6.1f}  {size / 1024:6.1f} KiB')
+
+	for fname, f in FRAMES.items():
+		defs, uses = [], []
+		for part in ('top', 'bottom'):
+			flip_v = f[part] is None              # reuse the top drawing, flipped
+			sheet, crop, drawn, cw = f[part] or f['top']
+			if not flip_v:
+				d = darkness(sheets[sheet], crop, f.get('clear', ()))
+				k = cw / (crop[2] - crop[0])
+				w, h = cw, round((crop[3] - crop[1]) * k, 1)
+				b64 = base64.b64encode(webp_bytes(raster(d, w, h))).decode()
+				defs.append(f'<image id="{part}" width="{w:g}" height="{h:g}" href="data:image/webp;base64,{b64}"/>')
+				src, sw, sh = part, w, h
+			drawn_left = drawn in ('tl', 'bl')
+			for side in ('l', 'r'):
+				mirror = (side == 'l') != drawn_left
+				x = INSET if side == 'l' else PAGE_W - INSET - sw
+				y = INSET if part == 'top' else PAGE_H - INSET - sh
+				a_, d_ = (-1 if mirror else 1), (-1 if flip_v else 1)
+				e_, f_ = x + (sw if mirror else 0), y + (sh if flip_v else 0)
+				uses.append(f'<use href="#{src}" transform="matrix({a_} 0 0 {d_} {e_:g} {f_:g})"/>')
+		svg = (f'<svg xmlns="http://www.w3.org/2000/svg" width="{PAGE_W}" height="{PAGE_H}" viewBox="0 0 {PAGE_W} {PAGE_H}">'
+		       f'<defs>{"".join(defs)}</defs>{"".join(uses)}</svg>\n')
+		size = write(f'frame-{fname}.svg', svg)
+		manifest['frames'][fname] = True
+		total += size
+		print(f'frame-{fname:8s}  {size / 1024:6.1f} KiB')
+
+	with open(os.path.join(HERE, 'art', 'pieces.json'), 'w') as fh:
+		json.dump(manifest, fh, indent=1, sort_keys=True)
+	print(f'total {total / 1024:.1f} KiB')
+
+
+if __name__ == '__main__':
+	main()

@@ -1,0 +1,194 @@
+{
+ "frames": {
+  "bone": true,
+  "gothic": true,
+  "thorn": true
+ },
+ "pieces": {
+  "banner-a": {
+   "h": 97.5,
+   "role": "marg",
+   "w": 44
+  },
+  "banner-b": {
+   "h": 98.2,
+   "role": "marg",
+   "w": 46
+  },
+  "bird-a": {
+   "h": 43.4,
+   "role": "marg",
+   "w": 54
+  },
+  "bird-b": {
+   "h": 40.1,
+   "role": "marg",
+   "w": 66
+  },
+  "bull": {
+   "h": 66.5,
+   "role": "marg",
+   "w": 62
+  },
+  "compass2": {
+   "h": 75.0,
+   "role": "marg",
+   "w": 74
+  },
+  "crest-beetle": {
+   "h": 112.6,
+   "role": "crest",
+   "w": 260
+  },
+  "crest-blades": {
+   "h": 88.6,
+   "role": "crest",
+   "w": 400
+  },
+  "crest-compass": {
+   "h": 114.2,
+   "role": "crest",
+   "w": 400
+  },
+  "crest-skull": {
+   "h": 77.6,
+   "role": "crest",
+   "w": 420
+  },
+  "fairy": {
+   "h": 78.1,
+   "role": "marg",
+   "w": 66
+  },
+  "mimic": {
+   "h": 41.2,
+   "role": "marg",
+   "w": 60
+  },
+  "pend-hex": {
+   "h": 120.0,
+   "role": "hang",
+   "w": 42
+  },
+  "pend-moon": {
+   "h": 100.5,
+   "role": "hang",
+   "w": 50
+  },
+  "pend-skull": {
+   "h": 93.9,
+   "role": "hang",
+   "w": 54
+  },
+  "pend-star": {
+   "h": 121.8,
+   "role": "hang",
+   "w": 36
+  },
+  "pool1": {
+   "h": 73.1,
+   "role": "pool",
+   "w": 70
+  },
+  "pool2": {
+   "h": 69.9,
+   "role": "pool",
+   "w": 72
+  },
+  "pool3": {
+   "h": 64.9,
+   "role": "pool",
+   "w": 70
+  },
+  "pool4": {
+   "h": 63.8,
+   "role": "pool",
+   "w": 68
+  },
+  "ram": {
+   "h": 57.4,
+   "role": "marg",
+   "w": 62
+  },
+  "rule-barbed": {
+   "h": 50.6,
+   "role": "rule",
+   "w": 300
+  },
+  "rule-knot": {
+   "h": 65.0,
+   "role": "rule",
+   "w": 300
+  },
+  "rule-thorn": {
+   "h": 31.4,
+   "role": "rule",
+   "w": 300
+  },
+  "skull-a": {
+   "h": 59.2,
+   "role": "marg",
+   "w": 52
+  },
+  "skull-b": {
+   "h": 53.2,
+   "role": "marg",
+   "w": 44
+  },
+  "sp1": {
+   "h": 36.1,
+   "role": "splat",
+   "w": 44
+  },
+  "sp2": {
+   "h": 39.2,
+   "role": "splat",
+   "w": 44
+  },
+  "sp3": {
+   "h": 31.9,
+   "role": "splat",
+   "w": 44
+  },
+  "sp4": {
+   "h": 38.7,
+   "role": "splat",
+   "w": 40
+  },
+  "sp5": {
+   "h": 37.7,
+   "role": "splat",
+   "w": 46
+  },
+  "sp6": {
+   "h": 43.8,
+   "role": "splat",
+   "w": 42
+  },
+  "sp7": {
+   "h": 40.6,
+   "role": "splat",
+   "w": 40
+  },
+  "sp8": {
+   "h": 37.5,
+   "role": "splat",
+   "w": 44
+  },
+  "sp9": {
+   "h": 45.0,
+   "role": "splat",
+   "w": 38
+  },
+  "specks": {
+   "h": 63.7,
+   "role": "splat",
+   "w": 60
+  },
+  "stars": {
+   "h": 51.9,
+   "role": "splat",
+   "w": 70
+  }
+ }
+}
