@@ -28,9 +28,10 @@
 	--gd-hot       : #8f1a14;                 /* emphasis: fresher blood  */
 	--gd-rule      : #4a1410;                 /* rules, underlines        */
 	--gd-ash       : #4d4336;                 /* captions, footers        */
+	--gd-foot      : #1a130e;                 /* footer text, >=4.5:1 on paper */
 	--gd-panel     : rgba(88, 60, 32, .20);   /* note / monster plate     */
 	--gd-stripe    : rgba(70, 44, 22, .10);   /* table zebra              */
-	--gd-burn      : rgba(34, 18, 7, .62);    /* scorched page edges      */
+	--gd-burn      : rgba(34, 18, 7, .46);    /* scorched page edges      */
 	--gd-bone      : #e6dcc2;                 /* light text on dark       */
 	--gd-iron      : #24201d;                 /* cover / ribbon black     */
 	--gd-seal      : #7c130e;                 /* wax-seal page number     */
@@ -70,6 +71,7 @@
 	--gd-hot       : #e8836f;
 	--gd-rule      : #8a2018;
 	--gd-ash       : #9a907c;
+	--gd-foot      : #a99f8a;
 	--gd-grain     : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'420'%20height%3D'420'%3E%3Cfilter%20id%3D'g'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.8'%20numOctaves%3D'3'%20seed%3D'11'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.80%200%200%200%200%20.72%200%200%200%200%20.60%20.55%200%200%200%20-.21'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'420'%20height%3D'420'%20filter%3D'url(%23g)'%2F%3E%3C%2Fsvg%3E");
 	--gd-stains    : none;
 	--gd-foxing    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'380'%20height%3D'380'%3E%3Cfilter%20id%3D'f'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.3'%20numOctaves%3D'2'%20seed%3D'9'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.58%200%200%200%200%20.52%200%200%200%200%20.42%200%207%200%200%20-5.5'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'380'%20height%3D'380'%20filter%3D'url(%23f)'%2F%3E%3C%2Fsvg%3E");
@@ -93,7 +95,7 @@
 	color            : var(--gd-text);
 	background-color : var(--gd-paper);
 	background-image :
-		radial-gradient(ellipse 88% 82% at 50% 47%, transparent 52%, var(--gd-burn) 100%),
+		radial-gradient(ellipse 88% 82% at 50% 47%, transparent 60%, var(--gd-burn) 100%),
 		var(--gd-stains),
 		var(--gd-foxing),
 		var(--gd-grain),
@@ -115,13 +117,15 @@
 	bottom              : 1.5cm;
 	width               : auto;
 	height              : 7px;
+	z-index             : 1;
+	background-color    : transparent;
 	background-image    :
-		linear-gradient(90deg, transparent, var(--gd-rule) 14%, var(--gd-rule) 86%, transparent),
-		linear-gradient(90deg, transparent 10%, var(--gd-rule) 30%, var(--gd-rule) 70%, transparent 90%);
+		linear-gradient(90deg, transparent, color-mix(in srgb, var(--gd-rule) 80%, transparent) 14%, color-mix(in srgb, var(--gd-rule) 80%, transparent) 86%, transparent),
+		linear-gradient(90deg, transparent 10%, color-mix(in srgb, var(--gd-rule) 80%, transparent) 30%, color-mix(in srgb, var(--gd-rule) 80%, transparent) 70%, transparent 90%);
 	background-size     : 100% 1.4px, 100% 1px;
 	background-position : top, bottom;
 	background-repeat   : no-repeat;
-	opacity             : .75;
+	opacity             : 1;
 }
 .page:nth-child(even)::after { transform : none; }
 
@@ -132,7 +136,7 @@
 	font-family    : 'IM Fell DW Pica SC', serif;
 	font-size      : .3cm;
 	letter-spacing : .09em;
-	color          : var(--gd-ash);
+	color          : var(--gd-foot);
 	text-shadow    : none;
 	text-transform : none;
 }
@@ -145,7 +149,7 @@
 	width          : auto;
 	font-family    : 'IM Fell DW Pica', serif;
 	font-size      : .42cm;
-	color          : var(--gd-ash);
+	color          : var(--gd-foot);
 	text-align     : right;
 	text-shadow    : none;
 }
@@ -300,16 +304,17 @@
 .page .note {
 	position            : relative;
 	margin-block        : .3cm;
-	padding             : .36cm .46cm .32cm;
+	padding             : calc(.36cm - 5px) calc(.46cm - 5px) calc(.32cm - 5px);
 	font-family         : 'IM Fell DW Pica', serif;
 	font-size           : .345cm;
 	line-height         : 1.28em;
 	background-color    : var(--gd-panel);
 	background-image    : var(--gd-grain);
 	background-size     : 420px 420px;
-	border              : 1px solid transparent;
+	border              : 6px solid transparent;
 	border-image        : var(--gd-frame) 24 / 24px / 14px stretch;
-	box-shadow          : .05cm .13cm .3cm rgba(0, 0, 0, .3);
+	background-clip     : padding-box;   /* fill stops inside the ragged stroke, no square corners */
+	box-shadow          : none;
 }
 .page .note p          { line-height : 1.28em; text-indent : 0; }
 .page .note h5         { font-size : .42cm; }
