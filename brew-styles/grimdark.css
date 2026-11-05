@@ -1,0 +1,824 @@
+/* ==================================================================
+   G R I M D A R K  ·  "ASHEN VELLUM"
+   Drop-in replacement for the Style tab (theme: 5e PHB, V3 renderer).
+
+   · Self-contained: every texture / frame / divider is inline SVG or
+     pure CSS. No imgur, no image hosting, nothing to rot.
+   · Keeps your template's class vocabulary (.chapter .tome .credits
+     .frontcredit .artist .imageText ...) so existing brews still work.
+   · Retints the theme through its own --HB_Color_* variables, so
+     snippets you haven't styled by hand inherit the mood for free.
+   · Dark pages:   \page {reliquary}
+   · Heavier soot: \page {soot}
+   ================================================================== */
+
+/* FONTS (must stay first in the sheet) ____________________________ */
+/* IM Fell    – 17th c. English types: uneven, ink-squashed, worn.
+   Pirata One – chunky gothic for titles.   UnifrakturMaguntia – drop caps.
+   Special Elite – typewriter, used for GM notes / "dossier" boxes.   */
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=IM+Fell+DW+Pica:ital@0;1&family=IM+Fell+DW+Pica+SC&family=Pirata+One&family=UnifrakturMaguntia&family=Special+Elite&display=swap');
+
+
+/* PALETTE & TOKENS ________________________________________________ */
+/* Everything colourful hangs off these. Change here, not below.     */
+:root {
+	--gd-paper     : #c6b998;                 /* page base: ash-grey vellum */
+	--gd-text      : #1b1410;                 /* body ink                 */
+	--gd-head      : #66100d;                 /* headings: dried blood    */
+	--gd-hot       : #8f1a14;                 /* emphasis: fresher blood  */
+	--gd-rule      : #4a1410;                 /* rules, underlines        */
+	--gd-ash       : #4d4336;                 /* captions, footers        */
+	--gd-panel     : rgba(88, 60, 32, .20);   /* note / monster plate     */
+	--gd-stripe    : rgba(70, 44, 22, .10);   /* table zebra              */
+	--gd-burn      : rgba(34, 18, 7, .62);    /* scorched page edges      */
+	--gd-bone      : #e6dcc2;                 /* light text on dark       */
+	--gd-iron      : #24201d;                 /* cover / ribbon black     */
+	--gd-seal      : #7c130e;                 /* wax-seal page number     */
+	--gd-ink-bleed : rgba(28, 14, 6, .45);
+
+	/* swap to `none` to switch the colour-grading of artwork off */
+	--gd-art-grade : saturate(.35) contrast(1.12) sepia(.55) brightness(.88);
+
+	/* textures (generated inline SVG) */
+	--gd-grain     : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'420'%20height%3D'420'%3E%3Cfilter%20id%3D'g'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.75'%20numOctaves%3D'3'%20seed%3D'11'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.20%200%200%200%200%20.16%200%200%200%200%20.11%201.1%200%200%200%20-.42'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'420'%20height%3D'420'%20filter%3D'url(%23g)'%2F%3E%3C%2Fsvg%3E");
+	--gd-stains    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'816'%20height%3D'1056'%3E%3Cfilter%20id%3D's'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.0045%20.0065'%20numOctaves%3D'5'%20seed%3D'23'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.34%200%200%200%200%20.28%200%200%200%200%20.20%201.7%200%200%200%20-.72'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'816'%20height%3D'1056'%20filter%3D'url(%23s)'%2F%3E%3C%2Fsvg%3E");
+	--gd-foxing    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'380'%20height%3D'380'%3E%3Cfilter%20id%3D'f'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.28'%20numOctaves%3D'2'%20seed%3D'5'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.26%200%200%200%200%20.17%200%200%200%200%20.09%200%2012%200%200%20-8.9'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'380'%20height%3D'380'%20filter%3D'url(%23f)'%2F%3E%3C%2Fsvg%3E");
+	--gd-frame     : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'120'%20height%3D'120'%20viewBox%3D'0%200%20120%20120'%3E%3Cfilter%20id%3D'r'%20x%3D'-10%25'%20y%3D'-10%25'%20width%3D'120%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.05'%20numOctaves%3D'2'%20seed%3D'4'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'6'%20xChannelSelector%3D'R'%20yChannelSelector%3D'G'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'none'%20stroke%3D'%231a130e'%20filter%3D'url(%23r)'%3E%3Crect%20x%3D'14'%20y%3D'14'%20width%3D'92'%20height%3D'92'%20stroke-width%3D'3.2'%2F%3E%3Crect%20x%3D'21'%20y%3D'21'%20width%3D'78'%20height%3D'78'%20stroke-width%3D'.9'%20opacity%3D'.75'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+	--gd-frame-red : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'120'%20height%3D'120'%20viewBox%3D'0%200%20120%20120'%3E%3Cfilter%20id%3D'r'%20x%3D'-10%25'%20y%3D'-10%25'%20width%3D'120%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.05'%20numOctaves%3D'2'%20seed%3D'4'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'6'%20xChannelSelector%3D'R'%20yChannelSelector%3D'G'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'none'%20stroke%3D'%236a100d'%20filter%3D'url(%23r)'%3E%3Crect%20x%3D'14'%20y%3D'14'%20width%3D'92'%20height%3D'92'%20stroke-width%3D'3.2'%2F%3E%3Crect%20x%3D'21'%20y%3D'21'%20width%3D'78'%20height%3D'78'%20stroke-width%3D'.9'%20opacity%3D'.75'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+	--gd-dagger    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'600'%20height%3D'28'%20viewBox%3D'0%200%20600%2028'%20preserveAspectRatio%3D'none'%3E%3Cg%20fill%3D'%236a100d'%3E%3Cpolygon%20points%3D'4%2C14%20276%2C11.6%20276%2C16.4'%2F%3E%3Cpolygon%20points%3D'596%2C14%20324%2C11.6%20324%2C16.4'%2F%3E%3Cpolygon%20points%3D'282%2C14%20286%2C10.5%20290%2C14%20286%2C17.5'%2F%3E%3Cpolygon%20points%3D'318%2C14%20314%2C10.5%20310%2C14%20314%2C17.5'%2F%3E%3Cpolygon%20points%3D'295.5%2C9%20304.5%2C9%20300%2C27.5'%2F%3E%3Crect%20x%3D'288'%20y%3D'5.6'%20width%3D'24'%20height%3D'3.4'%20rx%3D'1.2'%2F%3E%3Crect%20x%3D'298.7'%20y%3D'0.6'%20width%3D'2.6'%20height%3D'5.2'%2F%3E%3Ccircle%20cx%3D'300'%20cy%3D'1.4'%20r%3D'2'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+	--gd-torn      : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'816'%20height%3D'330'%20viewBox%3D'0%200%20816%20330'%20preserveAspectRatio%3D'none'%3E%3Cfilter%20id%3D'r'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.09'%20numOctaves%3D'3'%20seed%3D'2'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'9'%2F%3E%3C%2Ffilter%3E%3Cpath%20d%3D'M0%200H816V292L794.4%20287.0L785.9%20287.8L766.8%20295.5L753.2%20288.3L733.3%20287.1L713.3%20295.0L695.3%20292.2L689.3%20283.7L662.9%20287.2L653.7%20291.6L627.4%20288.0L619.6%20288.5L596.0%20285.4L580.9%20292.4L559.2%20292.9L532.8%20290.1L515.8%20287.0L494.4%20292.0L468.8%20299.8L458.0%20282.2L448.5%20293.4L440.3%20288.8L416.0%20289.0L389.1%20292.5L375.5%20301.9L353.4%20296.6L337.4%20298.2L329.9%20288.4L321.7%20329.6L309.7%20284.4L287.4%20318.6L271.7%20290.9L266.1%20281.9L253.8%20301.9L234.8%20293.6L215.1%20295.4L206.7%20285.5L198.3%20302.8L173.8%20302.9L158.6%20300.9L141.5%20294.7L126.6%20290.2L107.4%20288.1L96.5%20321.3L81.9%20300.7L63.5%20293.4L41.6%20300.4L35.8%20287.3L11.9%20288.8L0.0%20290.4Z'%20fill%3D'%23000'%20filter%3D'url(%23r)'%2F%3E%3C%2Fsvg%3E");
+	--gd-torn-sm   : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'816'%20height%3D'230'%20viewBox%3D'0%200%20816%20230'%20preserveAspectRatio%3D'none'%3E%3Cfilter%20id%3D'r'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.08'%20numOctaves%3D'3'%20seed%3D'8'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'8'%2F%3E%3C%2Ffilter%3E%3Cpath%20d%3D'M0%200H816V204L808.0%20196.8L801.2%20231.6L792.2%20210.2L770.8%20202.8L760.8%20209.7L736.1%20211.1L710.1%20207.7L683.6%20209.2L668.6%20199.8L660.0%20195.2L653.2%20205.2L640.4%20203.1L631.9%20200.8L618.7%20204.2L600.3%20212.5L593.0%20199.6L581.8%20196.8L567.6%20208.1L554.9%20201.4L542.7%20202.8L533.3%20208.4L527.4%20212.3L514.5%20240.2L502.2%20195.0L476.8%20211.1L452.8%20225.9L432.5%20195.9L425.5%20203.0L402.2%20204.1L396.2%20204.0L379.5%20204.3L352.8%20196.8L330.9%20205.9L306.4%20207.6L298.2%20210.4L285.1%20212.1L268.6%20204.2L246.6%20195.3L237.7%20199.6L226.7%20233.4L218.0%20208.4L212.8%20206.3L190.9%20210.9L185.5%20198.1L167.2%20209.7L140.3%20207.1L121.3%20209.8L107.0%20202.1L82.2%20202.9L61.9%20208.8L46.4%20207.5L29.0%20233.1L2.1%20210.5L0.0%20203.1Z'%20fill%3D'%23000'%20filter%3D'url(%23r)'%2F%3E%3C%2Fsvg%3E");
+	--gd-ribbon    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'620'%20height%3D'90'%20viewBox%3D'0%200%20620%2090'%20preserveAspectRatio%3D'none'%3E%3Cfilter%20id%3D'r'%20x%3D'-3%25'%20y%3D'-10%25'%20width%3D'106%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.06%20.12'%20numOctaves%3D'3'%20seed%3D'6'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'7'%2F%3E%3C%2Ffilter%3E%3Cpath%20d%3D'M6%206H614L604%2028%20614%2052%20606%2070%20614%2084H6L16%2062%206%2042%2014%2022Z'%20fill%3D'%23000'%20filter%3D'url(%23r)'%2F%3E%3C%2Fsvg%3E");
+
+	/* ...mapped onto the theme's own colour hooks */
+	--HB_Color_Background            : var(--gd-paper);
+	--HB_Color_Accent                : var(--gd-stripe);
+	--HB_Color_HeaderUnderline       : var(--gd-rule);
+	--HB_Color_HorizontalRule        : var(--gd-rule);
+	--HB_Color_HeaderText            : var(--gd-head);
+	--HB_Color_MonsterStatBackground : var(--gd-panel);
+	--HB_Color_CaptionText           : var(--gd-ash);
+	--HB_Color_WatercolorStain       : #4b1d14;
+	--HB_Color_Footnotes             : var(--gd-ash);
+}
+
+/* DARK PAGES  –  \page {reliquary} ________________________________ */
+.page.reliquary {
+	--gd-paper     : #15110f;
+	--gd-text      : #cdc1a3;
+	--gd-head      : #d9584a;
+	--gd-hot       : #e8836f;
+	--gd-rule      : #8a2018;
+	--gd-ash       : #9a907c;
+	--gd-grain     : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'420'%20height%3D'420'%3E%3Cfilter%20id%3D'g'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.8'%20numOctaves%3D'3'%20seed%3D'11'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.80%200%200%200%200%20.72%200%200%200%200%20.60%20.55%200%200%200%20-.21'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'420'%20height%3D'420'%20filter%3D'url(%23g)'%2F%3E%3C%2Fsvg%3E");
+	--gd-stains    : none;
+	--gd-foxing    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'380'%20height%3D'380'%3E%3Cfilter%20id%3D'f'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.3'%20numOctaves%3D'2'%20seed%3D'9'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.58%200%200%200%200%20.52%200%200%200%200%20.42%200%207%200%200%20-5.5'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'380'%20height%3D'380'%20filter%3D'url(%23f)'%2F%3E%3C%2Fsvg%3E");
+	--gd-panel     : rgba(255, 238, 205, .055);
+	--gd-stripe    : rgba(255, 238, 205, .06);
+	--gd-burn      : rgba(0, 0, 0, .85);
+	--gd-ink-bleed : rgba(0, 0, 0, .0);
+	--gd-frame     : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'120'%20height%3D'120'%20viewBox%3D'0%200%20120%20120'%3E%3Cfilter%20id%3D'r'%20x%3D'-10%25'%20y%3D'-10%25'%20width%3D'120%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.05'%20numOctaves%3D'2'%20seed%3D'4'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'6'%20xChannelSelector%3D'R'%20yChannelSelector%3D'G'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'none'%20stroke%3D'%23a89c82'%20filter%3D'url(%23r)'%3E%3Crect%20x%3D'14'%20y%3D'14'%20width%3D'92'%20height%3D'92'%20stroke-width%3D'3.2'%2F%3E%3Crect%20x%3D'21'%20y%3D'21'%20width%3D'78'%20height%3D'78'%20stroke-width%3D'.9'%20opacity%3D'.75'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+	--gd-frame-red : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'120'%20height%3D'120'%20viewBox%3D'0%200%20120%20120'%3E%3Cfilter%20id%3D'r'%20x%3D'-10%25'%20y%3D'-10%25'%20width%3D'120%25'%20height%3D'120%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.05'%20numOctaves%3D'2'%20seed%3D'4'%20result%3D't'%2F%3E%3CfeDisplacementMap%20in%3D'SourceGraphic'%20in2%3D't'%20scale%3D'6'%20xChannelSelector%3D'R'%20yChannelSelector%3D'G'%2F%3E%3C%2Ffilter%3E%3Cg%20fill%3D'none'%20stroke%3D'%23a3231b'%20filter%3D'url(%23r)'%3E%3Crect%20x%3D'14'%20y%3D'14'%20width%3D'92'%20height%3D'92'%20stroke-width%3D'3.2'%2F%3E%3Crect%20x%3D'21'%20y%3D'21'%20width%3D'78'%20height%3D'78'%20stroke-width%3D'.9'%20opacity%3D'.75'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+	--gd-dagger    : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'600'%20height%3D'28'%20viewBox%3D'0%200%20600%2028'%20preserveAspectRatio%3D'none'%3E%3Cg%20fill%3D'%23d9cdb0'%3E%3Cpolygon%20points%3D'4%2C14%20276%2C11.6%20276%2C16.4'%2F%3E%3Cpolygon%20points%3D'596%2C14%20324%2C11.6%20324%2C16.4'%2F%3E%3Cpolygon%20points%3D'282%2C14%20286%2C10.5%20290%2C14%20286%2C17.5'%2F%3E%3Cpolygon%20points%3D'318%2C14%20314%2C10.5%20310%2C14%20314%2C17.5'%2F%3E%3Cpolygon%20points%3D'295.5%2C9%20304.5%2C9%20300%2C27.5'%2F%3E%3Crect%20x%3D'288'%20y%3D'5.6'%20width%3D'24'%20height%3D'3.4'%20rx%3D'1.2'%2F%3E%3Crect%20x%3D'298.7'%20y%3D'0.6'%20width%3D'2.6'%20height%3D'5.2'%2F%3E%3Ccircle%20cx%3D'300'%20cy%3D'1.4'%20r%3D'2'%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+	--HB_Color_WatercolorStain : #5d1a12;
+}
+/* extra-heavy grime on any light page */
+.page.soot { --gd-burn : rgba(10, 5, 2, .82); }
+
+
+/* PAGE SURFACE ____________________________________________________ */
+.page {
+	font-family      : 'IM Fell English', 'Georgia', serif;
+	font-size        : .372cm;
+	color            : var(--gd-text);
+	background-color : var(--gd-paper);
+	background-image :
+		radial-gradient(ellipse 88% 82% at 50% 47%, transparent 52%, var(--gd-burn) 100%),
+		var(--gd-stains),
+		var(--gd-foxing),
+		var(--gd-grain),
+		linear-gradient(175deg, rgba(150, 118, 70, .10), rgba(30, 16, 6, .20));
+	background-size     : 100% 100%, 816px 1056px, 380px 380px, 420px 420px, 100% 100%;
+	background-repeat   : no-repeat, no-repeat, repeat, repeat, no-repeat;
+	background-position : 0 0, 0 0, 0 0, 0 0, 0 0;
+}
+.page:nth-child(even) {
+	background-size     : 100% 100%, 135% 135%, 380px 380px, 420px 420px, 100% 100%;
+	background-position : 0 0, 100% 100%, 160px 90px, 210px 40px, 0 0;
+}
+
+
+/* FOOTER ORNAMENT, FOOTNOTE & WAX-SEAL PAGE NUMBER _________________ */
+.page::after {
+	left                : 1.9cm;
+	right               : 1.9cm;
+	bottom              : 1.5cm;
+	width               : auto;
+	height              : 7px;
+	background-image    :
+		linear-gradient(90deg, transparent, var(--gd-rule) 14%, var(--gd-rule) 86%, transparent),
+		linear-gradient(90deg, transparent 10%, var(--gd-rule) 30%, var(--gd-rule) 70%, transparent 90%);
+	background-size     : 100% 1.4px, 100% 1px;
+	background-position : top, bottom;
+	background-repeat   : no-repeat;
+	opacity             : .75;
+}
+.page:nth-child(even)::after { transform : none; }
+
+.page .footnote {
+	right          : 3.3cm;
+	bottom         : .66cm;
+	width          : 9.5cm;
+	font-family    : 'IM Fell DW Pica SC', serif;
+	font-size      : .3cm;
+	letter-spacing : .09em;
+	color          : var(--gd-ash);
+	text-shadow    : none;
+	text-transform : none;
+}
+.page:nth-child(even) .footnote { left : 3.3cm; right : auto; }
+
+.page .pageNumber {
+	right          : 1.9cm;
+	bottom         : .62cm;
+	left           : auto;
+	width          : auto;
+	font-family    : 'IM Fell DW Pica', serif;
+	font-size      : .42cm;
+	color          : var(--gd-ash);
+	text-align     : right;
+	text-shadow    : none;
+}
+.page .pageNumber::before,
+.page .pageNumber.auto::before { content : '†  '; color : var(--gd-hot); }
+.page .pageNumber.auto::after  { content : counter(page-numbers); }
+.page:nth-child(even) .pageNumber { right : auto; left : 1.9cm; text-align : left; }
+
+
+/* TYPOGRAPHY ______________________________________________________ */
+.page p                { line-height : 1.27em; }
+.page p + p,
+.page ul + p,
+.page ol + p           { text-indent : 1.1em; }
+.page em               { font-style : italic; }
+
+/* Fell has no bold: emphasis is small caps, in ink – colour is kept for rules & labels */
+.page strong,
+.page :is(.note, .monster, .descriptive, .spellList, table) strong {
+	font-family    : 'IM Fell English', serif;
+	font-weight    : normal;
+	font-variant   : small-caps;
+	letter-spacing : .04em;
+	color          : inherit;
+}
+
+.page caps                    { font-variant : small-caps; letter-spacing : .04em; }
+.page .backcover caps         { font-size : 120%; }
+.page small                   { position : relative; bottom : 10px; font-size : 90%; text-transform : lowercase; }
+
+/* lists: obelisks, not bullets */
+.page ul               { list-style-type : '†  '; }
+.page ul ul            { list-style-type : '·  '; }
+.page li::marker       { color : var(--gd-hot); }
+
+/* links – inherit, underline on hover (as in your template) */
+.page a                { color : inherit; text-decoration : none; font-weight : inherit; }
+.page a:hover          { text-decoration : underline; text-decoration-color : var(--gd-hot); }
+
+/* HEADERS */
+.page :is(h1, h2, h3, h4, h5) {
+	break-after : avoid;
+	font-weight : normal;
+	color       : var(--gd-head);
+}
+.page h1 {
+	font-family    : 'Pirata One', serif;
+	font-size      : 1.02cm;
+	line-height    : 1em;
+	letter-spacing : .02em;
+	margin-bottom  : .1cm;
+}
+.page .toc h1 { margin-bottom : .2cm; }
+/* a plain rule under every H1 – tapers out, no gore */
+.page h1::after {
+	content        : '';
+	display        : block;
+	height         : 2px;
+	margin-top     : .1cm;
+	margin-bottom  : .12cm;
+	background     : linear-gradient(90deg, var(--gd-rule) 70%, transparent);
+	pointer-events : none;
+}
+.page h1 + * { margin-top : 0; }
+.page h2 {
+	font-family    : 'Pirata One', serif;
+	font-size      : .74cm;
+	line-height    : 1em;
+	letter-spacing : .025em;
+}
+.page h3 {
+	font-family    : 'IM Fell English SC', serif;
+	font-size      : .64cm;
+	line-height    : 1em;
+	letter-spacing : .045em;
+	border-bottom  : 2px solid;
+	border-image   : linear-gradient(90deg, var(--gd-rule) 55%, transparent) 1;
+	padding-bottom : .03cm;
+}
+.page h4 {
+	font-family    : 'IM Fell DW Pica SC', serif;
+	font-size      : .45cm;
+	letter-spacing : .06em;
+	color          : var(--gd-text);
+}
+.page h5 {
+	font-family    : 'IM Fell English', serif;
+	font-size      : .4cm;
+	font-style     : italic;
+	letter-spacing : .01em;
+	color          : var(--gd-head);
+}
+.page h5 + * { margin-top : .1cm; }
+
+/* H1 + first paragraph → small-caps lead-in, blackletter drop cap */
+.page h1 + p::first-line { font-variant : small-caps; letter-spacing : .03em; }
+.page p.first-letter::first-letter,
+.page p.drop-cap::first-letter,
+.page h1 + p::first-letter,
+.page h1 + .quote::first-letter {
+	float                   : left;
+	padding                 : 0;
+	margin                  : .02cm .1cm -.2cm -.02cm;
+	font-family             : 'Pirata One', serif;
+	font-size               : 1.75cm;
+	line-height             : 1em;
+	color                   : var(--gd-head);
+	background-image        : none;
+	-webkit-background-clip : border-box;
+	background-clip         : border-box;
+	text-shadow             : none;
+}
+
+/* visible horizontal rules (default theme hides them) */
+.page hr.dagger,
+.page .dagger hr {
+	visibility       : visible;
+	height           : .5cm;
+	background       : var(--gd-dagger) center / 100% 100% no-repeat;
+	border           : none;
+}
+
+
+/* TABLES __________________________________________________________ */
+.page table {
+	font-family     : 'IM Fell DW Pica', serif;
+	font-size       : .35cm;
+	line-height     : 1.22em;
+	border-collapse : collapse;
+	border-top      : 2px solid var(--gd-rule);
+	border-bottom   : 2px solid var(--gd-rule);
+}
+.page table thead th {
+	font-family    : 'IM Fell English SC', serif;
+	font-weight    : normal;
+	letter-spacing : .05em;
+	color          : var(--gd-head);
+	padding        : .05cm .08cm .03cm;
+	border-bottom  : 1px solid var(--gd-rule);
+}
+.page table tbody td { padding : .04cm .08cm; }
+
+/* QUOTE */
+.page .quote > p                       { font-style : italic; line-height : 1.22em; }
+.page .quote > p:first-child::first-line { font-size : 1.06em; font-variant : small-caps; letter-spacing : .03em; }
+.page .quote .attribution              { font-family : 'IM Fell English SC', serif; color : var(--gd-hot); letter-spacing : .04em; }
+.page .quote .attribution::before      { content : '— '; }
+.page .quote                           { padding-left : .35cm; border-left : 2px solid var(--gd-rule); }
+
+
+/* NOTE  ·  GM-facing aside – the only ragged-framed box ___________ */
+.page .note {
+	position            : relative;
+	margin-block        : .3cm;
+	padding             : .36cm .46cm .32cm;
+	font-family         : 'IM Fell DW Pica', serif;
+	font-size           : .345cm;
+	line-height         : 1.28em;
+	background-color    : var(--gd-panel);
+	background-image    : var(--gd-grain);
+	background-size     : 420px 420px;
+	border              : 1px solid transparent;
+	border-image        : var(--gd-frame) 24 / 24px / 14px stretch;
+	box-shadow          : .05cm .13cm .3cm rgba(0, 0, 0, .3);
+}
+.page .note p          { line-height : 1.28em; text-indent : 0; }
+.page .note h5         { font-size : .42cm; }
+.page .note strong     { color : var(--gd-head); }
+
+
+/* DESCRIPTIVE  ·  read-aloud text ________________________________ */
+.page .descriptive {
+	position         : relative;
+	padding          : .26cm .3cm .26cm .5cm;
+	font-family      : 'IM Fell English', serif;
+	font-size        : .372cm;
+	font-style       : italic;
+	background-color : transparent;
+	background-image : linear-gradient(90deg, color-mix(in srgb, var(--gd-hot) 15%, transparent), transparent 70%);
+	border           : 0;
+	border-left      : 4px double var(--gd-hot);
+	border-image     : none;
+	box-shadow       : none;
+}
+.page .descriptive p        { line-height : 1.3em; }
+.page .descriptive h5       { font-style : normal; }
+.page .descriptive strong   { font-style : normal; font-size : 1em; }
+
+
+/* MONSTER STAT BLOCK ______________________________________________ */
+.page .monster {
+	font-family : 'IM Fell DW Pica', serif;
+	font-size   : .345cm;
+}
+.page .monster.frame {
+	padding          : .24cm .3cm .28cm;
+	background-color : var(--gd-panel);
+	background-image :
+		radial-gradient(ellipse at 50% 30%, transparent 40%, rgba(60, 10, 6, .18) 100%),
+		var(--gd-grain);
+	background-size  : 100% 100%, 420px 420px;
+	border           : 0;
+	border-image     : none;   /* PHB's ornate monster border */
+	border-top       : 3px solid var(--gd-rule);
+	border-bottom    : 3px solid var(--gd-rule);
+	box-shadow       : none;
+}
+.page .monster h2 {
+	font-family : 'Pirata One', serif;
+	font-size   : .72cm;
+	line-height : 1em;
+}
+.page .monster h2::after { display : none; }
+.page .monster h2 + p    { font-size : .31cm; letter-spacing : .02em; }
+.page .monster h3        { font-family : 'IM Fell English SC', serif; font-size : .46cm; border-bottom : 1.5px solid var(--gd-rule); }
+.page .monster p         { text-indent : 0; }
+.page .monster strong    { font-family : 'IM Fell DW Pica SC', serif; font-variant : normal; letter-spacing : .03em; color : var(--gd-head); }
+.page .monster em strong,
+.page .monster strong em { font-family : 'IM Fell DW Pica', serif; font-variant : normal; font-style : italic; letter-spacing : 0; color : var(--gd-text); }
+.page .monster hr {
+	height           : 3px;
+	background       : var(--gd-head);
+	background-image : none;
+	-webkit-clip-path: polygon(0 0, 100% 50%, 0 100%);
+	clip-path        : polygon(0 0, 100% 50%, 0 100%);
+	opacity          : 1;
+}
+
+
+/* CLASS TABLE _____________________________________________________ */
+.page .classTable.frame {
+	margin-block        : .3cm;
+	padding             : 0;
+	background-color    : transparent;
+	border              : 0;
+	border-image        : none;
+}
+.page .classTable table { border-top : 0; border-bottom : 0; }
+.page .classTable.decoration::before { display : none; }
+
+
+/* CODE ____________________________________________________________ */
+.page code      { font-family : 'Special Elite', monospace; color : var(--gd-hot); background-color : rgba(0, 0, 0, .12); border-radius : 2px; }
+.page pre code  { border-radius : 0; border-image : var(--gd-frame) 24 / 14px / 8px stretch; }
+
+
+/* ARTIST CREDIT (rotated in the margin) ___________________________ */
+.page .artist {
+	position         : absolute !important;
+	bottom           : 100px;
+	left             : 60px;
+	transform        : rotate(-90deg);
+	transform-origin : bottom left;
+	text-align       : left;
+	font-family      : 'IM Fell DW Pica SC', serif;
+	font-size        : 13px;
+	text-transform   : lowercase;
+	text-shadow      : var(--gd-paper) 0 0 9px;
+}
+.page:nth-of-type(even):not(:has(.insideCover)) .artist {
+	left             : unset;
+	right            : 60px;
+	transform        : rotate(90deg);
+	transform-origin : bottom right;
+}
+
+
+/* WATERCOLOR  →  blood & soot stains _____________________________ */
+.page [class*='watercolor'] {
+	z-index          : -3;
+	mix-blend-mode   : multiply;
+	opacity          : .62;
+	background-color : var(--HB_Color_WatercolorStain);
+}
+.page.reliquary [class*='watercolor'] { mix-blend-mode : screen; opacity : .35; }
+
+
+/* ARTWORK  (kept from your template: every image is absolutely placed) */
+.page img:not(.logo img):not(.frontcredit img) {
+	position    : absolute;
+	z-index     : -2;
+	user-select : none;
+	filter      : var(--gd-art-grade);
+}
+.page .emblem img { z-index : 1 !important; }
+
+
+/* TABLE OF CONTENTS _______________________________________________ */
+.page .toc h1 { text-align : left; }
+.page .toc h3 {
+	font-family    : 'IM Fell English', serif;
+	font-size      : .4cm;
+	letter-spacing : 0;
+	border-bottom  : 0;
+	border-image   : none;
+	color          : var(--gd-text);
+}
+.page .toc h4 { font-family : 'IM Fell English SC', serif; color : var(--gd-head); font-size : .44cm; letter-spacing : .05em; }
+.page .toc ul h3 span:first-child::after { border-bottom : .04cm dotted var(--gd-ash); }
+.page .toc ul span:first-child::after    { border-bottom : .04cm dotted var(--gd-ash); }
+.page .toc ul span:last-child            { font-family : 'IM Fell DW Pica', serif; color : var(--gd-head); }
+.page .toc a:hover                       { text-decoration-color : var(--gd-hot); }
+
+
+/* COVER MURK  ·  unifies any artwork and keeps text legible ________ */
+.page:has(.frontCover)::before,
+.page:has(.backCover)::before {
+	content        : '';
+	position       : absolute;
+	inset          : 0;
+	z-index        : -1;
+	pointer-events : none;
+	background     :
+		radial-gradient(ellipse 95% 80% at 50% 48%, transparent 32%, rgba(4, 2, 2, .85) 100%),
+		linear-gradient(180deg, rgba(10, 5, 4, .85) 0%, rgba(10, 5, 4, .38) 26%, rgba(40, 10, 6, .16) 55%, rgba(8, 4, 3, .82) 100%),
+		linear-gradient(rgba(95, 30, 22, .34), rgba(95, 30, 22, .34));
+}
+.page:has(.backCover)::before {
+	background :
+		radial-gradient(ellipse 95% 80% at 50% 48%, transparent 32%, rgba(4, 2, 2, .85) 100%),
+		linear-gradient(90deg, rgba(8, 5, 4, .88), rgba(8, 5, 4, .55) 52%, rgba(8, 5, 4, .08)),
+		linear-gradient(rgba(95, 30, 22, .34), rgba(95, 30, 22, .34));
+}
+
+
+/* FRONT COVER _____________________________________________________ */
+.page:has(.frontCover),
+.page:has(.backCover) {
+	color            : var(--gd-bone);
+	background-color : #0d0a09;
+	--gd-grain       : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'420'%20height%3D'420'%3E%3Cfilter%20id%3D'g'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.8'%20numOctaves%3D'3'%20seed%3D'11'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.80%200%200%200%200%20.72%200%200%200%200%20.60%20.55%200%200%200%20-.21'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'420'%20height%3D'420'%20filter%3D'url(%23g)'%2F%3E%3C%2Fsvg%3E");
+	--gd-foxing      : url("data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20width%3D'380'%20height%3D'380'%3E%3Cfilter%20id%3D'f'%20x%3D'0'%20y%3D'0'%20width%3D'100%25'%20height%3D'100%25'%3E%3CfeTurbulence%20type%3D'fractalNoise'%20baseFrequency%3D'.3'%20numOctaves%3D'2'%20seed%3D'9'%20stitchTiles%3D'stitch'%2F%3E%3CfeColorMatrix%20values%3D'0%200%200%200%20.58%200%200%200%200%20.52%200%200%200%200%20.42%200%207%200%200%20-5.5'%2F%3E%3C%2Ffilter%3E%3Crect%20width%3D'380'%20height%3D'380'%20filter%3D'url(%23f)'%2F%3E%3C%2Fsvg%3E");
+	--gd-head        : #d9584a;
+	--gd-hot         : #e8836f;
+	--gd-rule        : #8a2018;
+	background-image :
+		radial-gradient(ellipse 90% 70% at 50% 30%, rgba(120, 30, 20, .20), transparent 70%),
+		radial-gradient(ellipse 100% 90% at 50% 50%, transparent 40%, rgba(0, 0, 0, .9) 100%),
+		var(--gd-foxing),
+		var(--gd-grain);
+	background-size     : 100% 100%, 100% 100%, 380px 380px, 420px 420px;
+	background-repeat   : no-repeat, no-repeat, repeat, repeat;
+	background-position : 0 0;
+	text-shadow         : none;
+}
+.page:has(.frontCover) { padding-top : 78px; }
+
+.page:has(.frontCover) h1 {
+	margin-top      : 16px;
+	font-family     : 'Pirata One', serif;
+	font-size       : 2.55cm;
+	line-height     : .92em;
+	letter-spacing  : .01em;
+	text-transform  : none;
+	color           : var(--gd-bone);
+	-webkit-text-stroke : .14cm #000;
+	paint-order     : stroke fill;
+	text-shadow     : 0 .12cm .35cm rgba(0, 0, 0, .8), 0 0 1.1cm rgba(150, 20, 14, .45);
+}
+.page:has(.frontCover) h1::after { display : none; }
+.page:has(.frontCover) h2,
+.page:has(.frontCover) h3 {
+	font-family         : 'IM Fell English SC', serif;
+	font-size           : .92cm;
+	letter-spacing      : .32cm;
+	margin-top          : 10px;
+	color               : var(--gd-bone);
+	-webkit-text-stroke : .1cm #000;
+	paint-order         : stroke fill;
+	border-bottom       : 0;
+	border-image        : none;
+}
+.page:has(.frontCover) h3 { font-size : .64cm; letter-spacing : .1cm; }
+.page:has(.frontCover) hr {
+	visibility : visible;
+	width      : 10cm;
+	height     : .5cm;
+	margin     : 12px auto;
+	background : var(--gd-dagger) center / 100% 100% no-repeat;
+	border     : 0;
+	filter     : drop-shadow(0 0 3px #000);
+}
+.page:has(.frontCover) .banner {
+	left            : 0;
+	height          : 1.8cm;
+	width           : 11cm;
+	padding-left    : 1.2cm;
+	font-family     : 'Pirata One', serif;
+	font-size       : 1cm;
+	letter-spacing  : .08em;
+	color           : var(--gd-bone);
+	background      : linear-gradient(180deg, #8d1710, #5d0b08);
+	-webkit-mask    : var(--gd-ribbon) center / 100% 100% no-repeat;
+	mask            : var(--gd-ribbon) center / 100% 100% no-repeat;
+	filter          : none;
+	text-shadow     : 0 2px 0 rgba(0, 0, 0, .6);
+}
+.page:has(.frontCover) .footnote {
+	right          : 0;
+	left           : 0;
+	bottom         : 1.3cm;
+	width          : 70%;
+	margin         : 0 auto;
+	font-family    : 'IM Fell English', serif;
+	font-size      : .5cm;
+	font-style     : italic;
+	letter-spacing : .01em;
+	color          : var(--gd-bone);
+	text-align     : center;
+	-webkit-text-stroke : .08cm #000;
+	paint-order    : stroke fill;
+}
+.page:has(.frontCover) .logo { top : .5cm; }
+.page:has(.frontCover) .pageNumber { display : none; }
+
+
+/* INSIDE COVER ____________________________________________________ */
+.page:has(.insideCover) h1 {
+	font-family : 'Pirata One', serif;
+	font-size   : 2.3cm;
+	line-height : .92em;
+	text-transform : none;
+	margin-top  : 1.4cm;
+}
+.page:has(.insideCover) h1::after { display : none; }
+.page:has(.insideCover) h2 {
+	font-family    : 'IM Fell English SC', serif;
+	font-size      : .8cm;
+	letter-spacing : .45cm;
+	color          : var(--gd-hot);
+}
+.page:has(.insideCover) hr {
+	visibility : visible;
+	width      : 12cm;
+	height     : .5cm;
+	margin     : .4cm auto;
+	background : var(--gd-dagger) center / 100% 100% no-repeat;
+	border     : 0;
+}
+
+
+/* PART COVER ______________________________________________________ */
+.page:has(.partCover) .partCover {
+	height           : 5.6cm;
+	background       : linear-gradient(180deg, #0d0a09, #231815 80%, #3a1210);
+	-webkit-mask     : var(--gd-torn-sm) top / 100% 100% no-repeat;
+	mask             : var(--gd-torn-sm) top / 100% 100% no-repeat;
+}
+.page:has(.partCover) h1 {
+	font-family    : 'Pirata One', serif;
+	font-size      : 2.4cm;
+	text-transform : none;
+	color          : var(--gd-bone);
+	text-shadow    : 0 .08cm .3cm #000;
+}
+.page:has(.partCover) h1::after { display : none; }
+.page:has(.partCover) h2 {
+	font-family    : 'IM Fell English SC', serif;
+	font-size      : .62cm;
+	letter-spacing : .3cm;
+	color          : var(--gd-hot);
+}
+
+
+/* BACK COVER ______________________________________________________ */
+.page:has(.backCover) h1 {
+	font-family : 'Pirata One', serif;
+	font-size   : 1.45cm;
+	line-height : 1.05em;
+	color       : var(--gd-head);
+}
+.page:has(.backCover) h1::after { display : none; }
+.page:has(.backCover) p {
+	font-family : 'IM Fell English', serif;
+	font-size   : .4cm;
+	line-height : 1.38em;
+	text-indent : 0;
+	color       : var(--gd-bone);
+}
+.page:has(.backCover) hr {
+	visibility : visible;
+	width      : 5cm;
+	height     : .5cm;
+	background : var(--gd-dagger) center / 100% 100% no-repeat;
+	border     : 0;
+}
+.page:has(.backCover) .backCover { background-image : none; }
+.page:has(.backCover) .pageNumber,
+.page:has(.backCover)::after { display : none; }
+
+
+/* CREDITS PAGE ____________________________________________________ */
+.page .credits h1 { font-size : 1.1cm; }
+.page .credits h1 + p::first-letter,
+.page .credits h1 + p::first-line { all : unset; }
+.page .credits h2,
+.page .credits h5 { margin-bottom : 14px; }
+.page .credits p {
+	font-family : 'IM Fell DW Pica', serif;
+	font-style  : normal;
+	font-size   : .94em;
+	line-height : 1.45em;
+	text-indent : -1em;
+	margin-left : 1em;
+}
+.page .credits a { color : var(--gd-hot); }
+.page .credits .footnote {
+	position       : static;
+	width          : 100%;
+	padding        : 30px;
+	font-size      : 1em;
+	text-align     : left;
+	color          : var(--gd-text);
+}
+.page .credits .footnote p { padding : 2em; text-indent : 0; }
+
+/* front-credit plate: art in a ragged frame instead of imgur masks */
+.page .frontcredit {
+	position      : relative;
+	right         : 16px;
+	width         : 340px;
+	height        : 240px;
+	margin-top    : 15px;
+	margin-bottom : 110px;
+	border        : 1px solid transparent;
+	border-image  : var(--gd-frame) 24 / 24px / 14px stretch;
+}
+.page .frontcredit img { position : relative; top : 0; left : 0; width : 100%; z-index : -1; filter : var(--gd-art-grade); }
+.page .frontcredit h5  { margin-top : 10px; margin-bottom : -2px; }
+.page .frontcredit p   { text-indent : 0; margin-left : 0; }
+
+
+/* CHAPTER HEADING  ·  torn art + iron ribbon ______________________ */
+/* geometry knob: where the ribbon sits (px from top of the page)    */
+.page { --gd-ribbon-top : 232px; }
+
+.page .chapter {
+	column-span   : all;
+	display       : block;
+	margin-bottom : 10px;
+}
+.page .chapter:not(.intro) { padding-top : 186px; }
+.page .chapter.tall        { --gd-ribbon-top : 332px; padding-top : 286px; }
+
+.page .chapter h1 {
+	margin-bottom  : 36px;
+	font-size      : 1.12cm;
+	text-align     : center;
+	color          : var(--gd-bone);
+	text-shadow    : 0 2px 0 rgba(0, 0, 0, .7);
+}
+.page .chapter h1::after { display : none; }
+
+/* the iron ribbon the title is printed on */
+.page .chapter:not(.intro)::after {
+	content          : '';
+	position         : absolute;
+	top              : var(--gd-ribbon-top);
+	left             : -40px;
+	z-index          : -1;
+	width            : 680px;
+	height           : 84px;
+	background       : linear-gradient(180deg, #2b2623, #14100e 55%, #0b0807);
+	-webkit-mask     : var(--gd-ribbon) center / 100% 100% no-repeat;
+	mask             : var(--gd-ribbon) center / 100% 100% no-repeat;
+	filter           : drop-shadow(0 5px 5px rgba(0, 0, 0, .55));
+}
+.page .chapter.short::after { width : 560px; left : 30px; }
+.page .chapter.long::after  { width : 760px; left : -80px; }
+
+/* intro chapters: no art – a smear of blood behind the title instead */
+.page .chapter.intro {
+	margin-bottom : -12px;
+}
+.page .chapter.intro h1 { color : var(--gd-head); text-align : left; text-shadow : 0 0 .7px var(--gd-ink-bleed); }
+.page .chapter.intro h1::after { display : block; }
+
+/* body copy after a chapter: big blackletter initial */
+.page .chapter + p::first-letter,
+.page .chapter + .quote::first-letter {
+	float         : left;
+	margin        : .02cm .1cm -.2cm -.02cm;
+	padding       : 0;
+	font-family   : 'Pirata One', serif;
+	font-size     : 1.9cm;
+	line-height   : 1em;
+	color         : var(--gd-head);
+	background    : none;
+	text-shadow   : none;
+}
+.page h1 + .quote::first-letter,
+.page .chapter + .quote::first-letter { font-size : 88px; margin-left : -4px; }
+.page .chapter + p::first-line,
+.page .chapter + .quote::first-line {
+	font-variant   : small-caps;
+	letter-spacing : .04em;
+}
+
+/* chapter art: images on a chapter page, torn along the bottom.
+   Crop with  ![](url){--art-x:80%,--art-y:40%}  (defaults: centred)        */
+.page:has(.chapter) img {
+	position      : absolute;
+	top           : 0;
+	left          : -7px;
+	width         : 102%;
+	height        : 310px;
+	object-fit    : cover;
+	object-position : var(--art-x, 50%) var(--art-y, 50%);
+	z-index       : -2;
+	-webkit-mask  : var(--gd-torn) top / 100% 310px no-repeat;
+	mask          : var(--gd-torn) top / 100% 310px no-repeat;
+}
+.page:has(.chapter.tall) img {
+	height            : 410px;
+	-webkit-mask-size : 100% 410px;
+	mask-size         : 100% 410px;
+}
+/* …but never mask logos or the front-credit plate */
+.page:has(.chapter) :is(.logo, .frontcredit) img { -webkit-mask : none; mask : none; height : auto; object-fit : fill; }
+
+
+/* "TOMES"  ·  boxed lore ________________________________________ */
+.page .tome {
+	position         : relative;
+	margin           : .3cm auto;
+	padding          : .3cm .4cm;
+	font-family      : 'IM Fell DW Pica', serif;
+	font-size        : .36cm;
+	background-color : var(--gd-panel);
+	border-top       : 2px solid var(--gd-rule);
+	border-bottom    : 2px solid var(--gd-rule);
+}
+.page .tome.clear,
+.page .tome.empty  { background : none; box-shadow : none; }
+.page .tome.wide   { padding : .3cm .2cm; }
+.page .tome p:first-of-type { padding-top : 2px; }
+.page .tome p + p  { text-indent : 0; margin-top : 6px; }
+.page .tome h5     { font-size : .4cm; }
+.page .tome h1 + p::first-letter { padding-left : 0; font-size : 2.4cm; margin-left : 0; }
+.page .quote.tome p::first-line  { font-variant : small-caps; letter-spacing : .03em; font-size : 1.05em; }
+.page .quote.tome p + p::first-line { font-variant : unset; letter-spacing : inherit; font-size : inherit; }
+.page .quote.tome { border-left : 0; padding-left : .4cm; }
+.page .quote.tome.author p:last-child { font-family : 'IM Fell English SC', serif; text-align : right; margin-top : 4px; color : var(--gd-hot); }
+
+
+/* ===== carried over from your template, unchanged in behaviour ===== */
+.homebreweryCredits { transform : translate(59%, 443%); }
+.imageText {
+	position    : absolute;
+	width       : auto;
+	font-family : 'WalterTurncoat';
+	font-size   : .27cm;
+	color       : var(--HB_Color_CaptionText);
+	text-align  : center;
+}
+.dndCredits {
+	position   : absolute;
+	bottom     : 14%;
+	left       : 50%;
+	width      : 100%;
+	padding    : 35px;
+	font-size  : 10px;
+	text-align : center;
+	transform  : translateX(-50%);
+}
+
+
+/* PRINT ___________________________________________________________
+   Homebrewery pages are fixed US Letter (215.9 x 279.4 mm). Pin the sheet to
+   the same size so the paper choice in the print dialog cannot leave a blank
+   strip under the page background or crop full-bleed art. For A4, change the
+   size below AND set `.page { width: 210mm; height: 297mm; }` (layout reflows). */
+@page { size : 215.9mm 279.4mm; margin : 0; }
+@media print {
+	* { -webkit-print-color-adjust : exact; print-color-adjust : exact; }
+}
