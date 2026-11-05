@@ -2,32 +2,38 @@
    P L A N A R   I N K
    Drop-in replacement for the Style tab (theme: 5e PHB, V3 renderer).
 
-   An ink-and-watercolour sketchbook look: parchment with torn, browned
-   edges; a thin hand-inked frame with thorned corners and a crown
-   ornament; skulls and invented planar sigils down the margins; ink
-   splatter; brush-lettered titles; faded italic body text; drop caps
-   sitting in grey ink washes; artwork in plain ink-ruled plates.
+   A 90s planar-sketchbook look: parchment with torn, browned edges;
+   hand-inked gothic corner brackets and crest; a few skulls and sigils in
+   the margins; artwork that bleeds into the paper through uneven
+   watercolour masks instead of sitting in boxes.
 
-   · Self-contained. All line art is generated inline SVG (see
-     brew-styles/planar-ink/build.mjs). Only Google Fonts is fetched.
+   · Self-contained. Ink art is lifted off an asset sheet and embedded as
+     WebP; everything else is generated SVG (see planar-ink/build.mjs).
+     Only Google Fonts is fetched.
    · Retints the theme through its own --HB_Color_* hooks, so stock
      snippets inherit the palette.
 
-   PAGE VARIANTS  (put on the \page line, e.g.  \page {plain} )
-     plain   frame only, no margin sigils
-     clean   no ink splatter
-     bare    no frame, sigils or splatter: just the paper
-     untorn  straight page edges (for print shops that dislike the mask)
+   PAGE VARIANTS  (on the \page line, e.g.  \page {plain} )
+     plain    corners + crest only, no marginalia
+     bare     no ink art at all: just the paper
+     untorn   straight page edges (for printers that dislike the mask)
+
+   ARTWORK  (see "ARTWORK" below for the full workflow)
+     ![](url){watercolor-mask}            image fades unevenly into the page
+       + wc-2 / wc-3                      alternative mask silhouettes
+       + fade-left/-right/-top/-bottom    also fade out toward the text
+       + wc-float-left / wc-float-right   float in a column; text wraps the
+                                          mask's actual silhouette
+       + wc-behind                        faint layer underneath the text
+     {{plate ... ![](url) }}              block-level masked art (legacy name)
 
    BLOCKS
-     {{kicker SERIES NAME}}           small caps line + arrow above a title
-     {{plate ![](url) }}              artwork in an ink-ruled frame;
-                                      add  ,wide  or position it with
-                                      {{plate,position:absolute,top:..}}
-     {{caption ...}}                  small italic caption for a plate
-     {{dropcap ...}}                  first paragraph gets an ink-wash
-                                      initial (automatic after an H1)
-     {{rule}}                         hand-inked divider with lozenge
+     {{kicker SERIES NAME}}   engraved caps + arrow above a title
+     {{intro ...}}            full-width, balanced two-column lead-in
+     {{dropcap ...}}          ink-wash initial on its first paragraph
+                              (automatic for the paragraph after an H1)
+     {{caption ...}}          small italic caption
+     {{rule}}                 hand-inked divider with lozenge
 
    NOTE: generated file. Edit planar-ink/rules.css and re-run
          node brew-styles/planar-ink/build.mjs
@@ -35,9 +41,10 @@
 
 /* FONTS (must stay first in the sheet) ____________________________ */
 /* Henny Penny  – brush-inked display caps for titles.
-   EB Garamond  – Garamond italic for the faded body ink.
-   Cinzel       – clean engraved capitals for kickers & small headings.
-   IM Fell      – roman old-style capitals for drop caps.               */
+   Cinzel       – engraved capitals for kickers & small headings.
+   IM Fell      – old-style roman for drop caps.
+   EB Garamond  – fallback body face / captions.
+   Body text uses the PHB theme's own BookInsanityRemake.                */
 @import url('https://fonts.googleapis.com/css2?family=Henny+Penny&family=EB+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Cinzel:wght@500;700&family=IM+Fell+English&display=swap');
 
 
@@ -48,13 +55,13 @@
 :root {
 	--pi-paper   : #efe0bd;                  /* page base                  */
 	--pi-ink     : #1d1712;                  /* titles, rules, line art    */
-	--pi-text    : #3a3027;                  /* body: faded iron-gall ink  */
+	--pi-text    : #2b231c;                  /* body text                  */
 	--pi-faint   : #6c6051;                  /* captions, footers          */
 	--pi-wash    : rgba(91, 83, 72, .11);    /* boxes, table zebra         */
 	--pi-wash-2  : rgba(91, 83, 72, .2);
 
-	/* artwork is multiplied into the paper so it reads as watercolour on
-	   parchment; set to  none / normal  to show art untouched            */
+	/* artwork is multiplied into the paper so whites take on the parchment
+	   and it reads as watercolour; set to  none / normal  to show it raw   */
 	--pi-art-grade : sepia(.3) saturate(.72) contrast(1.02) brightness(1.04);
 	--pi-art-blend : multiply;
 
@@ -72,12 +79,11 @@
 
 /* PAGE SURFACE ____________________________________________________ */
 .page {
-	padding          : 3.25cm 2.95cm 2.35cm;
+	padding          : 3.3cm 3.05cm 2.4cm;
 	column-width     : 7cm;     /* PHB's 8cm minimum won't fit two columns inside the frame */
 	column-gap       : .85cm;
-	font-family      : 'EB Garamond', 'Georgia', serif;
-	font-size        : .372cm;
-	font-style       : italic;
+	font-family      : 'BookInsanityRemake', 'EB Garamond', 'Georgia', serif;
+	font-size        : .34cm;
 	color            : var(--pi-text);
 	background-color : var(--pi-paper);
 	background-image :
@@ -92,53 +98,49 @@
 	-webkit-mask        : var(--pi-edge) 0 0 / 100% 100% no-repeat;
 	mask                : var(--pi-edge) 0 0 / 100% 100% no-repeat;
 }
-/* vary the stains so facing pages don't look stamped */
 .page:nth-child(even) {
 	background-size     : 100% 100%, 130% 130%, 360px 360px, 400px 400px, 100% 100%;
 	background-position : 0 0, 100% 100%, 140px 80px, 190px 30px, 0 0;
 }
 .page.untorn { -webkit-mask : none; mask : none; }
 
-/* frame, sigils and splatter live on one overlay under the text */
+/* corners, crest and marginalia: one overlay underneath the text */
 .page::before {
-	content          : '';
-	position         : absolute;
-	inset            : 0;
-	z-index          : -1;
-	pointer-events   : none;
-	background-image : var(--pi-frame), var(--pi-sigils), var(--pi-splatter);
-	background-size  : 100% 100%;
-	background-repeat: no-repeat;
+	content           : '';
+	position          : absolute;
+	inset             : 0;
+	z-index           : -1;
+	pointer-events    : none;
+	background-image  : var(--pi-frame), var(--pi-marginalia);
+	background-size   : 100% 100%;
+	background-repeat : no-repeat;
 }
-.page:nth-child(even)::before {
-	background-image : var(--pi-frame), var(--pi-sigils), var(--pi-splatter-r);
-}
-.page.plain { --pi-sigils : none; }
-.page.clean { --pi-splatter : none; --pi-splatter-r : none; }
-.page.bare  { --pi-frame : none; --pi-sigils : none; --pi-splatter : none; --pi-splatter-r : none; }
+/* facing pages: mirror the marginalia so the skulls sit on the outer edge */
+.page:nth-child(even)::before { transform : scaleX(-1); }
+.page.plain { --pi-marginalia : none; }
+.page.bare  { --pi-frame : none; --pi-marginalia : none; }
 
-/* the PHB footer accent fights the frame – drop it */
+/* the PHB footer accent fights the corners – drop it */
 .page::after { display : none; }
 
 
-/* FOOTER: PAGE NUMBER IN THE FOOT ORNAMENT, FOOTNOTE ______________ */
+/* FOOTER __________________________________________________________ */
 .page .pageNumber,
 .page:nth-child(even) .pageNumber {
-	right          : 0;
-	left           : 0;
-	bottom         : 44px;
-	width          : 1.4cm;
-	margin         : 0 auto;
-	font-family    : 'Henny Penny', serif;
-	font-size      : .4cm;
-	font-style     : normal;
-	line-height    : 18px;
-	color          : var(--pi-ink);
-	text-align     : center;
+	right       : 0;
+	left        : 0;
+	bottom      : 30px;
+	width       : 1.4cm;
+	margin      : 0 auto;
+	font-family : 'Henny Penny', serif;
+	font-size   : .4cm;
+	line-height : 18px;
+	color       : var(--pi-ink);
+	text-align  : center;
 }
 .page .footnote {
-	right          : 2.95cm;
-	bottom         : 1.38cm;
+	right          : 3.05cm;
+	bottom         : 1.4cm;
 	width          : 8cm;
 	font-family    : 'EB Garamond', serif;
 	font-size      : .29cm;
@@ -146,17 +148,15 @@
 	color          : var(--pi-faint);
 	text-transform : none;
 }
-.page:nth-child(even) .footnote { left : 2.95cm; right : auto; }
+.page:nth-child(even) .footnote { left : 3.05cm; right : auto; }
 
 
 /* TYPOGRAPHY ______________________________________________________ */
-.page p                { line-height : 1.3em; }
+.page p                { line-height : 1.34em; }
 .page p + p,
 .page ul + p,
-.page ol + p           { text-indent : 1.2em; }
-.page em               { font-style : normal; }             /* roman inside italic */
-.page :is(.note, .monster, table, .descriptive) em { font-style : italic; }
-.page strong           { font-weight : 600; letter-spacing : 0; color : var(--pi-ink); }
+.page ol + p           { text-indent : 1.1em; }
+.page strong           { color : var(--pi-ink); }
 .page a                { color : var(--pi-ink); text-decoration : underline dotted; text-underline-offset : 2px; }
 
 .page ul               { list-style-type : '–  '; }
@@ -165,16 +165,15 @@
 /* HEADINGS */
 .page :is(h1, h2, h3, h4, h5, h6) {
 	font-weight : normal;
-	font-style  : normal;
 	color       : var(--pi-ink);
 	break-after : avoid;
 }
 .page h1 {
-	margin-bottom  : .38cm;
+	margin-bottom  : .4cm;
 	font-family    : 'Henny Penny', serif;
-	font-size      : 1.42cm;
-	line-height    : 1.04em;
-	letter-spacing : .005em;
+	font-size      : 1.36cm;
+	line-height    : 1.06em;
+	letter-spacing : .01em;
 	text-align     : center;
 	text-transform : uppercase;
 	text-shadow    : 0 0 1px rgba(29, 23, 18, .55);   /* a hint of ink bleed */
@@ -182,14 +181,14 @@
 .page h1 + p::first-line { font-variant : normal; }
 .page h2 {
 	font-family    : 'Henny Penny', serif;
-	font-size      : .74cm;
-	line-height    : 1.05em;
+	font-size      : .7cm;
+	line-height    : 1.08em;
 	text-transform : uppercase;
 }
 .page h3 {
 	padding-bottom : .16cm;
 	font-family    : 'Cinzel', serif;
-	font-size      : .47cm;
+	font-size      : .45cm;
 	font-weight    : 700;
 	line-height    : 1.1em;
 	letter-spacing : .05em;
@@ -198,21 +197,15 @@
 }
 .page h4 {
 	font-family    : 'Cinzel', serif;
-	font-size      : .4cm;
+	font-size      : .39cm;
 	font-weight    : 700;
 	letter-spacing : .04em;
 }
 .page h5 {
 	font-family    : 'Cinzel', serif;
-	font-size      : .34cm;
+	font-size      : .33cm;
 	font-weight    : 700;
 	letter-spacing : .1em;
-}
-.page h6 {
-	font-family    : 'EB Garamond', serif;
-	font-size      : .36cm;
-	font-style     : italic;
-	font-weight    : 600;
 }
 
 /* KICKER  ·  {{kicker SERIES}} above a title */
@@ -223,7 +216,6 @@
 	padding-bottom : .5cm;
 	font-family    : 'Cinzel', serif;
 	font-size      : .95cm;
-	font-style     : normal;
 	font-weight    : 700;
 	line-height    : 1em;
 	letter-spacing : .07em;
@@ -233,33 +225,7 @@
 }
 .page .kicker + h1 { margin-top : 0; }
 
-/* DROP CAP  ·  automatic after an H1, or {{dropcap ...}} / p.drop-cap */
-.page h1 + p::first-letter,
-.page p.first-letter::first-letter,
-.page p.drop-cap::first-letter,
-.page .dropcap > p:first-of-type::first-letter {
-	float                   : left;
-	margin                  : .06cm .14cm -.06cm -.06cm;
-	padding                 : .1cm .14cm .02cm .1cm;
-	font-family             : 'IM Fell English', serif;
-	font-size               : 1.62cm;
-	font-style              : normal;
-	line-height             : .86em;
-	color                   : var(--pi-ink);
-	background-color        : transparent;
-	background-image        : var(--pi-blot);
-	background-position     : center;
-	background-size         : 150% 150%;
-	background-repeat       : no-repeat;
-	-webkit-background-clip : border-box;
-	background-clip         : border-box;
-	text-shadow             : 0 0 1px rgba(29, 23, 18, .4);
-}
-.page .dropcap > p:first-of-type { text-indent : 0; }
-/* PHB blocks are inline-block + break-inside:avoid, i.e. unsplittable: let prose flow */
-.page .dropcap { display : block; break-inside : auto; }
-
-/* INTRO  ·  {{intro ...}}  full-width, balanced two-column lead-in */
+/* INTRO  ·  {{intro ...}} */
 .page .intro {
 	display       : block;     /* hbfm blocks are inline-block; column-span ignores those */
 	column-span   : all;
@@ -269,6 +235,33 @@
 	margin-bottom : .4cm;
 }
 
+/* DROP CAP  ·  automatic after an H1, or {{dropcap ...}} / p.drop-cap.
+   The wash is a translucent image: the paper (and any art behind it)
+   shows straight through – there is no opaque patch to hide.            */
+.page h1 + p::first-letter,
+.page p.first-letter::first-letter,
+.page p.drop-cap::first-letter,
+.page .dropcap > p:first-of-type::first-letter {
+	float                   : left;
+	margin                  : .04cm .14cm -.08cm -.08cm;
+	padding                 : .12cm .16cm .04cm .12cm;
+	font-family             : 'IM Fell English', serif;
+	font-size               : 1.5cm;
+	line-height             : .86em;
+	color                   : var(--pi-ink);
+	background-color        : transparent;
+	background-image        : var(--pi-blot);
+	background-position     : center;
+	background-size         : 135% 135%;
+	background-repeat       : no-repeat;
+	-webkit-background-clip : border-box;
+	background-clip         : border-box;
+	text-shadow             : 0 0 1px rgba(29, 23, 18, .4);
+}
+.page .dropcap > p:first-of-type { text-indent : 0; }
+/* PHB blocks are inline-block + break-inside:avoid, i.e. unsplittable: let prose flow */
+.page .dropcap { display : block; break-inside : auto; }
+
 /* RULE  ·  {{rule}} */
 .page .rule {
 	display    : block;
@@ -277,51 +270,11 @@
 	background : var(--pi-rule) center / 100% 100% no-repeat;
 }
 
-
-/* ARTWORK _________________________________________________________ */
-/* stock behaviour (absolute images with inline styles) still works;
-   they just pick up the watercolour grade                                */
-.page img {
-	filter         : var(--pi-art-grade);
-	mix-blend-mode : var(--pi-art-blend);
-}
-
-/* PLATE  ·  art in a plain ink-ruled frame, as in a field journal */
-.page .plate {
-	position       : relative;
-	display        : block;
-	z-index        : 0;
-	height         : 9cm;
-	margin         : .1cm 0 .3cm;
-	padding        : 0;
-	break-inside   : avoid;
-	isolation      : isolate;
-}
-.page .plate.wide { column-span : all; }
-.page .plate img {
-	position        : absolute;
-	inset           : 0;
-	z-index         : -1;
-	width           : 100%;
-	height          : 100%;
-	object-fit      : cover;
-	object-position : var(--art-x, 50%) var(--art-y, 50%);
-}
-.page .plate::after {
-	content        : '';
-	position       : absolute;
-	inset          : -7px;
-	pointer-events : none;
-	border         : 14px solid transparent;
-	border-image   : var(--pi-inkbox) 22 / 14px / 0 stretch;
-}
-.page .plate p { margin : 0; }
-
 /* CAPTION  ·  {{caption ...}} */
 .page .caption {
 	display     : block;
 	font-family : 'EB Garamond', serif;
-	font-size   : .27cm;
+	font-size   : .28cm;
 	font-style  : italic;
 	line-height : 1.25em;
 	color       : var(--pi-faint);
@@ -329,8 +282,110 @@
 }
 .page .caption p { text-indent : 0; }
 
+
+/* ARTWORK _________________________________________________________
+
+   Every image is graded and multiplied into the paper. Masking is opt-in.
+
+   THE MASK
+   .watercolor-mask paints the element through two alpha layers:
+       --pi-wc-shape  an uneven watercolour silhouette (generated SVG with
+                      no intrinsic size, so it stretches to the box)
+       --pi-wc-fade   a directional gradient, solid by default
+   intersected, so a fade only ever removes more art. The silhouette sits
+   ~16% inside the box on every side – size the box generously.
+
+   Works on an <img> directly:   ![](url){watercolor-mask,fade-left}
+   or on a block wrapping one:   {{watercolor-mask,wide,height:9cm ... }}  */
+
+.page img {
+	filter         : var(--pi-art-grade);
+	mix-blend-mode : var(--pi-art-blend);
+}
+
+/* NB: Blank's stock-stamp rule  [class*='watercolor']  substring-matches
+   this class and would force position:absolute, 2000px x 2000px and a
+   coloured background. Reset all of it here (same specificity, later).  */
+.page .watercolor-mask,
+.page .plate {
+	position         : relative;
+	z-index          : auto;
+	width            : auto;
+	height           : auto;
+	background-color : transparent;
+	background-size  : auto;
+	--pi-wc-shape : var(--pi-wc-1);
+	--pi-wc-fade  : linear-gradient(#000, #000);
+	-webkit-mask-image     : var(--pi-wc-shape), var(--pi-wc-fade);
+	mask-image             : var(--pi-wc-shape), var(--pi-wc-fade);
+	-webkit-mask-size      : 100% 100%;
+	mask-size              : 100% 100%;
+	-webkit-mask-repeat    : no-repeat;
+	mask-repeat            : no-repeat;
+	-webkit-mask-composite : source-in;
+	mask-composite         : intersect;
+}
+.page .wc-2 { --pi-wc-shape : var(--pi-wc-2); }
+.page .wc-3 { --pi-wc-shape : var(--pi-wc-3); }
+
+/* fade toward the side the text is on */
+.page .fade-left   { --pi-wc-fade : linear-gradient(to right,  transparent, #000 40%); }
+.page .fade-right  { --pi-wc-fade : linear-gradient(to left,   transparent, #000 40%); }
+.page .fade-top    { --pi-wc-fade : linear-gradient(to bottom, transparent, #000 40%); }
+.page .fade-bottom { --pi-wc-fade : linear-gradient(to top,    transparent, #000 40%); }
+
+/* block form: the wrapper is masked, the image just fills it */
+.page :is(div, span).watercolor-mask,
+.page .plate {
+	position     : relative;
+	display      : block;
+	height       : 9cm;
+	break-inside : avoid;
+}
+.page .plate.wide,
+.page div.watercolor-mask.wide { column-span : all; width : auto; }   /* auto, not PHB's 100%, so negative margins bleed */
+.page :is(div, span).watercolor-mask img,
+.page .plate img {
+	position        : absolute;
+	inset           : 0;
+	z-index         : 0;
+	width           : 100%;
+	height          : 100%;
+	object-fit      : cover;
+	object-position : var(--art-x, 50%) var(--art-y, 50%);
+}
+.page :is(div, span).watercolor-mask p,
+.page .plate p { margin : 0; }
+
+/* FLOAT  ·  text wraps the silhouette itself, not the bounding box.
+   shape-outside reads the same mask image as the art, so the wrap line
+   follows the painted edge. Give it a width and height.                 */
+.page .wc-float-left,
+.page .wc-float-right {
+	--pi-wc-shape          : var(--pi-wc-1);
+	width                  : var(--wc-w, 60%);
+	height                 : var(--wc-h, 6cm);
+	object-fit             : cover;
+	shape-outside          : var(--pi-wc-shape);
+	shape-image-threshold  : .3;
+	shape-margin           : .18cm;
+}
+.page .wc-float-left  { float : left;  margin : 0 0 0 -.6cm; }
+.page .wc-float-right { float : right; margin : 0 -.6cm 0 0; }
+.page .wc-float-left.wc-2,  .page .wc-float-right.wc-2  { --pi-wc-shape : var(--pi-wc-2); }
+.page .wc-float-left.wc-3,  .page .wc-float-right.wc-3  { --pi-wc-shape : var(--pi-wc-3); }
+
+/* BEHIND  ·  a faint scene underneath the text column(s). Place it with
+   inline styles; .page is a stacking context, so z-index:-1 lands above
+   the paper but below the text.                                          */
+.page .wc-behind {
+	position : absolute;
+	z-index  : -1;
+	opacity  : var(--wc-opacity, .45);
+}
+
 /* stock watercolour masks → grey ink washes */
-.page [class*='watercolor'] {
+.page [class*='watercolor']:not(.watercolor-mask) {
 	z-index          : -2;
 	mix-blend-mode   : multiply;
 	opacity          : .4;
@@ -339,15 +394,13 @@
 
 
 /* NOTE  ·  sketched box ___________________________________________ */
-/* boxes swap PHB's bitmap borders for the ink box; border-box sizing keeps
-   the drawn border inside the column instead of spilling into the gutter  */
+/* border-box sizing keeps the drawn border inside the column            */
 .page .note {
 	box-sizing       : border-box;
-	font-family      : 'EB Garamond', serif;
 	margin-block     : .3cm;
 	padding          : .3cm .38cm;
-	font-style       : normal;
-	font-size        : .35cm;
+	font-family      : 'BookInsanityRemake', 'EB Garamond', serif;
+	font-size        : .33cm;
 	background-color : var(--pi-wash);
 	background-image : var(--pi-grain);
 	background-size  : 400px 400px;
@@ -358,28 +411,27 @@
 .page .note h5 { margin-bottom : .08cm; }
 .page .note p  { text-indent : 0; }
 
-/* DESCRIPTIVE  ·  read-aloud ______________________________________ */
+/* DESCRIPTIVE  ·  read-aloud: the one place italics belong ________ */
 .page .descriptive {
-	margin-block     : .3cm;
-	font-family      : 'EB Garamond', serif;
-	padding          : .22cm .3cm .22cm .45cm;
-	font-style       : italic;
-	background       : linear-gradient(90deg, var(--pi-wash-2), transparent 80%);
-	border           : 0;
-	border-left      : 3px double var(--pi-ink);
-	border-image     : none;
-	box-shadow       : none;
+	margin-block : .3cm;
+	padding      : .22cm .3cm .22cm .45cm;
+	font-family  : 'EB Garamond', serif;
+	font-size    : .36cm;
+	font-style   : italic;
+	background   : linear-gradient(90deg, var(--pi-wash-2), transparent 80%);
+	border       : 0;
+	border-left  : 3px double var(--pi-ink);
+	border-image : none;
+	box-shadow   : none;
 }
 .page .descriptive p { line-height : 1.32em; }
 
 
 /* TABLES __________________________________________________________ */
 .page table {
-	font-family : 'EB Garamond', serif;
-	font-size   : .34cm;
-	font-style  : normal;
-	line-height : 1.22em;
-	border-top  : 1.5px solid var(--pi-ink);
+	font-size     : .32cm;
+	line-height   : 1.22em;
+	border-top    : 1.5px solid var(--pi-ink);
 	border-bottom : 1.5px solid var(--pi-ink);
 }
 .page table thead th {
@@ -396,11 +448,6 @@
 
 
 /* MONSTER STAT BLOCK ______________________________________________ */
-.page .monster {
-	font-family : 'EB Garamond', serif;
-	font-size   : .345cm;
-	font-style  : normal;
-}
 .page .monster.frame {
 	box-sizing       : border-box;
 	padding          : .2cm .26cm .24cm;
@@ -411,33 +458,26 @@
 	border-image     : var(--pi-inkbox) 22 / 14px / 4px stretch;
 	box-shadow       : none;
 }
-.page .monster h2 { font-size : .66cm; }
-.page .monster h2 + p { font-style : italic; }
+.page .monster h2 { font-size : .64cm; }
 .page .monster h3 {
-	font-size     : .42cm;
-	background    : none;
-	border-bottom : 1.5px solid var(--pi-ink);
-	padding-bottom: .03cm;
+	font-size      : .42cm;
+	background     : none;
+	border-bottom  : 1.5px solid var(--pi-ink);
+	padding-bottom : .03cm;
 }
 .page .monster :is(dt, strong) { color : var(--pi-ink); }
 .page .monster hr {
-	height     : 2px;
-	background : var(--pi-ink);
-	opacity    : .85;
+	height            : 2px;
+	background        : var(--pi-ink);
+	opacity           : .85;
 	-webkit-clip-path : polygon(0 0, 100% 50%, 0 100%);
-	clip-path  : polygon(0 0, 100% 50%, 0 100%);
+	clip-path         : polygon(0 0, 100% 50%, 0 100%);
 }
 
 
 /* TABLE OF CONTENTS _______________________________________________ */
 .page .toc h1 { text-align : center; }
-.page .toc h3 {
-	font-family    : 'EB Garamond', serif;
-	font-size      : .39cm;
-	font-weight    : 600;
-	letter-spacing : 0;
-	background     : none;
-}
+.page .toc h3 { font-family : 'BookInsanityRemake', serif; font-size : .37cm; font-weight : bold; letter-spacing : 0; background : none; }
 .page .toc h4 { font-family : 'Cinzel', serif; font-weight : 700; font-size : .36cm; }
 .page .toc ul span:first-child::after { border-bottom : .04cm dotted var(--pi-faint); }
 .page .toc ul span:last-child { font-family : 'Henny Penny', serif; color : var(--pi-ink); }
@@ -447,7 +487,6 @@
 /* CODE ____________________________________________________________ */
 .page code {
 	font-size        : .32cm;
-	font-style       : normal;
 	color            : var(--pi-ink);
 	background-color : var(--pi-wash-2);
 }
@@ -484,9 +523,9 @@
 
 /* PRINT ___________________________________________________________
    Homebrewery pages are US Letter (215.9 x 279.4 mm). Pin the sheet so the
-   print dialog can't leave a strip under the background or crop the frame.
-   The torn-edge mask leaves the very edge of the sheet unprinted (white),
-   like the reference; use  \page {untorn}  if you'd rather print to bleed. */
+   print dialog can't leave a strip under the background or crop the art.
+   The torn-edge mask leaves the very edge of the sheet unprinted (white);
+   use  \page {untorn}  if you'd rather print to bleed.                    */
 @page { size : 215.9mm 279.4mm; margin : 0; }
 @media print {
 	* { -webkit-print-color-adjust : exact; print-color-adjust : exact; }

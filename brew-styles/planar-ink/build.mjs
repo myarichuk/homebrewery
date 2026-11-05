@@ -4,16 +4,15 @@
    Builds ../planar-ink.css from ./rules.css, injecting every image the
    sheet needs as CSS custom properties at the @@ASSETS@@ marker:
 
-   · art/frame.webp, art/marginalia.webp – ink line-work lifted off the
-     AI mockups by extract_marginalia.py (corner brackets, crest, skulls,
-     sigil, splatter). Embedded as base64 WebP.
+   · art/*.webp – ink line-work and the drop-cap wash, lifted off the
+     asset sheet by extract_marginalia.py. Embedded as base64 WebP.
    · generated SVG – torn page edge, scorched rim, paper textures, the
-     drop-cap ink wash, the watercolour image masks, small rules.
+     watercolour image masks, small rules and the text-box border.
 
    The output is a single self-contained sheet you can paste into the
    Homebrewery Style tab. Nothing is fetched except Google Fonts.
 
-       python3 brew-styles/planar-ink/extract_marginalia.py <m1.jpg> <m2.jpg>   (only if art changes)
+       python3 brew-styles/planar-ink/extract_marginalia.py <sheet.jpg>   (only if art changes)
        node    brew-styles/planar-ink/build.mjs
 
    Page geometry is fixed: a V3 page is 215.9 x 279.4 mm = 816 x 1056 CSS px.
@@ -29,7 +28,6 @@ const W     = 816;
 const H     = 1056;
 const SEED  = 0x5161;
 const INK   = '#1d1712';
-const WASH  = '#5b5348';
 
 /* ---------- utilities ---------------------------------------------------- */
 
@@ -124,13 +122,13 @@ const buildEdgeBurn = ()=>{
 // No width/height on the <svg>: with no intrinsic size the mask stretches to
 // whatever box it is applied to, and the same image can drive shape-outside.
 
-const buildWatercolorMask = ({ seed, warp = 80, blur = 9, inset = 66, grainK = 0.7, freq = 0.011 })=>svg(400, 400, `
+const buildWatercolorMask = ({ seed, warp = 74, blur = 3.2, inset = 62, grainK = 1.1, freq = 0.013 })=>svg(400, 400, `
 	<filter id="m" x="-25%" y="-25%" width="150%" height="150%" color-interpolation-filters="sRGB">
 		<feTurbulence type="fractalNoise" baseFrequency="${freq}" numOctaves="3" seed="${seed}" result="warp"/>
 		<feDisplacementMap in="SourceGraphic" in2="warp" scale="${warp}" xChannelSelector="R" yChannelSelector="G" result="shape"/>
 		<feGaussianBlur in="shape" stdDeviation="${blur}" result="soft"/>
-		<feTurbulence type="fractalNoise" baseFrequency=".07" numOctaves="2" seed="${seed + 1}" result="n"/>
-		<feColorMatrix in="n" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  2.4 0 0 0 -1.15" result="grain"/>
+		<feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="4" seed="${seed + 1}" result="n"/>
+		<feColorMatrix in="n" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  3.2 0 0 0 -1.6" result="grain"/>
 		<feComposite in="soft" in2="grain" operator="arithmetic" k1="${grainK}" k2="1" k3="0" k4="0"/>
 	</filter>
 	<rect x="${inset}" y="${inset}" width="${400 - 2 * inset}" height="${400 - 2 * inset}" fill="#fff" filter="url(#m)"/>`,
@@ -161,21 +159,6 @@ const buildFoxing = ()=>svg(360, 360, `
 
 /* ---------- small pieces ------------------------------------------------- */
 
-// translucent grey ink wash behind drop caps – no opaque patch, the paper
-// texture shows straight through it
-const buildBlot = ()=>svg(160, 160, `
-	<filter id="b" x="-30%" y="-30%" width="160%" height="160%">
-		<feTurbulence type="fractalNoise" baseFrequency=".045" numOctaves="3" seed="21" result="n"/>
-		<feDisplacementMap in="SourceGraphic" in2="n" scale="34"/>
-		<feGaussianBlur stdDeviation="2.4"/>
-	</filter>
-	<g filter="url(#b)">
-		<ellipse cx="78" cy="82" rx="50" ry="54" fill="${WASH}" opacity=".34"/>
-		<ellipse cx="70" cy="74" rx="30" ry="34" fill="${WASH}" opacity=".24"/>
-		<circle cx="128" cy="40" r="5" fill="${WASH}" opacity=".45"/>
-		<circle cx="26" cy="134" r="3" fill="${WASH}" opacity=".45"/>
-	</g>`);
-
 // unsteady ink rectangle – border-image for text boxes (notes, stat blocks)
 const buildInkBox = ()=>svg(120, 120, `
 	${wobble('w', 3, 0.06, 6)}
@@ -204,14 +187,14 @@ const assets = {
 	'--pi-frame'      : webpUri('art/frame.webp'),
 	'--pi-marginalia' : webpUri('art/marginalia.webp'),
 	'--pi-wc-1'       : svgUri(buildWatercolorMask({ seed: 4 })),
-	'--pi-wc-2'       : svgUri(buildWatercolorMask({ seed: 19, warp: 100, blur: 7, freq: 0.014 })),
-	'--pi-wc-3'       : svgUri(buildWatercolorMask({ seed: 33, warp: 60, blur: 13, grainK: 0.9 })),
+	'--pi-wc-2'       : svgUri(buildWatercolorMask({ seed: 19, warp: 92, blur: 2.6, freq: 0.016 })),
+	'--pi-wc-3'       : svgUri(buildWatercolorMask({ seed: 33, warp: 60, blur: 5, grainK: 1.3, freq: 0.01 })),
 	'--pi-edge'       : svgUri(buildEdgeMask()),
 	'--pi-burn'       : svgUri(buildEdgeBurn()),
 	'--pi-stains'     : svgUri(buildStains()),
 	'--pi-grain'      : svgUri(buildGrain()),
 	'--pi-foxing'     : svgUri(buildFoxing()),
-	'--pi-blot'       : svgUri(buildBlot()),
+	'--pi-blot'       : webpUri('art/blot.webp'),
 	'--pi-inkbox'     : svgUri(buildInkBox()),
 	'--pi-rule'       : svgUri(buildRule()),
 	'--pi-arrow'      : svgUri(buildArrow())

@@ -10,11 +10,11 @@ The streets coil around the inside of a ring that hangs over a spire without end
 }}
 }}
 
-{{plate,wide,height:14.6cm,--art-y:35%
+{{watercolor-mask,wide,fade-top,height:17.6cm,margin-top:-1.4cm,margin-left:-1.6cm,margin-right:-1.6cm,--art-y:35%
 ![The Spirit of War, 1851, by Jasper Francis Cropsey](/assets/the_spirit_of_war.webp)
 }}
 
-{{caption,text-align:right,margin-top:.15cm
+{{caption,position:absolute,bottom:2.3cm,right:3.05cm,text-align:right
 *The Spirit of War*, Jasper Francis Cropsey, 1851. Public domain.
 }}
 
@@ -30,15 +30,13 @@ The war rarely stays where it belongs. Its battlefields spill into the Outlands,
 
 Mercenaries are the war's true currency. Yugoloths sell their blades to both sides and laugh at each other's dead. Mortal sellswords chase fortunes in fiendish coin that sours in the purse by morning. The wise take payment in favors, and the wiser take nothing at all.
 
-Scholars in the City of Doors keep a running tally of the dead. They gave up counting individuals centuries ago and now measure the war in layers of the Abyss overrun and circles of Hell put to the torch. By their reckoning the war is precisely even, and has been since before time had a name.
+Scholars in the City of Doors keep a running tally of the dead. They gave up counting individuals centuries ago and now measure the war in layers of the Abyss overrun and circles of Hell put to the torch.
 
-Some say the gods allow the war because it keeps both hordes too busy to turn on the Upper Planes. Others say the gods are afraid of it. Nobody in the Cage asks a fiend which story is true; the answer always comes with a price.
-
-{{plate,position:absolute,top:7.2cm,right:2.95cm,width:7.2cm,height:15.6cm,--art-x:62%
+{{watercolor-mask,wc-2,fade-left,position:absolute,top:6.4cm,right:1.2cm,width:11.2cm,height:18.4cm,--art-x:62%
 ![Ruined tower](/assets/ruined_tower.webp)
 }}
 
-{{caption,position:absolute,top:23.1cm,right:2.95cm,width:7.2cm,text-align:right
+{{caption,position:absolute,top:23.6cm,right:3.05cm,width:6.4cm,text-align:right
 The front line is wherever two fiends meet.
 }}
 
@@ -52,17 +50,21 @@ Recorded by a scribe of the Fated, who asked not to be named.
 
 # The Great Wheel
 
+![](/assets/roman_theatre.webp){watercolor-mask,wc-float-right,wc-3,--wc-w:68%,--wc-h:6.6cm}
+
 Picture the planes as a wheel. At its hub stands the Outlands, a plain of grey grass with a spire in the middle that reaches higher than sight. On the spire's tip, impossibly, hangs the City of Doors. Around the rim turn the Outer Planes, each one a belief made solid.
 
 The rim is not still. Gate-towns sit at the edge of the Outlands, one for every plane on the rim, and each town drifts a little closer to its neighbor every year. When a town grows too much like the plane it serves, it slides through the gate and is never seen on the Outlands again.
 
+\column
+
 {{dropcap
 Out past the rim lies the Astral Sea, silver and silent, where the corpses of dead gods drift like islands and githyanki raiders sail between them. Travelers who reach the Astral find that time there is a rumor: they do not age, they do not hunger, and they do not always remember why they came.
 
-Most travelers never see any of this. They pass through one door, then another, and learn the shape of the planes the way a sailor learns the sea, one storm at a time.
+Most travelers never see any of this. They pass through one door, then another, and learn the shape of the planes the way a sailor learns the sea, one storm at a time. The doors do not care who walks through them, and the planes do not care who arrives.
 }}
 
-{{plate,wide,height:11.2cm,margin-top:.45cm,--art-y:60%
+{{watercolor-mask,wc-behind,fade-top,position:absolute,bottom:1.2cm,left:1.4cm,width:18.4cm,height:11cm,--wc-opacity:.5,--art-y:62%
 ![The Departure, 1837, by Thomas Cole](/assets/the_departure.webp)
 }}
 
