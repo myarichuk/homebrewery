@@ -1,0 +1,493 @@
+/* ==================================================================
+   P L A N A R   I N K
+   Drop-in replacement for the Style tab (theme: 5e PHB, V3 renderer).
+
+   An ink-and-watercolour sketchbook look: parchment with torn, browned
+   edges; a thin hand-inked frame with thorned corners and a crown
+   ornament; skulls and invented planar sigils down the margins; ink
+   splatter; brush-lettered titles; faded italic body text; drop caps
+   sitting in grey ink washes; artwork in plain ink-ruled plates.
+
+   · Self-contained. All line art is generated inline SVG (see
+     brew-styles/planar-ink/build.mjs). Only Google Fonts is fetched.
+   · Retints the theme through its own --HB_Color_* hooks, so stock
+     snippets inherit the palette.
+
+   PAGE VARIANTS  (put on the \page line, e.g.  \page {plain} )
+     plain   frame only, no margin sigils
+     clean   no ink splatter
+     bare    no frame, sigils or splatter: just the paper
+     untorn  straight page edges (for print shops that dislike the mask)
+
+   BLOCKS
+     {{kicker SERIES NAME}}           small caps line + arrow above a title
+     {{plate ![](url) }}              artwork in an ink-ruled frame;
+                                      add  ,wide  or position it with
+                                      {{plate,position:absolute,top:..}}
+     {{caption ...}}                  small italic caption for a plate
+     {{dropcap ...}}                  first paragraph gets an ink-wash
+                                      initial (automatic after an H1)
+     {{rule}}                         hand-inked divider with lozenge
+
+   NOTE: generated file. Edit planar-ink/rules.css and re-run
+         node brew-styles/planar-ink/build.mjs
+   ================================================================== */
+
+/* FONTS (must stay first in the sheet) ____________________________ */
+/* Henny Penny  – brush-inked display caps for titles.
+   EB Garamond  – Garamond italic for the faded body ink.
+   Cinzel       – clean engraved capitals for kickers & small headings.
+   IM Fell      – roman old-style capitals for drop caps.               */
+@import url('https://fonts.googleapis.com/css2?family=Henny+Penny&family=EB+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Cinzel:wght@500;700&family=IM+Fell+English&display=swap');
+
+
+/* @@ASSETS@@ */
+
+
+/* PALETTE _________________________________________________________ */
+:root {
+	--pi-paper   : #efe0bd;                  /* page base                  */
+	--pi-ink     : #1d1712;                  /* titles, rules, line art    */
+	--pi-text    : #3a3027;                  /* body: faded iron-gall ink  */
+	--pi-faint   : #6c6051;                  /* captions, footers          */
+	--pi-wash    : rgba(91, 83, 72, .11);    /* boxes, table zebra         */
+	--pi-wash-2  : rgba(91, 83, 72, .2);
+
+	/* artwork is multiplied into the paper so it reads as watercolour on
+	   parchment; set to  none / normal  to show art untouched            */
+	--pi-art-grade : sepia(.3) saturate(.72) contrast(1.02) brightness(1.04);
+	--pi-art-blend : multiply;
+
+	--HB_Color_Background            : var(--pi-paper);
+	--HB_Color_Accent                : var(--pi-wash);
+	--HB_Color_HeaderUnderline       : var(--pi-ink);
+	--HB_Color_HorizontalRule        : var(--pi-ink);
+	--HB_Color_HeaderText            : var(--pi-ink);
+	--HB_Color_MonsterStatBackground : var(--pi-wash);
+	--HB_Color_CaptionText           : var(--pi-faint);
+	--HB_Color_WatercolorStain       : #6d655a;
+	--HB_Color_Footnotes             : var(--pi-faint);
+}
+
+
+/* PAGE SURFACE ____________________________________________________ */
+.page {
+	padding          : 3.25cm 2.95cm 2.35cm;
+	column-width     : 7cm;     /* PHB's 8cm minimum won't fit two columns inside the frame */
+	column-gap       : .85cm;
+	font-family      : 'EB Garamond', 'Georgia', serif;
+	font-size        : .372cm;
+	font-style       : italic;
+	color            : var(--pi-text);
+	background-color : var(--pi-paper);
+	background-image :
+		var(--pi-burn),
+		var(--pi-stains),
+		var(--pi-foxing),
+		var(--pi-grain),
+		radial-gradient(ellipse 70% 60% at 48% 42%, rgba(255, 250, 235, .35), transparent 70%);
+	background-size     : 100% 100%, 100% 100%, 360px 360px, 400px 400px, 100% 100%;
+	background-repeat   : no-repeat, no-repeat, repeat, repeat, no-repeat;
+	box-shadow          : none;
+	-webkit-mask        : var(--pi-edge) 0 0 / 100% 100% no-repeat;
+	mask                : var(--pi-edge) 0 0 / 100% 100% no-repeat;
+}
+/* vary the stains so facing pages don't look stamped */
+.page:nth-child(even) {
+	background-size     : 100% 100%, 130% 130%, 360px 360px, 400px 400px, 100% 100%;
+	background-position : 0 0, 100% 100%, 140px 80px, 190px 30px, 0 0;
+}
+.page.untorn { -webkit-mask : none; mask : none; }
+
+/* frame, sigils and splatter live on one overlay under the text */
+.page::before {
+	content          : '';
+	position         : absolute;
+	inset            : 0;
+	z-index          : -1;
+	pointer-events   : none;
+	background-image : var(--pi-frame), var(--pi-sigils), var(--pi-splatter);
+	background-size  : 100% 100%;
+	background-repeat: no-repeat;
+}
+.page:nth-child(even)::before {
+	background-image : var(--pi-frame), var(--pi-sigils), var(--pi-splatter-r);
+}
+.page.plain { --pi-sigils : none; }
+.page.clean { --pi-splatter : none; --pi-splatter-r : none; }
+.page.bare  { --pi-frame : none; --pi-sigils : none; --pi-splatter : none; --pi-splatter-r : none; }
+
+/* the PHB footer accent fights the frame – drop it */
+.page::after { display : none; }
+
+
+/* FOOTER: PAGE NUMBER IN THE FOOT ORNAMENT, FOOTNOTE ______________ */
+.page .pageNumber,
+.page:nth-child(even) .pageNumber {
+	right          : 0;
+	left           : 0;
+	bottom         : 44px;
+	width          : 1.4cm;
+	margin         : 0 auto;
+	font-family    : 'Henny Penny', serif;
+	font-size      : .4cm;
+	font-style     : normal;
+	line-height    : 18px;
+	color          : var(--pi-ink);
+	text-align     : center;
+}
+.page .footnote {
+	right          : 2.95cm;
+	bottom         : 1.38cm;
+	width          : 8cm;
+	font-family    : 'EB Garamond', serif;
+	font-size      : .29cm;
+	font-style     : italic;
+	color          : var(--pi-faint);
+	text-transform : none;
+}
+.page:nth-child(even) .footnote { left : 2.95cm; right : auto; }
+
+
+/* TYPOGRAPHY ______________________________________________________ */
+.page p                { line-height : 1.3em; }
+.page p + p,
+.page ul + p,
+.page ol + p           { text-indent : 1.2em; }
+.page em               { font-style : normal; }             /* roman inside italic */
+.page :is(.note, .monster, table, .descriptive) em { font-style : italic; }
+.page strong           { font-weight : 600; letter-spacing : 0; color : var(--pi-ink); }
+.page a                { color : var(--pi-ink); text-decoration : underline dotted; text-underline-offset : 2px; }
+
+.page ul               { list-style-type : '–  '; }
+.page li::marker       { color : var(--pi-ink); }
+
+/* HEADINGS */
+.page :is(h1, h2, h3, h4, h5, h6) {
+	font-weight : normal;
+	font-style  : normal;
+	color       : var(--pi-ink);
+	break-after : avoid;
+}
+.page h1 {
+	margin-bottom  : .38cm;
+	font-family    : 'Henny Penny', serif;
+	font-size      : 1.42cm;
+	line-height    : 1.04em;
+	letter-spacing : .005em;
+	text-align     : center;
+	text-transform : uppercase;
+	text-shadow    : 0 0 1px rgba(29, 23, 18, .55);   /* a hint of ink bleed */
+}
+.page h1 + p::first-line { font-variant : normal; }
+.page h2 {
+	font-family    : 'Henny Penny', serif;
+	font-size      : .74cm;
+	line-height    : 1.05em;
+	text-transform : uppercase;
+}
+.page h3 {
+	padding-bottom : .16cm;
+	font-family    : 'Cinzel', serif;
+	font-size      : .47cm;
+	font-weight    : 700;
+	line-height    : 1.1em;
+	letter-spacing : .05em;
+	border-bottom  : 0;
+	background     : var(--pi-rule) left bottom / 100% 6px no-repeat;
+}
+.page h4 {
+	font-family    : 'Cinzel', serif;
+	font-size      : .4cm;
+	font-weight    : 700;
+	letter-spacing : .04em;
+}
+.page h5 {
+	font-family    : 'Cinzel', serif;
+	font-size      : .34cm;
+	font-weight    : 700;
+	letter-spacing : .1em;
+}
+.page h6 {
+	font-family    : 'EB Garamond', serif;
+	font-size      : .36cm;
+	font-style     : italic;
+	font-weight    : 600;
+}
+
+/* KICKER  ·  {{kicker SERIES}} above a title */
+.page .kicker {
+	display        : block;
+	column-span    : all;
+	margin-bottom  : .4cm;
+	padding-bottom : .5cm;
+	font-family    : 'Cinzel', serif;
+	font-size      : .95cm;
+	font-style     : normal;
+	font-weight    : 700;
+	line-height    : 1em;
+	letter-spacing : .07em;
+	color          : var(--pi-ink);
+	text-align     : center;
+	background     : var(--pi-arrow) center bottom / 1.4cm .52cm no-repeat;
+}
+.page .kicker + h1 { margin-top : 0; }
+
+/* DROP CAP  ·  automatic after an H1, or {{dropcap ...}} / p.drop-cap */
+.page h1 + p::first-letter,
+.page p.first-letter::first-letter,
+.page p.drop-cap::first-letter,
+.page .dropcap > p:first-of-type::first-letter {
+	float                   : left;
+	margin                  : .06cm .14cm -.06cm -.06cm;
+	padding                 : .1cm .14cm .02cm .1cm;
+	font-family             : 'IM Fell English', serif;
+	font-size               : 1.62cm;
+	font-style              : normal;
+	line-height             : .86em;
+	color                   : var(--pi-ink);
+	background-color        : transparent;
+	background-image        : var(--pi-blot);
+	background-position     : center;
+	background-size         : 150% 150%;
+	background-repeat       : no-repeat;
+	-webkit-background-clip : border-box;
+	background-clip         : border-box;
+	text-shadow             : 0 0 1px rgba(29, 23, 18, .4);
+}
+.page .dropcap > p:first-of-type { text-indent : 0; }
+/* PHB blocks are inline-block + break-inside:avoid, i.e. unsplittable: let prose flow */
+.page .dropcap { display : block; break-inside : auto; }
+
+/* INTRO  ·  {{intro ...}}  full-width, balanced two-column lead-in */
+.page .intro {
+	display       : block;     /* hbfm blocks are inline-block; column-span ignores those */
+	column-span   : all;
+	columns       : 2;
+	column-gap    : .85cm;
+	column-fill   : balance;
+	margin-bottom : .4cm;
+}
+
+/* RULE  ·  {{rule}} */
+.page .rule {
+	display    : block;
+	height     : 14px;
+	margin     : .25cm 0;
+	background : var(--pi-rule) center / 100% 100% no-repeat;
+}
+
+
+/* ARTWORK _________________________________________________________ */
+/* stock behaviour (absolute images with inline styles) still works;
+   they just pick up the watercolour grade                                */
+.page img {
+	filter         : var(--pi-art-grade);
+	mix-blend-mode : var(--pi-art-blend);
+}
+
+/* PLATE  ·  art in a plain ink-ruled frame, as in a field journal */
+.page .plate {
+	position       : relative;
+	display        : block;
+	z-index        : 0;
+	height         : 9cm;
+	margin         : .1cm 0 .3cm;
+	padding        : 0;
+	break-inside   : avoid;
+	isolation      : isolate;
+}
+.page .plate.wide { column-span : all; }
+.page .plate img {
+	position        : absolute;
+	inset           : 0;
+	z-index         : -1;
+	width           : 100%;
+	height          : 100%;
+	object-fit      : cover;
+	object-position : var(--art-x, 50%) var(--art-y, 50%);
+}
+.page .plate::after {
+	content        : '';
+	position       : absolute;
+	inset          : -7px;
+	pointer-events : none;
+	border         : 14px solid transparent;
+	border-image   : var(--pi-inkbox) 22 / 14px / 0 stretch;
+}
+.page .plate p { margin : 0; }
+
+/* CAPTION  ·  {{caption ...}} */
+.page .caption {
+	display     : block;
+	font-family : 'EB Garamond', serif;
+	font-size   : .27cm;
+	font-style  : italic;
+	line-height : 1.25em;
+	color       : var(--pi-faint);
+	text-indent : 0;
+}
+.page .caption p { text-indent : 0; }
+
+/* stock watercolour masks → grey ink washes */
+.page [class*='watercolor'] {
+	z-index          : -2;
+	mix-blend-mode   : multiply;
+	opacity          : .4;
+	background-color : var(--HB_Color_WatercolorStain);
+}
+
+
+/* NOTE  ·  sketched box ___________________________________________ */
+/* boxes swap PHB's bitmap borders for the ink box; border-box sizing keeps
+   the drawn border inside the column instead of spilling into the gutter  */
+.page .note {
+	box-sizing       : border-box;
+	font-family      : 'EB Garamond', serif;
+	margin-block     : .3cm;
+	padding          : .3cm .38cm;
+	font-style       : normal;
+	font-size        : .35cm;
+	background-color : var(--pi-wash);
+	background-image : var(--pi-grain);
+	background-size  : 400px 400px;
+	border           : 10px solid transparent;
+	border-image     : var(--pi-inkbox) 22 / 14px / 4px stretch;
+	box-shadow       : none;
+}
+.page .note h5 { margin-bottom : .08cm; }
+.page .note p  { text-indent : 0; }
+
+/* DESCRIPTIVE  ·  read-aloud ______________________________________ */
+.page .descriptive {
+	margin-block     : .3cm;
+	font-family      : 'EB Garamond', serif;
+	padding          : .22cm .3cm .22cm .45cm;
+	font-style       : italic;
+	background       : linear-gradient(90deg, var(--pi-wash-2), transparent 80%);
+	border           : 0;
+	border-left      : 3px double var(--pi-ink);
+	border-image     : none;
+	box-shadow       : none;
+}
+.page .descriptive p { line-height : 1.32em; }
+
+
+/* TABLES __________________________________________________________ */
+.page table {
+	font-family : 'EB Garamond', serif;
+	font-size   : .34cm;
+	font-style  : normal;
+	line-height : 1.22em;
+	border-top  : 1.5px solid var(--pi-ink);
+	border-bottom : 1.5px solid var(--pi-ink);
+}
+.page table thead th {
+	padding        : .06cm .1cm .04cm;
+	font-family    : 'Cinzel', serif;
+	font-size      : .3cm;
+	font-weight    : 700;
+	letter-spacing : .04em;
+	color          : var(--pi-ink);
+	border-bottom  : 1px solid var(--pi-ink);
+}
+.page table tbody td { padding : .04cm .1cm; }
+.page table tbody tr:nth-child(odd) { background-color : var(--pi-wash); }
+
+
+/* MONSTER STAT BLOCK ______________________________________________ */
+.page .monster {
+	font-family : 'EB Garamond', serif;
+	font-size   : .345cm;
+	font-style  : normal;
+}
+.page .monster.frame {
+	box-sizing       : border-box;
+	padding          : .2cm .26cm .24cm;
+	background-color : var(--pi-wash);
+	background-image : var(--pi-grain);
+	background-size  : 400px 400px;
+	border           : 10px solid transparent;
+	border-image     : var(--pi-inkbox) 22 / 14px / 4px stretch;
+	box-shadow       : none;
+}
+.page .monster h2 { font-size : .66cm; }
+.page .monster h2 + p { font-style : italic; }
+.page .monster h3 {
+	font-size     : .42cm;
+	background    : none;
+	border-bottom : 1.5px solid var(--pi-ink);
+	padding-bottom: .03cm;
+}
+.page .monster :is(dt, strong) { color : var(--pi-ink); }
+.page .monster hr {
+	height     : 2px;
+	background : var(--pi-ink);
+	opacity    : .85;
+	-webkit-clip-path : polygon(0 0, 100% 50%, 0 100%);
+	clip-path  : polygon(0 0, 100% 50%, 0 100%);
+}
+
+
+/* TABLE OF CONTENTS _______________________________________________ */
+.page .toc h1 { text-align : center; }
+.page .toc h3 {
+	font-family    : 'EB Garamond', serif;
+	font-size      : .39cm;
+	font-weight    : 600;
+	letter-spacing : 0;
+	background     : none;
+}
+.page .toc h4 { font-family : 'Cinzel', serif; font-weight : 700; font-size : .36cm; }
+.page .toc ul span:first-child::after { border-bottom : .04cm dotted var(--pi-faint); }
+.page .toc ul span:last-child { font-family : 'Henny Penny', serif; color : var(--pi-ink); }
+.page .toc a { text-decoration : none; }
+
+
+/* CODE ____________________________________________________________ */
+.page code {
+	font-size        : .32cm;
+	font-style       : normal;
+	color            : var(--pi-ink);
+	background-color : var(--pi-wash-2);
+}
+
+
+/* STOCK COVERS  ·  re-ink the PHB cover snippets ___________________ */
+.page:has(:is(.frontCover, .insideCover, .backCover)) h1 {
+	font-family         : 'Henny Penny', serif;
+	font-size           : 1.9cm;
+	line-height         : 1.02em;
+	color               : var(--pi-ink);
+	-webkit-text-stroke : 0;
+	text-shadow         : 0 0 1px rgba(29, 23, 18, .55);
+}
+.page:has(:is(.frontCover, .insideCover, .backCover)) h2 {
+	font-family         : 'Cinzel', serif;
+	font-weight         : 700;
+	color               : var(--pi-ink);
+	-webkit-text-stroke : 0;
+}
+.page:has(:is(.frontCover, .insideCover)) hr {
+	height           : 14px;
+	background-image : var(--pi-rule);
+	filter           : none;
+}
+.page:has(.frontCover) .footnote {
+	font-family         : 'EB Garamond', serif;
+	font-style          : italic;
+	color               : var(--pi-text);
+	-webkit-text-stroke : 0;
+}
+.page:has(:is(.frontCover, .backCover)) .pageNumber { display : none; }
+
+
+/* PRINT ___________________________________________________________
+   Homebrewery pages are US Letter (215.9 x 279.4 mm). Pin the sheet so the
+   print dialog can't leave a strip under the background or crop the frame.
+   The torn-edge mask leaves the very edge of the sheet unprinted (white),
+   like the reference; use  \page {untorn}  if you'd rather print to bleed. */
+@page { size : 215.9mm 279.4mm; margin : 0; }
+@media print {
+	* { -webkit-print-color-adjust : exact; print-color-adjust : exact; }
+}
