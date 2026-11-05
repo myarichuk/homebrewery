@@ -131,3 +131,19 @@ ___
 }}
 
 {{pageNumber,auto}}
+
+\page {frame-occult,crest-classic}
+
+{{wreath
+![Portrait](/assets/catwarrior.jpg)
+## Sir Whiskers
+*Factol of the Fated*
+}}
+
+## A Portrait in Thorns
+
+The wreath frames a heading on its ribbon and, if you give it one, an image clipped to the oval behind. It suits faction leaders, patrons and chapter emblems.
+
+The corners on this page are the occult set: four different drawings, an eye in the triangle, a key, a skull among runes and an ouroboros under the phases of the moon.
+
+{{pageNumber,auto}}

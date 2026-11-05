@@ -17,7 +17,7 @@
      plain    corners + crest only, no marginalia
      bare     no ink art at all: just the paper
      untorn   straight page edges (for printers that dislike the mask)
-     frame-classic / frame-thorn / frame-gothic / frame-bone   corner set
+     frame-classic / -thorn / -gothic / -bone / -occult        corner set
      crest-compass / crest-classic / crest-skull / crest-blades /
      crest-beetle / crest-none                                 page-top crest
      (set them for the whole book with  .page { --pi-frame : var(--pi-frame-thorn); }
@@ -41,6 +41,8 @@
      {{rule}}                 thorn-and-star divider; + vine / knot / barbed
      {{cartouche ... }}       thorn-and-leaf title frame (covers, chapter
                               openers); put an H1 inside
+     {{wreath ... }}          oval thorn wreath: heading on the ribbon,
+                              optional image in the oval (full sheet only)
      {{orn ☠}}                inline ornament from Planar Thorn:
                                 ☠ skull & bones   💀 skull     ⚔ swords
                                 † cross-dagger    ❖ diamonds   ☨ barred cross
@@ -121,7 +123,7 @@
        .page { --pi-frame : var(--pi-frame-thorn); }
    or per page on the \page line:   \page {frame-thorn, crest-skull}
 
-   frames  classic · thorn · gothic · bone
+   frames  classic · thorn · gothic · bone · occult (four different corners)
    crests  compass (default) · classic · skull · blades · beetle · none
    (planar-ink-lite.css carries only the classic frame and the compass
     and classic crests.)                                                  */
@@ -135,6 +137,7 @@
 .page.frame-thorn    { --pi-frame : var(--pi-frame-thorn); }
 .page.frame-gothic   { --pi-frame : var(--pi-frame-gothic); }
 .page.frame-bone     { --pi-frame : var(--pi-frame-bone); }
+.page.frame-occult   { --pi-frame : var(--pi-frame-occult); }
 .page.crest-compass  { --pi-crest : var(--pi-p-crest-compass); --pi-crest-size : 400px 114px; --pi-crest-top : 8px; }
 .page.crest-classic  { --pi-crest : var(--pi-crest-classic);   --pi-crest-size : 313px 66px;  --pi-crest-top : 14px; }
 .page.crest-skull    { --pi-crest : var(--pi-p-crest-skull);   --pi-crest-size : 420px 78px;  --pi-crest-top : 22px; }
@@ -367,6 +370,56 @@
 .page .cartouche :is(h1, h2) { margin : 0; font-size : 1.2cm; line-height : 1em; white-space : nowrap; }
 .page .cartouche h1 + p::first-letter { all : unset; }
 .page .cartouche p { margin : .05cm 0 0; text-indent : 0; font-family : 'Cinzel', serif; font-size : .34cm; font-weight : 700; letter-spacing : .12em; }
+
+/* WREATH  ·  {{wreath ... }}  oval thorn wreath with a ribbon.
+   The first heading inside goes on the ribbon; an image inside fills the
+   oval behind it, clipped to the wreath's opening (a portrait medallion,
+   a chapter emblem). Anything else is centred under the ribbon.
+
+     {{wreath
+     ![](portrait.webp)
+     ## Lady of Pain
+     }}                                                                   */
+.page .wreath {
+	position        : relative;
+	display         : block;
+	column-span     : all;
+	width           : var(--wreath-w, 11cm);
+	max-width       : 100%;
+	margin          : .2cm auto .5cm;
+	aspect-ratio    : 380 / 278.5;
+	text-align      : center;
+	background      : var(--pi-p-wreath) center / 100% 100% no-repeat;
+	break-inside    : avoid;
+}
+.page .wreath img {
+	position        : absolute;
+	top             : 21%;
+	left            : 18%;
+	z-index         : -1;
+	width           : 64%;          /* a replaced element won't stretch between insets */
+	height          : 62%;
+	object-fit      : cover;
+	-webkit-clip-path : ellipse(50% 50%);
+	clip-path       : ellipse(50% 50%);
+	-webkit-mask-image : none;
+	mask-image      : none;
+}
+.page .wreath :is(h1, h2, h3, h4) {
+	position        : absolute;
+	top             : 47.5%;
+	left            : 33%;
+	right           : 33%;
+	margin          : 0;
+	font-size       : var(--wreath-title, .62cm);
+	line-height     : 1;
+	white-space     : nowrap;
+	transform       : translateY(-50%);
+}
+.page .wreath p:has(img) { position : static; margin : 0; }
+.page .wreath p:not(:has(img)) { position : absolute; top : 62%; left : 30%; right : 30%; margin : 0; text-indent : 0; font-size : .3cm; font-style : italic; }
+.page .wreath:has(img) p:not(:has(img)) { top : 100%; }     /* with a portrait, the subtitle goes under the wreath */
+.page .wreath h1 + p::first-letter { all : unset; }
 
 /* ORNAMENT  ·  {{orn ☠}} inline, takes the text colour */
 .page .orn {

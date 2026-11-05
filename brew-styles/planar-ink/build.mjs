@@ -257,8 +257,10 @@ const SPLATS_PER_PAGE = 7;
 const WASHES_PER_PAGE = 2;
 const MARGIN_TOP = 244, MARGIN_BOTTOM = 828;     // between the corner brackets
 
-// left / right margin bands (page px)
-const band = (side, w)=>(side === 0 ? [26, Math.max(26, 104 - w)] : [Math.min(792 - w, 714), 792 - w]);
+// left / right margin bands (page px). Generous on purpose: a drawing may
+// sit near the torn edge or tuck a little toward the text, so the pieces
+// don't line up in a ruled column down each margin.
+const band = (side, w)=>(side === 0 ? [14, Math.max(14, 122 - w)] : [Math.min(802 - w, 694), 802 - w]);
 
 const overlaps = (a, b, gap)=>a[0] < b[0] + b[2] + gap && b[0] < a[0] + a[2] + gap && a[1] < b[1] + b[3] + gap && b[1] < a[1] + a[3] + gap;
 
@@ -294,18 +296,19 @@ const marginaliaLayout = (i)=>{
 	const r = mulberry32(SEED ^ (0x3A11 + i * 101));
 	const taken = [], placed = [];
 	const put = (p, regions, gap)=>{
-		const box = place(r, taken, p.w, p.h, regions, gap);
-		if (box) placed.push({ p, x: box[0], y: box[1], w: p.w, h: p.h });
+		const k = .82 + r() * .36;                              // drawn a little larger or smaller each time
+		const box = place(r, taken, p.w * k, p.h * k, regions(p.w * k), gap);
+		if (box) placed.push({ p, x: box[0], y: box[1], w: p.w * k, h: p.h * k });
 	};
 	// a pendant hangs from the top of one margin on most pages
 	if (r() < .65) {
 		const p = HANG_POOL[Math.floor(r() * HANG_POOL.length)];
 		const side = r() < .5 ? 0 : 1;
-		put(p, [[...band(side, p.w), MARGIN_TOP, MARGIN_TOP + p.h + 14]], 20);
+		put(p, (w)=>[[...band(side, w), MARGIN_TOP, MARGIN_TOP + p.h * 1.2 + 14]], 20);
 	}
 	const count = 3 + (r() < .5 ? 1 : 0);
 	for (const p of shuffle(r, MARG_POOL).slice(0, count)) {
-		put(p, [[...band(0, p.w), MARGIN_TOP, MARGIN_BOTTOM], [...band(1, p.w), MARGIN_TOP, MARGIN_BOTTOM]], 24);
+		put(p, (w)=>[[...band(0, w), MARGIN_TOP, MARGIN_BOTTOM], [...band(1, w), MARGIN_TOP, MARGIN_BOTTOM]], 24 + r() * 40);
 	}
 	return lists(placed);
 };
@@ -352,7 +355,8 @@ const scatterCss = ()=>{
 
 /* ---------- emit ---------------------------------------------------------
    Two sheets are written:
-     planar-ink.css       everything: 4 corner sets, 5 crests, 4 rules
+     planar-ink.css       everything: 5 corner sets, 5 crests, 4 rules,
+                          the thorn wreath
      planar-ink-lite.css  classic corners, classic + compass crests, thorn
                           rule only: about half the size, for a lighter
                           Style tab. Classes for the missing options just
@@ -362,13 +366,14 @@ const readSvg = (file)=>svgUri(fs.readFileSync(path.join(here, file), 'utf8'));
 const EXTRA_FRAMES = Object.keys(manifest.frames);
 const CRESTS = Object.keys(manifest.pieces).filter((n)=>manifest.pieces[n].role === 'crest');
 const RULES  = Object.keys(manifest.pieces).filter((n)=>manifest.pieces[n].role === 'rule');
+const PLATES = Object.keys(manifest.pieces).filter((n)=>manifest.pieces[n].role === 'plate');
 const LITE_KEEP = new Set(['crest-compass', 'rule-thorn']);
 
 const buildAssets = (lite)=>({
 	'--pi-frame-classic' : readSvg('art/frame.svg'),
 	...Object.fromEntries((lite ? [] : EXTRA_FRAMES).map((n)=>[`--pi-frame-${n}`, readSvg(`art/frame-${n}.svg`)])),
 	'--pi-crest-classic' : readSvg('art/m-crest.svg'),
-	...Object.fromEntries([...CRESTS, ...RULES].filter((n)=>!lite || LITE_KEEP.has(n)).map((n)=>[`--pi-p-${n}`, webpUri(`art/p-${n}.webp`)])),
+	...Object.fromEntries([...CRESTS, ...RULES, ...PLATES].filter((n)=>!lite || LITE_KEEP.has(n)).map((n)=>[`--pi-p-${n}`, webpUri(`art/p-${n}.webp`)])),
 	...Object.fromEntries(Object.keys(CLASSIC).map((n)=>[`--pi-m-${n}`, readSvg(`art/m-${n}.svg`)])),
 	...Object.fromEntries(CLASSIC_MARG.map((n)=>[`--pi-m-${n}-tone`, webpUri(`art/m-${n}-tone.webp`)])),
 	...Object.fromEntries([...byRole('marg'), ...byRole('hang'), ...byRole('splat'), ...byRole('pool')]

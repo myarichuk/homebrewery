@@ -36,6 +36,7 @@ import sys
 
 import numpy as np
 from PIL import Image
+from scipy import ndimage
 
 HERE    = os.path.dirname(os.path.abspath(__file__))
 INK     = (29, 23, 18)
@@ -45,6 +46,8 @@ RES     = 2.5          # 240 dpi on the printed page: past what ink-on-paper tex
 SHEETS  = {
 	'm' : ('source/marginalia-2.jpg', (1493, 2000)),
 	'h' : ('source/headers.jpg', (2000, 1493)),
+	'w' : ('source/wreath.webp', (1500, 1000)),           # transparent, magenta-keyed shading
+	'o' : ('source/corners-occult.webp', (1500, 1000)),   # transparent, magenta-keyed shading
 }
 
 # name: (sheet, crop, css width, role, options)
@@ -99,6 +102,8 @@ PIECES = {
 	                   {'clear': [(150, 418, 842, 498), (1158, 418, 1852, 498)]}),   # banner spikes below
 	'crest-skull'   : ('h', (118, 778, 1872, 1102),  420, 'crest'),
 	'crest-blades'  : ('h', (160, 1098, 1848, 1472), 400, 'crest'),
+	# ------------------------------------------------------- wreath frame
+	'wreath'        : ('w', (125, 38, 1372, 952),    380, 'plate', {'res': 2, 'fill': [(750, 495)]}),   # dense engraving: 2x keeps it under 100 KiB
 }
 
 # Corner sets: (sheet, crop, which corner the drawing is, css width).
@@ -107,6 +112,9 @@ PIECES = {
 FRAMES = {
 	'thorn'  : dict(top=('m', (0, 0, 312, 338), 'tl', 150), bottom=('m', (24, 348, 308, 612), 'bl', 140)),
 	'gothic' : dict(top=('m', (328, 22, 588, 300), 'tl', 132), bottom=None),
+	# four different corners, placed as drawn (no mirroring)
+	'occult' : dict(res=2, corners={'tl': ('o', (60, 45, 615, 555), 196), 'tr': ('o', (978, 50, 1432, 520), 162),
+	                         'bl': ('o', (70, 575, 525, 950), 160), 'br': ('o', (868, 540, 1425, 950), 196)}),
 	'bone'   : dict(top=('m', (812, 86, 1338, 602), 'tr', 190), bottom=None,
 	                clear=[(812, 380, 1186, 602)]),          # the beetle crest sits inside this box
 }
@@ -114,11 +122,24 @@ INSET = 18      # px from the page edge
 
 
 def load(sheet):
+	"""Sheet as greyscale ink-on-white. Transparent sheets are flattened onto
+	white. Some generated sheets fill their hatching gaps with magenta (a
+	keying colour the generator half-applied): that is paper, not ink, so
+	strongly magenta pixels are pushed back to white."""
 	path, size = SHEETS[sheet]
-	im = Image.open(os.path.join(HERE, path)).convert('L')
+	im = Image.open(os.path.join(HERE, path))
 	if im.size != size:
 		sys.exit(f'{path}: expected {size}, got {im.size}; the crop tables would be wrong')
-	return im
+	if im.mode in ('RGBA', 'LA', 'P'):
+		bg = Image.new('RGBA', im.size, (255, 255, 255, 255))
+		bg.alpha_composite(im.convert('RGBA'))
+		im = bg
+	rgb = np.asarray(im.convert('RGB'), np.float32)
+	r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
+	L = rgb @ np.array([.299, .587, .114], np.float32)
+	t = np.clip((np.minimum(r, b) - g - 40) / 60, 0, 1)
+	L = L + (255 - L) * t
+	return Image.fromarray(np.clip(L + 0.5, 0, 255).astype(np.uint8), 'L')
 
 
 def darkness(img, crop, clear=()):
@@ -129,6 +150,25 @@ def darkness(img, crop, clear=()):
 	d = np.clip((P - L) / P, 0, 1)
 	for x0, y0, x1, y1 in clear:
 		d[max(0, y0 - crop[1]):max(0, y1 - crop[1]), max(0, x0 - crop[0]):max(0, x1 - crop[0])] = 0
+	return drop_intruders(d)
+
+
+def drop_intruders(d):
+	"""Sheets pack drawings tightly, so a crop box catches corners of its
+	neighbours. Anything that is cut by the crop edge and is not part of the
+	drawing itself (the largest connected shape, or one at least a third of
+	its size) is a neighbour: blank it. Free-standing specks inside the box
+	(splatter dots, stars) don't touch the edge and stay."""
+	ink = ndimage.binary_dilation(d > 0.12, iterations=3)
+	lab, n = ndimage.label(ink)
+	if n < 2:
+		return d
+	sizes = ndimage.sum(ink, lab, range(1, n + 1))
+	edge = set(np.unique(np.concatenate([lab[0], lab[-1], lab[:, 0], lab[:, -1]]))) - {0}
+	keep = sizes >= sizes.max() / 3
+	drop = [i + 1 for i in range(n) if (i + 1) in edge and not keep[i]]
+	if drop:
+		d = np.where(np.isin(lab, drop), 0, d)
 	return d
 
 
@@ -137,11 +177,21 @@ def smooth(d, lo, hi):
 	return t * t * (3 - 2 * t)
 
 
-def raster(d, w, h, strength=1.0, res=RES):
+PAPER = np.array([239, 224, 189], np.float32)
+
+
+def raster(d, w, h, strength=1.0, res=RES, fill=None):
+	"""fill: bool mask of enclosed areas to make opaque paper (a ribbon or
+	plate face that text sits on, so nothing behind shows through)."""
 	a = smooth(d, 0.06, 0.8) * strength
 	rgba = np.zeros((*a.shape, 4), np.uint8)
 	rgba[..., :3] = INK
 	rgba[..., 3] = (a * 255 + 0.5).astype(np.uint8)
+	if fill is not None and fill.any():
+		ink = np.array(INK, np.float32)
+		col = ink * a[..., None] + PAPER * (1 - a[..., None])
+		rgba[fill, :3] = (col[fill] + 0.5).astype(np.uint8)
+		rgba[fill, 3] = 255
 	img = Image.fromarray(rgba, 'RGBA')
 	return img.resize((max(1, round(w * res)), max(1, round(h * res))), Image.LANCZOS)
 
@@ -170,14 +220,27 @@ def main():
 		d = darkness(sheets[sheet], crop, opt.get('clear', ()))
 		k = cw / (crop[2] - crop[0])
 		w, h = round(cw, 1), round((crop[3] - crop[1]) * k, 1)
-		size = write(f'p-{name}.webp', webp_bytes(raster(d, w, h, opt.get('strength', 1.0))))
+		fill = None
+		if opt.get('fill'):
+			lab, _ = ndimage.label(d < 0.35)
+			seeds = [lab[y - crop[1], x - crop[0]] for x, y in opt['fill']]
+			fill = ndimage.binary_dilation(np.isin(lab, [s_ for s_ in seeds if s_]), iterations=2)
+		size = write(f'p-{name}.webp', webp_bytes(raster(d, w, h, opt.get('strength', 1.0), opt.get('res', RES), fill)))
 		manifest['pieces'][name] = {'w': w, 'h': h, 'role': role}
 		total += size
 		print(f'{name:14s} {w:6.1f} x {h:6.1f}  {size / 1024:6.1f} KiB')
 
 	for fname, f in FRAMES.items():
 		defs, uses = [], []
-		for part in ('top', 'bottom'):
+		for corner, (sheet, crop, cw) in f.get('corners', {}).items():
+			d = darkness(sheets[sheet], crop)
+			k = cw / (crop[2] - crop[0])
+			w, h = cw, round((crop[3] - crop[1]) * k, 1)
+			b64 = base64.b64encode(webp_bytes(raster(d, w, h, res=f.get('res', RES)))).decode()
+			x = INSET if corner[1] == 'l' else PAGE_W - INSET - w
+			y = INSET if corner[0] == 't' else PAGE_H - INSET - h
+			uses.append(f'<image x="{x:g}" y="{y:g}" width="{w:g}" height="{h:g}" href="data:image/webp;base64,{b64}"/>')
+		for part in (('top', 'bottom') if 'top' in f else ()):
 			flip_v = f[part] is None              # reuse the top drawing, flipped
 			sheet, crop, drawn, cw = f[part] or f['top']
 			if not flip_v:

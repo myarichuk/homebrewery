@@ -2,6 +2,7 @@
  "frames": {
   "bone": true,
   "gothic": true,
+  "occult": true,
   "thorn": true
  },
  "pieces": {
@@ -189,6 +190,11 @@
    "h": 51.9,
    "role": "splat",
    "w": 70
+  },
+  "wreath": {
+   "h": 278.5,
+   "role": "plate",
+   "w": 380
   }
  }
 }
