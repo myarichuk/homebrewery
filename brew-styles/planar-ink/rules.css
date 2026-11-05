@@ -111,25 +111,41 @@
 }
 .page.untorn { -webkit-mask : none; mask : none; }
 
-/* corners, crest and marginalia: one overlay underneath the text */
+/* corners and crest: one overlay underneath the text */
 .page::before {
 	content           : '';
 	position          : absolute;
 	inset             : 0;
 	z-index           : -1;
 	pointer-events    : none;
-	background-image  : var(--pi-frame), var(--pi-marginalia);
+	background-image  : var(--pi-frame);
 	background-size   : 100% 100%;
 	background-repeat : no-repeat;
 }
-/* facing pages: mirror the marginalia so the skulls sit on the outer edge */
-.page:nth-child(even)::before { transform : scaleX(-1); }
-.page.plain { --pi-marginalia : none; }
-.page.bare  { --pi-frame : none; --pi-marginalia : none; }
 
-/* the PHB footer accent fights the corners – drop it */
-.page::after { display : none; }
-
+/* marginalia and ink splatter: a second overlay, laid out per page.
+   The positions come from the generated block above (3 layouts, 5 splatter
+   sets, 4 nudges, cycling over pages: no two pages in 60 alike).
+   Facing pages are mirrored so the layout reads from the outer edge.    */
+.page::after {
+	content             : '';
+	display             : block;
+	position            : absolute;
+	inset               : 0;
+	z-index             : -1;
+	width               : auto;
+	height              : auto;
+	pointer-events      : none;
+	background-image    : var(--pi-m-skull), var(--pi-m-skull-sm), var(--pi-m-dagger), var(--pi-m-compass), var(--pi-m-orrery), var(--pi-splat-img);
+	background-position : var(--pi-marg-pos), var(--pi-splat-pos);
+	background-size     : auto, auto, auto, auto, auto, var(--pi-splat-size);
+	background-repeat   : no-repeat;
+	-webkit-mask        : none;
+	mask                : none;
+}
+.page:nth-child(even)::after { transform : scaleX(-1); }
+.page:is(.plain, .bare)::after { display : none; }
+.page.bare::before { display : none; }
 
 /* FOOTER __________________________________________________________ */
 .page .pageNumber,
@@ -182,15 +198,14 @@
 	line-height    : 1.06em;
 	letter-spacing : .01em;
 	text-align     : center;
-	text-transform : uppercase;
-	text-shadow    : 0 0 1px rgba(29, 23, 18, .55);   /* a hint of ink bleed */
+	text-transform : none;      /* as written: capitals tall, lowercase as small caps */
 }
 .page h1 + p::first-line { font-variant : normal; }
 .page h2 {
 	font-family    : 'Planar Thorn', 'Cinzel', serif;
 	font-size      : .7cm;
 	line-height    : 1.08em;
-	text-transform : uppercase;
+	text-transform : none;
 }
 .page h3 {
 	padding-bottom : .16cm;
@@ -269,7 +284,6 @@
 	background-repeat       : no-repeat;
 	-webkit-background-clip : border-box;
 	background-clip         : border-box;
-	text-shadow             : 0 0 1px rgba(29, 23, 18, .4);
 }
 .page .dropcap > p:first-of-type { text-indent : 0; }
 /* PHB blocks are inline-block + break-inside:avoid, i.e. unsplittable: let prose flow */
@@ -331,15 +345,21 @@
    Every image is graded and multiplied into the paper. Masking is opt-in.
 
    THE MASK
-   .watercolor-mask paints the element through two alpha layers:
-       --pi-wc-shape  an uneven watercolour silhouette (generated SVG with
-                      no intrinsic size, so it stretches to the box)
-       --pi-wc-fade   a directional gradient, solid by default
-   intersected, so a fade only ever removes more art. The silhouette sits
-   ~16% inside the box on every side – size the box generously.
+   .watercolor-mask gives the art a torn-paper edge. The picture keeps
+   almost all of its box; only a rim of ~1-3% is ragged.
+       --pi-wc-shape  the torn edge: plain vector polygons, no SVG filters,
+                      so it prints as sharply as it displays. No intrinsic
+                      size: it stretches to the box.
+                      wc-1 torn paper · wc-2 rough tear
+                      wc-3 bleed: wide soft watercolour rim, no frame
+       ink-frame      (block form) hand-inked border over the art
+       --pi-wc-fade   optional directional fade (fade-left/-right/-top/-bottom)
+                      for art that should bleed into the text side.
 
-   Works on an <img> directly:   ![](url){watercolor-mask,fade-left}
-   or on a block wrapping one:   {{watercolor-mask,wide,height:9cm ... }}  */
+   Prefer the block form for print:  {{watercolor-mask,wide,height:9cm ... }}
+   The wrapper takes the fade, the image the edge: one mask per element.
+   ![](url){watercolor-mask} on a bare image works too; adding a fade there
+   needs mask-composite, which some PDF exporters drop.                   */
 
 .page img {
 	filter         : var(--pi-art-grade);
@@ -358,32 +378,45 @@
 	background-color : transparent;
 	background-size  : auto;
 	--pi-wc-shape : var(--pi-wc-1);
-	--pi-wc-fade  : linear-gradient(#000, #000);
-	-webkit-mask-image     : var(--pi-wc-shape), var(--pi-wc-fade);
-	mask-image             : var(--pi-wc-shape), var(--pi-wc-fade);
-	-webkit-mask-size      : 100% 100%;
-	mask-size              : 100% 100%;
-	-webkit-mask-repeat    : no-repeat;
-	mask-repeat            : no-repeat;
-	-webkit-mask-composite : source-in;
-	mask-composite         : intersect;
+	--pi-wc-fade  : none;
+	-webkit-mask-image  : var(--pi-wc-shape);
+	mask-image          : var(--pi-wc-shape);
+	-webkit-mask-size   : 100% 100%;
+	mask-size           : 100% 100%;
+	-webkit-mask-repeat : no-repeat;
+	mask-repeat         : no-repeat;
 }
 .page .wc-2 { --pi-wc-shape : var(--pi-wc-2); }
 .page .wc-3 { --pi-wc-shape : var(--pi-wc-3); }
 
 /* fade toward the side the text is on */
-.page .fade-left   { --pi-wc-fade : linear-gradient(to right,  transparent, #000 40%); }
-.page .fade-right  { --pi-wc-fade : linear-gradient(to left,   transparent, #000 40%); }
-.page .fade-top    { --pi-wc-fade : linear-gradient(to bottom, transparent, #000 40%); }
-.page .fade-bottom { --pi-wc-fade : linear-gradient(to top,    transparent, #000 40%); }
+.page .fade-left   { --pi-wc-fade : linear-gradient(to right,  transparent, #000 30%); }
+.page .fade-right  { --pi-wc-fade : linear-gradient(to left,   transparent, #000 30%); }
+.page .fade-top    { --pi-wc-fade : linear-gradient(to bottom, transparent, #000 30%); }
+.page .fade-bottom { --pi-wc-fade : linear-gradient(to top,    transparent, #000 30%); }
 
-/* block form: the wrapper is masked, the image just fills it */
+/* An <img> with a fade needs both layers intersected on one element.
+   mask-composite is the least print-safe piece of all this (WebKit's PDF
+   path has dropped it); the block form below avoids it.                 */
+.page img.watercolor-mask:is(.fade-left, .fade-right, .fade-top, .fade-bottom) {
+	-webkit-mask-image     : var(--pi-wc-shape), var(--pi-wc-fade);
+	mask-image             : var(--pi-wc-shape), var(--pi-wc-fade);
+	-webkit-mask-composite : source-in;
+	mask-composite         : intersect;
+}
+
+/* BLOCK FORM  ·  one mask per element, nothing to composite:
+   the wrapper carries the fade (if any) and does the multiply into the
+   paper; the image inside carries the torn edge.                        */
 .page :is(div, span).watercolor-mask,
 .page .plate {
-	position     : relative;
-	display      : block;
-	height       : 9cm;
-	break-inside : avoid;
+	position            : relative;
+	display             : block;
+	height              : 9cm;
+	break-inside        : avoid;
+	-webkit-mask-image  : var(--pi-wc-fade);
+	mask-image          : var(--pi-wc-fade);
+	mix-blend-mode      : var(--pi-art-blend);
 }
 .page .plate.wide,
 .page div.watercolor-mask.wide { column-span : all; width : auto; }   /* auto, not PHB's 100%, so negative margins bleed */
@@ -396,9 +429,30 @@
 	height          : 100%;
 	object-fit      : cover;
 	object-position : var(--art-x, 50%) var(--art-y, 50%);
+	-webkit-mask-image  : var(--pi-wc-shape);
+	mask-image          : var(--pi-wc-shape);
+	-webkit-mask-size   : 100% 100%;
+	mask-size           : 100% 100%;
+	-webkit-mask-repeat : no-repeat;
+	mask-repeat         : no-repeat;
+	mix-blend-mode  : normal;
 }
 .page :is(div, span).watercolor-mask p,
 .page .plate p { margin : 0; }
+
+/* INK FRAME  ·  add  ink-frame  to a block-form mask for the framed panel
+   of the references: a rough pen border drawn over the art, with the paint
+   running a little past it. Pair with wc-1 (default) or wc-2.            */
+.page :is(div, span).watercolor-mask.ink-frame::after {
+	content        : '';
+	position       : absolute;
+	inset          : 0;
+	z-index        : 1;
+	box-sizing     : border-box;
+	border         : 22px solid transparent;
+	border-image   : var(--pi-ink-frame) 40 / 22px stretch;
+	pointer-events : none;
+}
 
 /* FLOAT  ·  text wraps the silhouette itself, not the bounding box.
    shape-outside reads the same mask image as the art, so the wrap line
@@ -542,7 +596,6 @@
 	line-height         : 1.02em;
 	color               : var(--pi-ink);
 	-webkit-text-stroke : 0;
-	text-shadow         : 0 0 1px rgba(29, 23, 18, .55);
 }
 .page:has(:is(.frontCover, .insideCover, .backCover)) h2 {
 	font-family         : 'Cinzel', serif;

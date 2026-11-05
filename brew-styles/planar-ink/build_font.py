@@ -49,7 +49,7 @@ import numpy as np
 from PIL import Image
 from scipy import ndimage
 
-import potrace
+from inktrace import trace
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.t2CharStringPen import T2CharStringPen
 from fontTools.pens.transformPen import TransformPen
@@ -210,28 +210,6 @@ def build_n(caps):
 
 
 # ----------------------------------------------------------------------------
-def trace(mask):
-	"""bool mask -> RecordingPen in pixel space (y down)."""
-	# potracer reads values below its black level as ink, so hand it the
-	# inverse (False = ink). Pad with paper so contours never touch the edge.
-	bm   = potrace.Bitmap(np.pad(~mask, 2, constant_values=True))
-	path = bm.trace(turdsize=8, turnpolicy=potrace.POTRACE_TURNPOLICY_MINORITY,
-	                alphamax=1.0, opticurve=True, opttolerance=0.4)
-	pen = RecordingPen()
-	for curve in path:
-		sx, sy = curve.start_point.x - 2, curve.start_point.y - 2
-		pen.moveTo((sx, sy))
-		for seg in curve.segments:
-			if seg.is_corner:
-				pen.lineTo((seg.c.x - 2, seg.c.y - 2))
-				pen.lineTo((seg.end_point.x - 2, seg.end_point.y - 2))
-			else:
-				pen.curveTo((seg.c1.x - 2, seg.c1.y - 2), (seg.c2.x - 2, seg.c2.y - 2),
-				            (seg.end_point.x - 2, seg.end_point.y - 2))
-		pen.closePath()
-	return pen
-
-
 class Glyph:
 	def __init__(self, mask, origin, baseline, scale, *, track=TRACK, gap=GAP, raise_=0):
 		self.rec  = trace(mask)

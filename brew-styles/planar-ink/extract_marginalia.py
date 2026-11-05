@@ -25,11 +25,17 @@ how much darker each pixel is than the paper around it:
 Colour is discarded: every pixel becomes the same iron-gall ink (#1d1712)
 and alpha carries the tone, so the art multiplies naturally into the paper.
 
+Line work is then *traced* (potrace, see inktrace.py) at the sheet's full
+resolution and written as SVG paths, so corners and sigils stay as sharp as
+the text at any zoom and in print. A bitmap layer at page size would have
+to be ~2550 px wide to hold up at 300 dpi; the vectors are smaller.
+
 Outputs (relative to this file):
-    art/frame.webp        four corner brackets + crest, page-sized
-    art/marginalia.webp   skulls, sigils, compass, orrery, splatter, page-sized
-    art/blot.webp         grey ink wash behind drop caps
-Page-sized layers are drawn at OUT_SCALE x 816 x 1056 CSS px.
+    art/frame.svg         four corner brackets + crest, 816 x 1056 viewBox
+    art/m-*.svg           skulls, dagger, compass, orrery, splatters: one
+                          file each, placed (and varied per page) by CSS
+    art/blot.webp         grey ink wash behind drop caps (stays a bitmap:
+                          it is all soft tone, nothing to trace)
 """
 
 import os
@@ -38,10 +44,11 @@ import sys
 import numpy as np
 from PIL import Image, ImageFilter, ImageOps
 
+from inktrace import trace, svg_path
+
 HERE      = os.path.dirname(os.path.abspath(__file__))
 PAGE_W    = 816
 PAGE_H    = 1056
-OUT_SCALE = 1.5
 INK_RGB   = (29, 23, 18)               # #1d1712, same as --pi-ink
 LO, HI    = 0.10, 0.55
 SHEET     = (1792, 2400)
@@ -66,17 +73,19 @@ FRAME = [
 	dict(crop=(760, 352, 1282, 462), at=(408, 14), scale=0.6, anchor='tc'),      # crest
 ]
 
-# Kept deliberately sparse: the margins frame the text, they don't compete with it.
-MARGINALIA = [
-	dict(crop=(38, 786, 148, 898),    at=(44, 250),  scale=0.5),                   # skull
-	dict(crop=(292, 782, 372, 872),   at=(60, 312),  scale=0.4),                   # small skull
-	dict(crop=(462, 1072, 548, 1292), at=(50, 600),  scale=0.5),                   # horned dagger
-	dict(crop=(290, 1358, 518, 1600), at=(790, 250), scale=0.3,  anchor='tr'),     # compass rose
-	dict(crop=(922, 1062, 1065, 1292), at=(786, 334), scale=0.34, anchor='tr'),    # orrery
-	dict(crop=(395, 1628, 538, 1802), at=(28, 470),  scale=0.32),                  # splatter
-	dict(crop=(588, 1618, 748, 1792), at=(800, 690), scale=0.3,  anchor='tr'),     # splatter
-	dict(crop=(205, 1808, 368, 1968), at=(250, 992), scale=0.26),                  # splatter
-]
+# Marginalia are emitted one file per drawing (art/m-<name>.svg, sized in
+# CSS px at `scale`), and placed by rules.css, which varies their position
+# and size from page to page. Splatters can be reused many times.
+PIECES = {
+	'skull'    : dict(crop=(38, 786, 148, 898),    scale=0.5),
+	'skull-sm' : dict(crop=(292, 782, 372, 872),   scale=0.4),
+	'dagger'   : dict(crop=(462, 1072, 548, 1292), scale=0.5),
+	'compass'  : dict(crop=(290, 1358, 518, 1600), scale=0.3),
+	'orrery'   : dict(crop=(922, 1062, 1065, 1292), scale=0.34),
+	'splat-a'  : dict(crop=(395, 1628, 538, 1802), scale=0.32),
+	'splat-b'  : dict(crop=(588, 1618, 748, 1792), scale=0.3),
+	'splat-c'  : dict(crop=(205, 1808, 368, 1968), scale=0.26),
+}
 
 BLOT = (772, 1812, 902, 1952)
 BLOT_STRENGTH = 0.38                   # the sheet's wash is near-solid; a drop cap needs a light one
@@ -100,25 +109,42 @@ def separate(rgb: Image.Image, mode: str = 'ink') -> Image.Image:
 	return Image.fromarray(out, 'RGBA')
 
 
-def render(sheet, el) -> Image.Image:
-	layer = separate(sheet.crop(el['crop']))
-	if el.get('mirror'):
-		layer = ImageOps.mirror(layer)
-	k = el['scale'] * OUT_SCALE
-	return layer.resize((max(1, round(layer.width * k)), max(1, round(layer.height * k))), Image.LANCZOS)
-
-
-def compose(sheet, elements) -> Image.Image:
-	canvas = Image.new('RGBA', (round(PAGE_W * OUT_SCALE), round(PAGE_H * OUT_SCALE)), (0, 0, 0, 0))
+def vector(sheet, elements) -> str:
+	"""Trace every element at sheet resolution and place it on the page."""
+	paths = []
 	for el in elements:
-		img = render(sheet, el)
-		x, y = el['at'][0] * OUT_SCALE, el['at'][1] * OUT_SCALE
+		x0, y0, x1, y1 = el['crop']
+		alpha = np.asarray(separate(sheet.crop(el['crop'])))[..., 3]
+		rec = trace(alpha >= 128, turdsize=4, alphamax=1.0, opttolerance=0.3)
+		k, w, h = el['scale'], (x1 - x0) * el['scale'], (y1 - y0) * el['scale']
+		x, y = el['at']
 		anchor = el.get('anchor', 'tl')
-		if anchor in ('tr', 'br'): x -= img.width
-		if anchor == 'tc':         x -= img.width / 2
-		if anchor in ('bl', 'br'): y -= img.height
-		canvas.alpha_composite(img, (round(x), round(y)))
-	return canvas
+		if anchor in ('tr', 'br'): x -= w
+		if anchor == 'tc':         x -= w / 2
+		if anchor in ('bl', 'br'): y -= h
+		t = (-k, 0, 0, k, x + w, y) if el.get('mirror') else (k, 0, 0, k, x, y)
+		paths.append(svg_path(rec, t, prec=1))
+	return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{PAGE_W}" height="{PAGE_H}" '
+	        f'viewBox="0 0 {PAGE_W} {PAGE_H}"><path fill="#{"%02x%02x%02x" % INK_RGB}" '
+	        f'd="{"".join(paths)}"/></svg>\n')
+
+
+def piece(sheet, el) -> str:
+	"""One drawing as a standalone SVG, intrinsic size in CSS px."""
+	x0, y0, x1, y1 = el['crop']
+	k = el['scale']
+	w, h = round((x1 - x0) * k, 1), round((y1 - y0) * k, 1)
+	alpha = np.asarray(separate(sheet.crop(el['crop'])))[..., 3]
+	d = svg_path(trace(alpha >= 128, turdsize=4, opttolerance=0.3), (k, 0, 0, k, 0, 0), prec=1)
+	return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{w:g}" height="{h:g}" viewBox="0 0 {w:g} {h:g}">'
+	        f'<path fill="#{"%02x%02x%02x" % INK_RGB}" d="{d}"/></svg>\n')
+
+
+def save_svg(text: str, name: str):
+	path = os.path.join(HERE, 'art', name)
+	with open(path, 'w') as fh:
+		fh.write(text)
+	print(f'wrote {os.path.relpath(path)}  ({os.path.getsize(path) / 1024:.1f} KiB)')
 
 
 def save(img: Image.Image, name: str):
@@ -134,8 +160,9 @@ def main():
 	if sheet.size != SHEET:
 		sys.exit(f'expected a {SHEET[0]}x{SHEET[1]} asset sheet, got {sheet.size}: the crop table would be wrong')
 	os.makedirs(os.path.join(HERE, 'art'), exist_ok=True)
-	save(compose(sheet, FRAME), 'frame.webp')
-	save(compose(sheet, MARGINALIA), 'marginalia.webp')
+	save_svg(vector(sheet, FRAME), 'frame.svg')
+	for name, el in PIECES.items():
+		save_svg(piece(sheet, el), f'm-{name}.svg')
 	save(separate(sheet.crop(BLOT), 'wash'), 'blot.webp')
 
 

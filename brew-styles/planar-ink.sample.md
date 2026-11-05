@@ -10,11 +10,11 @@ The streets coil around the inside of a ring that hangs over a spire without end
 }}
 }}
 
-{{watercolor-mask,wide,fade-top,height:17.6cm,margin-top:-1.4cm,margin-left:-1.6cm,margin-right:-1.6cm,--art-y:35%
+{{watercolor-mask,wide,ink-frame,height:14.6cm,margin-top:.3cm,margin-left:-1cm,margin-right:-1cm,--art-y:35%
 ![The Spirit of War, 1851, by Jasper Francis Cropsey](/assets/the_spirit_of_war.webp)
 }}
 
-{{caption,position:absolute,bottom:2.3cm,right:3.05cm,text-align:right
+{{caption,position:absolute,bottom:1.75cm,right:2.2cm,text-align:right
 *The Spirit of War*, Jasper Francis Cropsey, 1851. Public domain.
 }}
 
@@ -32,11 +32,11 @@ Mercenaries are the war's true currency. Yugoloths sell their blades to both sid
 
 Scholars in the City of Doors keep a running tally of the dead. They gave up counting individuals centuries ago and now measure the war in layers of the Abyss overrun and circles of Hell put to the torch.
 
-{{watercolor-mask,wc-2,fade-left,position:absolute,top:6.4cm,right:1.2cm,width:11.2cm,height:18.4cm,--art-x:62%
+{{watercolor-mask,ink-frame,wc-2,position:absolute,top:7.1cm,right:2.2cm,width:8.6cm,height:16.3cm,--art-x:62%
 ![Ruined tower](/assets/ruined_tower.webp)
 }}
 
-{{caption,position:absolute,top:23.6cm,right:3.05cm,width:6.4cm,text-align:right
+{{caption,position:absolute,top:23.6cm,right:2.2cm,width:6.4cm,text-align:right
 The front line is wherever two fiends meet.
 }}
 
@@ -52,7 +52,7 @@ Recorded by a scribe of the Fated, who asked not to be named.
 # The Great Wheel
 }}
 
-![](/assets/roman_theatre.webp){watercolor-mask,wc-float-right,wc-3,--wc-w:68%,--wc-h:6.6cm}
+![](/assets/roman_theatre.webp){watercolor-mask,wc-float-right,--wc-w:68%,--wc-h:6.6cm}
 
 Picture the planes as a wheel. At its hub stands the Outlands, a plain of grey grass with a spire in the middle that reaches higher than sight. On the spire's tip, impossibly, hangs the City of Doors. Around the rim turn the Outer Planes, each one a belief made solid.
 
@@ -66,7 +66,7 @@ Out past the rim lies the Astral Sea, silver and silent, where the corpses of de
 Most travelers never see any of this. They pass through one door, then another, and learn the shape of the planes the way a sailor learns the sea, one storm at a time. The doors do not care who walks through them, and the planes do not care who arrives.
 }}
 
-{{watercolor-mask,wc-behind,fade-top,position:absolute,bottom:1.2cm,left:1.4cm,width:18.4cm,height:11cm,--wc-opacity:.5,--art-y:62%
+{{watercolor-mask,wc-behind,wc-3,fade-top,position:absolute,bottom:1.2cm,left:1.4cm,width:18.4cm,height:11cm,--wc-opacity:.5,--art-y:62%
 ![The Departure, 1837, by Thomas Cole](/assets/the_departure.webp)
 }}
 
