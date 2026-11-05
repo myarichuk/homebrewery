@@ -138,39 +138,39 @@
 }
 /* per-page marginalia & splatter variation (generated) */
 .page:nth-child(7n+1) {
-	--pi-marg-img  : var(--pi-p-compass2), var(--pi-p-banner-a), var(--pi-m-orrery), var(--pi-m-orrery-tone), var(--pi-p-bird-b);
-	--pi-marg-pos  : 36.1px 705.3px, 63.7px 497.2px, 701px 340.2px, 701px 340.2px, 724.3px 627.6px;
-	--pi-marg-size : 81.1px 82.2px, 36.9px 81.7px, 52.4px 83.4px, 52.4px 83.4px, 68.3px 41.5px;
+	--pi-marg-img  : var(--pi-m-skull-sm), var(--pi-m-skull-sm-tone), var(--pi-m-dagger), var(--pi-m-dagger-tone), var(--pi-p-skull-b), var(--pi-p-banner-b);
+	--pi-marg-pos  : 698px 271.6px, 698px 271.6px, 717.6px 521.9px, 717.6px 521.9px, 697.4px 657.2px, 55.3px 491px;
+	--pi-marg-size : 37.8px 42.5px, 37.8px 42.5px, 47.8px 122.2px, 47.8px 122.2px, 32.3px 39px, 42.1px 89.8px;
 }
 .page:nth-child(7n+2) {
-	--pi-marg-img  : var(--pi-m-dagger), var(--pi-m-dagger-tone), var(--pi-p-banner-b), var(--pi-p-bird-b);
-	--pi-marg-pos  : 726.3px 390.6px, 726.3px 390.6px, 65.2px 732.6px, 44.7px 528px;
-	--pi-marg-size : 49.9px 127.7px, 49.9px 127.7px, 43.1px 92px, 68px 41.3px;
+	--pi-marg-img  : var(--pi-p-pend-star), var(--pi-p-fairy), var(--pi-p-bull), var(--pi-m-skull), var(--pi-m-skull-tone), var(--pi-p-ram);
+	--pi-marg-pos  : 762.4px 255.2px, 695.9px 560px, 705.8px 413.2px, 742.8px 496.5px, 742.8px 496.5px, 56.7px 637px;
+	--pi-marg-size : 37.1px 125.6px, 65.8px 77.8px, 72px 77.2px, 58.4px 59.4px, 58.4px 59.4px, 62.1px 57.5px;
 }
 .page:nth-child(7n+3) {
-	--pi-marg-img  : var(--pi-p-pend-hex), var(--pi-p-skull-b), var(--pi-p-bird-a), var(--pi-m-skull-sm), var(--pi-m-skull-sm-tone);
-	--pi-marg-pos  : 763.9px 254.3px, 49px 352.7px, 46px 727px, 46.3px 605px, 46.3px 605px;
-	--pi-marg-size : 37.3px 106.7px, 49px 59.2px, 52.7px 42.4px, 36.1px 40.6px, 36.1px 40.6px;
+	--pi-marg-img  : var(--pi-p-pend-moon), var(--pi-m-skull-sm), var(--pi-m-skull-sm-tone), var(--pi-p-ram), var(--pi-m-dagger), var(--pi-m-dagger-tone);
+	--pi-marg-pos  : 695px 245.2px, 57.9px 481.2px, 57.9px 481.2px, 18.5px 639.4px, 22.7px 708.8px, 22.7px 708.8px;
+	--pi-marg-size : 62.9px 126.4px, 33.7px 37.9px, 33.7px 37.9px, 64.8px 60px, 41.8px 106.9px, 41.8px 106.9px;
 }
 .page:nth-child(7n+4) {
-	--pi-marg-img  : var(--pi-p-pend-hex), var(--pi-p-bull), var(--pi-m-orrery), var(--pi-m-orrery-tone), var(--pi-p-skull-b);
-	--pi-marg-pos  : 55.6px 255.3px, 700px 633.3px, 722.4px 340.1px, 722.4px 340.1px, 51.7px 607px;
-	--pi-marg-size : 42.8px 122.2px, 62.1px 66.6px, 47.7px 75.9px, 47.7px 75.9px, 46.5px 56.3px;
+	--pi-marg-img  : var(--pi-m-dagger), var(--pi-m-dagger-tone), var(--pi-p-banner-a), var(--pi-p-bird-a), var(--pi-p-banner-b);
+	--pi-marg-pos  : 753.2px 480px, 753.2px 480px, 703.8px 692.4px, 709.6px 611.7px, 740px 677px;
+	--pi-marg-size : 35.2px 89.9px, 35.2px 89.9px, 34.7px 76.9px, 61.6px 49.5px, 41.1px 87.8px;
 }
 .page:nth-child(7n+5) {
-	--pi-marg-img  : var(--pi-p-pend-skull), var(--pi-p-bull), var(--pi-p-banner-b), var(--pi-p-ram), var(--pi-m-dagger), var(--pi-m-dagger-tone);
-	--pi-marg-pos  : 698px 254px, 735px 533px, 38.7px 354.9px, 724.8px 710px, 44.9px 715.3px, 44.9px 715.3px;
-	--pi-marg-size : 60.8px 105.7px, 60.4px 64.8px, 49.4px 105.5px, 60.1px 55.6px, 40.3px 103.2px, 40.3px 103.2px;
+	--pi-marg-img  : var(--pi-p-bird-b), var(--pi-p-ram), var(--pi-p-fairy);
+	--pi-marg-pos  : 44.6px 386.8px, 32.2px 636.6px, 21.1px 538.5px;
+	--pi-marg-size : 68.9px 41.9px, 75.4px 69.8px, 80.3px 95px;
 }
 .page:nth-child(7n+6) {
-	--pi-marg-img  : var(--pi-p-pend-hex), var(--pi-p-banner-b), var(--pi-m-skull), var(--pi-m-skull-tone), var(--pi-p-fairy), var(--pi-p-bull);
-	--pi-marg-pos  : 746.3px 248.4px, 31.4px 433px, 19.8px 750.9px, 19.8px 750.9px, 699.2px 728.5px, 729.3px 554.6px;
-	--pi-marg-size : 48.5px 138.7px, 45.4px 96.9px, 56.7px 57.7px, 56.7px 57.7px, 76.4px 90.4px, 71.5px 76.7px;
+	--pi-marg-img  : var(--pi-m-skull-sm), var(--pi-m-skull-sm-tone), var(--pi-p-fairy), var(--pi-p-ram), var(--pi-m-dagger), var(--pi-m-dagger-tone);
+	--pi-marg-pos  : 31.3px 418.6px, 31.3px 418.6px, 35.9px 294.4px, 18.7px 223.8px, 699.9px 306px, 699.9px 306px;
+	--pi-marg-size : 36.9px 41.5px, 36.9px 41.5px, 63.4px 75px, 63.9px 59.1px, 34.4px 87.9px, 34.4px 87.9px;
 }
 .page:nth-child(7n+7) {
-	--pi-marg-img  : var(--pi-p-pend-hex), var(--pi-p-compass2), var(--pi-p-bird-a), var(--pi-m-dagger), var(--pi-m-dagger-tone);
-	--pi-marg-pos  : 43.5px 255.9px, 707.5px 486.2px, 22.7px 524.7px, 61.3px 646.2px, 61.3px 646.2px;
-	--pi-marg-size : 41px 117.2px, 86.2px 87.4px, 62.4px 50.1px, 49.2px 125.8px, 49.2px 125.8px;
+	--pi-marg-img  : var(--pi-m-skull-sm), var(--pi-m-skull-sm-tone);
+	--pi-marg-pos  : 14.4px 408.8px, 14.4px 408.8px;
+	--pi-marg-size : 28.6px 32.2px, 28.6px 32.2px;
 }
 .page:nth-child(5n+1) {
 	--pi-splat-img  : var(--pi-p-sp4), var(--pi-m-splat-b), var(--pi-p-sp8), var(--pi-p-sp1), var(--pi-m-splat-b), var(--pi-p-stars), var(--pi-m-splat-a), var(--pi-pool-3), var(--pi-p-pool3);
@@ -530,16 +530,25 @@
 	background      : var(--pi-p-wreath) center / 100% 100% no-repeat;
 	break-inside    : avoid;
 }
+/* The ribbon crosses the middle of the opening, so a portrait has to put
+   the face in the upper half: the image box runs from above the opening
+   (the top thorns cover the overshoot) to its bottom, and is aligned to
+   its top. A figure with the face in its upper third (most character art)
+   lands with the face above the ribbon and the ribbon across the chest.
+   Adjust per image:
+     --wreath-focus  which part of the image shows when it is cropped
+                     (object-position y: 0% top .. 100% bottom)          */
 .page .wreath img {
 	position        : absolute;
-	top             : 21%;
+	top             : 10%;
 	left            : 18%;
 	z-index         : -1;
 	width           : 64%;          /* a replaced element won't stretch between insets */
-	height          : 62%;
+	height          : 79%;
 	object-fit      : cover;
-	-webkit-clip-path : ellipse(50% 50%);
-	clip-path       : ellipse(50% 50%);
+	object-position : 50% var(--wreath-focus, 0%);
+	-webkit-clip-path : ellipse(50% 46% at 50% 54%);    /* the opening, a little taller at the top */
+	clip-path       : ellipse(50% 46% at 50% 54%);
 	-webkit-mask-image : none;
 	mask-image      : none;
 }
@@ -556,7 +565,8 @@
 }
 .page .wreath p:has(img) { position : static; margin : 0; }
 .page .wreath p:not(:has(img)) { position : absolute; top : 62%; left : 30%; right : 30%; margin : 0; text-indent : 0; font-size : .3cm; font-style : italic; }
-.page .wreath:has(img) p:not(:has(img)) { top : 100%; }     /* with a portrait, the subtitle goes under the wreath */
+.page .wreath:has(img) p:not(:has(img)) { top : 99%; left : 15%; right : 15%; font-size : .36cm; }     /* with a portrait, the subtitle goes under the wreath */
+.page .wreath:has(img) { margin-bottom : 1.1cm; }
 .page .wreath h1 + p::first-letter { all : unset; }
 
 /* ORNAMENT  ·  {{orn ☠}} inline, takes the text colour */

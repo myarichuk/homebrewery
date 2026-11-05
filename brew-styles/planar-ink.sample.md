@@ -144,6 +144,25 @@ ___
 
 The wreath frames a heading on its ribbon and, if you give it one, an image clipped to the oval behind. It suits faction leaders, patrons and chapter emblems.
 
+The ribbon crosses the middle of the oval, so the image is aligned to the top: art with the face in its upper third shows the face above the ribbon. If the crop is wrong for your picture, move it with `--wreath-focus`.
+
+### The Fated
+
+Sir Whiskers holds the Hall of Records by right of having taken it, and the Takers hold that whatever a cat can sit on, a cat owns. Every portal key sold in the Clerk's Ward pays him a tithe, and nobody remembers agreeing to it.
+
 The corners on this page are the occult set: four different drawings, an eye in the triangle, a key, a skull among runes and an ouroboros under the phases of the moon.
+
+### What He Wants
+
+Every cat in Sigil, every one of them, sleeping in a sunbeam on the Hall's steps by the end of the year. He has not said why. The Guvners are keeping a ledger.
+
+### What He Offers
+
+A warm hearth, a full bowl and a key to a door that opens wherever the bearer last felt safe. The price is a name, given freely, written in the ledger in the bearer's own hand.
+
+{{note
+##### Rumour in the Hive
+They say the Factol was a stray in the Lower Ward until he slept a night in the Lady's shadow and woke up knowing every door in the Cage.
+}}
 
 {{pageNumber,auto}}

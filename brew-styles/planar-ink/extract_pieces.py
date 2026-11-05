@@ -115,8 +115,10 @@ FRAMES = {
 	# four different corners, placed as drawn (no mirroring)
 	'occult' : dict(res=2, corners={'tl': ('o', (60, 45, 615, 555), 196), 'tr': ('o', (978, 50, 1432, 520), 162),
 	                         'bl': ('o', (70, 575, 525, 950), 160), 'br': ('o', (868, 540, 1425, 950), 196)}),
-	'bone'   : dict(top=('m', (812, 86, 1338, 602), 'tr', 190), bottom=None,
-	                clear=[(812, 380, 1186, 602)]),          # the beetle crest sits inside this box
+	# the sheet draws two nested brackets here (bones outside, a plain rune
+	# bracket inside, the beetle crest inside that): keep only the outer one
+	'bone'   : dict(top=('m', (812, 86, 1382, 606), 'tr', 200), bottom=None,
+	                clear=[(812, 236, 1256, 606)]),
 }
 INSET = 18      # px from the page edge
 

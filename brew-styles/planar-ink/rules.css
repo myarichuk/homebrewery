@@ -392,16 +392,25 @@
 	background      : var(--pi-p-wreath) center / 100% 100% no-repeat;
 	break-inside    : avoid;
 }
+/* The ribbon crosses the middle of the opening, so a portrait has to put
+   the face in the upper half: the image box runs from above the opening
+   (the top thorns cover the overshoot) to its bottom, and is aligned to
+   its top. A figure with the face in its upper third (most character art)
+   lands with the face above the ribbon and the ribbon across the chest.
+   Adjust per image:
+     --wreath-focus  which part of the image shows when it is cropped
+                     (object-position y: 0% top .. 100% bottom)          */
 .page .wreath img {
 	position        : absolute;
-	top             : 21%;
+	top             : 10%;
 	left            : 18%;
 	z-index         : -1;
 	width           : 64%;          /* a replaced element won't stretch between insets */
-	height          : 62%;
+	height          : 79%;
 	object-fit      : cover;
-	-webkit-clip-path : ellipse(50% 50%);
-	clip-path       : ellipse(50% 50%);
+	object-position : 50% var(--wreath-focus, 0%);
+	-webkit-clip-path : ellipse(50% 46% at 50% 54%);    /* the opening, a little taller at the top */
+	clip-path       : ellipse(50% 46% at 50% 54%);
 	-webkit-mask-image : none;
 	mask-image      : none;
 }
@@ -418,7 +427,8 @@
 }
 .page .wreath p:has(img) { position : static; margin : 0; }
 .page .wreath p:not(:has(img)) { position : absolute; top : 62%; left : 30%; right : 30%; margin : 0; text-indent : 0; font-size : .3cm; font-style : italic; }
-.page .wreath:has(img) p:not(:has(img)) { top : 100%; }     /* with a portrait, the subtitle goes under the wreath */
+.page .wreath:has(img) p:not(:has(img)) { top : 99%; left : 15%; right : 15%; font-size : .36cm; }     /* with a portrait, the subtitle goes under the wreath */
+.page .wreath:has(img) { margin-bottom : 1.1cm; }
 .page .wreath h1 + p::first-letter { all : unset; }
 
 /* ORNAMENT  ·  {{orn ☠}} inline, takes the text colour */

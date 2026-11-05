@@ -292,24 +292,44 @@ const lists = (placed)=>{
 	return { img: img.join(', '), pos: pos.join(', '), size: size.join(', ') };
 };
 
+// Uniform random placement still reads as ruled: three or four pieces of
+// similar size, one per stretch of margin, look evenly spaced however the
+// dice fall. Scribes didn't fill margins that way. They loaded one margin
+// and left the other nearly bare, and drew things in little groups (a skull
+// with the dagger beside it). So: a heavy and a light side, a pair on the
+// heavy side most of the time, and a wider spread of sizes.
 const marginaliaLayout = (i)=>{
 	const r = mulberry32(SEED ^ (0x3A11 + i * 101));
 	const taken = [], placed = [];
 	const put = (p, regions, gap)=>{
-		const k = .82 + r() * .36;                              // drawn a little larger or smaller each time
-		const box = place(r, taken, p.w * k, p.h * k, regions(p.w * k), gap);
+		const k = .72 + r() * .56;                              // drawn a little larger or smaller each time
+		const box = place(r, taken, p.w * k, p.h * k, regions(p.w * k, p.h * k), gap);
 		if (box) placed.push({ p, x: box[0], y: box[1], w: p.w * k, h: p.h * k });
+		return box;
 	};
+	const heavy = r() < .5 ? 0 : 1, light = 1 - heavy;
+	const pool = shuffle(r, MARG_POOL);
 	// a pendant hangs from the top of one margin on most pages
+	let lightCount = r() < .3 ? 0 : 1;
 	if (r() < .65) {
 		const p = HANG_POOL[Math.floor(r() * HANG_POOL.length)];
-		const side = r() < .5 ? 0 : 1;
+		const side = r() < .6 ? light : heavy;
+		if (side === light) lightCount = 0;
 		put(p, (w)=>[[...band(side, w), MARGIN_TOP, MARGIN_TOP + p.h * 1.2 + 14]], 20);
 	}
-	const count = 3 + (r() < .5 ? 1 : 0);
-	for (const p of shuffle(r, MARG_POOL).slice(0, count)) {
-		put(p, (w)=>[[...band(0, w), MARGIN_TOP, MARGIN_BOTTOM], [...band(1, w), MARGIN_TOP, MARGIN_BOTTOM]], 24 + r() * 40);
+	// the heavy side: one or two singles plus, usually, a pair drawn close
+	const singles = 1 + (r() < .45 ? 1 : 0);
+	for (let k = 0; k < singles; k++)
+		put(pool.pop(), (w)=>[[...band(heavy, w), MARGIN_TOP, MARGIN_BOTTOM]], 30 + r() * 90);
+	if (r() < .7) {
+		const a = put(pool.pop(), (w)=>[[...band(heavy, w), MARGIN_TOP, MARGIN_BOTTOM - 60]], 30);
+		if (a) {
+			const below = r() < .65, y = below ? a[1] + a[3] + 2 : a[1] - 2;
+			put(pool.pop(), (w, h)=>[[...band(heavy, w), below ? y : y - h - 14, below ? y + h + 14 : y]], 1);
+		}
 	}
+	for (let k = 0; k < lightCount; k++)
+		put(pool.pop(), (w)=>[[...band(light, w), MARGIN_TOP, MARGIN_BOTTOM]], 40);
 	return lists(placed);
 };
 
