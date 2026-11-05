@@ -34,8 +34,8 @@ Outputs (relative to this file):
     art/frame.svg         four corner brackets + crest, 816 x 1056 viewBox
     art/m-*.svg           skulls, dagger, compass, orrery, splatters: one
                           file each, placed (and varied per page) by CSS
-    art/blot.webp         grey ink wash behind drop caps (stays a bitmap:
-                          it is all soft tone, nothing to trace)
+    art/m-*-tone.webp     grey watercolour shading under the skulls, dagger,
+                          compass and orrery (soft, so a 2x bitmap)
 """
 
 import os
@@ -43,6 +43,8 @@ import sys
 
 import numpy as np
 from PIL import Image, ImageFilter, ImageOps
+
+from scipy import ndimage
 
 from inktrace import trace, svg_path
 
@@ -140,6 +142,33 @@ def piece(sheet, el) -> str:
 	        f'<path fill="#{"%02x%02x%02x" % INK_RGB}" d="{d}"/></svg>\n')
 
 
+TONED = ('skull', 'skull-sm', 'dagger', 'compass', 'orrery')
+WASH_RGB = (93, 84, 74)
+
+
+def tone(sheet, el) -> Image.Image:
+	"""The watercolour shading under a drawing, as the reference sketches
+	have it: grey wash inside the drawing's silhouette, deepest where the
+	hatching is densest (the artist hatched the shadows), with the darker
+	rim that drying watercolour leaves, slightly off-register. Rendered at
+	2x the piece's CSS size; it is all soft, a bitmap is right for it."""
+	ink = np.asarray(separate(sheet.crop(el['crop'])))[..., 3] / 255.0
+	sil = ndimage.binary_fill_holes(ndimage.binary_closing(ink > 0.3, iterations=7))
+	sil = ndimage.binary_erosion(sil, iterations=3)
+	dens = ndimage.gaussian_filter(ink, 6)
+	dist = ndimage.distance_transform_edt(sil)
+	a = np.where(sil, 0.10 + 0.75 * dens + 0.22 * np.exp(-dist / 3.5), 0)
+	a = ndimage.gaussian_filter(a, 1.4)
+	a = ndimage.shift(a, (3, -2), order=1)            # off-register, like a real wash
+	a = np.clip(a * 0.55, 0, 1)
+	rgba = np.zeros((*a.shape, 4), np.uint8)
+	rgba[..., :3] = WASH_RGB
+	rgba[..., 3] = (a * 255 + 0.5).astype(np.uint8)
+	img = Image.fromarray(rgba, 'RGBA')
+	k = el['scale'] * 2
+	return img.resize((round(img.width * k), round(img.height * k)), Image.LANCZOS)
+
+
 def save_svg(text: str, name: str):
 	path = os.path.join(HERE, 'art', name)
 	with open(path, 'w') as fh:
@@ -163,7 +192,8 @@ def main():
 	save_svg(vector(sheet, FRAME), 'frame.svg')
 	for name, el in PIECES.items():
 		save_svg(piece(sheet, el), f'm-{name}.svg')
-	save(separate(sheet.crop(BLOT), 'wash'), 'blot.webp')
+		if name in TONED:
+			save(tone(sheet, el), f'm-{name}-tone.webp')
 
 
 if __name__ == '__main__':

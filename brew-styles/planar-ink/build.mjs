@@ -210,29 +210,6 @@ const buildInkFrame = (seed)=>{
 	return svg(S, S, `<g fill="none" stroke="${INK}" stroke-linecap="round" stroke-linejoin="round">${strokes.join('')}</g>`);
 };
 
-/* ---------- paper textures ---------------------------------------------- */
-
-const buildStains = ()=>svg(W, H, `
-	<filter id="s" x="0" y="0" width="100%" height="100%">
-		<feTurbulence type="fractalNoise" baseFrequency=".0042 .006" numOctaves="5" seed="31"/>
-		<feColorMatrix values="0 0 0 0 .48  0 0 0 0 .33  0 0 0 0 .16  1.5 0 0 0 -.66"/>
-	</filter>
-	<rect width="${W}" height="${H}" filter="url(#s)"/>`, 'preserveAspectRatio="none"');
-
-const buildGrain = ()=>svg(400, 400, `
-	<filter id="g" x="0" y="0" width="100%" height="100%">
-		<feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" seed="13" stitchTiles="stitch"/>
-		<feColorMatrix values="0 0 0 0 .32  0 0 0 0 .24  0 0 0 0 .14  1 0 0 0 -.44"/>
-	</filter>
-	<rect width="400" height="400" filter="url(#g)"/>`);
-
-const buildFoxing = ()=>svg(360, 360, `
-	<filter id="f" x="0" y="0" width="100%" height="100%">
-		<feTurbulence type="fractalNoise" baseFrequency=".25" numOctaves="2" seed="17" stitchTiles="stitch"/>
-		<feColorMatrix values="0 0 0 0 .40  0 0 0 0 .27  0 0 0 0 .12  0 11 0 0 -8.3"/>
-	</filter>
-	<rect width="360" height="360" filter="url(#f)"/>`);
-
 /* ---------- small pieces ------------------------------------------------- */
 
 // unsteady ink rectangle – border-image for text boxes (notes, stat blocks)
@@ -273,6 +250,7 @@ const PIECE = {
 const MARG  = ['skull', 'skull-sm', 'dagger', 'compass', 'orrery'];
 const SPLAT = ['splat-a', 'splat-b', 'splat-c'];
 const SPLATS_PER_PAGE = 7;
+const WASHES_PER_PAGE = 2;
 
 // left / right margin bands between the corner brackets (page px)
 const band = (side, w)=>(side === 0 ? [26, 104 - w] : [714, 792 - w]);
@@ -300,7 +278,7 @@ const marginaliaLayouts = (count)=>Array.from({ length: count }, (_, i)=>{
 		const near = name === 'skull-sm' ? taken[0] : null;     // small skull tucks under the big one
 		const regions = near ? [[near[0] + 4, near[0] + 22, near[1] + near[3] + 4, near[1] + near[3] + h + 30]] : [[x0, x1, 240, 900]];
 		const [x, y] = place(r, taken, w, h, regions, near ? 2 : 26);
-		return `${f(x)}px ${f(y)}px`;
+		return `${f(x)}px ${f(y)}px, ${f(x)}px ${f(y)}px`;        // line, then its wash
 	}).join(', ');
 });
 
@@ -320,6 +298,13 @@ const splatterSets = (count)=>Array.from({ length: count }, (_, i)=>{
 		const [x, y] = place(r, taken, w, h, regions, 10);
 		return { img: `var(--pi-m-${name})`, pos: `${f(x)}px ${f(y)}px`, size: `${f(w)}px ${f(h)}px` };
 	});
+	// soft grey watercolour pools, like the references' margin stains
+	for (let k = 0; k < WASHES_PER_PAGE; k++) {
+		const w = 46 + r() * 74, h = w;
+		const regions = [[...band(0, w * .7), 230, 960], [...band(1, w * .7), 230, 960]];
+		const [x, y] = place(r, taken, w, h, regions, -w * .3);
+		layers.push({ img: `var(--pi-pool-${1 + Math.floor(r() * 3)})`, pos: `${f(x)}px ${f(y)}px`, size: `${f(w)}px ${f(h)}px` });
+	}
 	return {
 		img  : layers.map((l)=>l.img).join(', '),
 		pos  : layers.map((l)=>l.pos).join(', '),
@@ -341,6 +326,7 @@ const assets = {
 	'--pi-frame'      : svgUri(fs.readFileSync(path.join(here, 'art/frame.svg'), 'utf8')),
 	...Object.fromEntries(['skull', 'skull-sm', 'dagger', 'compass', 'orrery', 'splat-a', 'splat-b', 'splat-c']
 		.map((n)=>[`--pi-m-${n}`, svgUri(fs.readFileSync(path.join(here, `art/m-${n}.svg`), 'utf8'))])),
+	...Object.fromEntries(MARG.map((n)=>[`--pi-m-${n}-tone`, webpUri(`art/m-${n}-tone.webp`)])),
 	// torn paper, slightly feathered
 	'--pi-wc-1'       : svgUri(buildArtMask({ seed: 4,  amp: 1,   layers: [[.35, 0], [1, 9]] })),
 	// rougher tear, deeper bites
@@ -351,10 +337,12 @@ const assets = {
 	'--pi-ink-frame'  : svgUri(buildInkFrame(71)),
 	'--pi-edge'       : svgUri(buildEdgeMask()),
 	'--pi-burn'       : svgUri(buildEdgeBurn()),
-	'--pi-stains'     : svgUri(buildStains()),
-	'--pi-grain'      : svgUri(buildGrain()),
-	'--pi-foxing'     : svgUri(buildFoxing()),
-	'--pi-blot'       : webpUri('art/blot.webp'),
+	'--pi-paper-tile' : webpUri('art/paper.webp'),
+	'--pi-stains'     : webpUri('art/stains.webp'),
+	'--pi-inkgrain'   : webpUri('art/inkgrain.webp'),
+	'--pi-pool-1'     : webpUri('art/wash-1.webp'),
+	'--pi-pool-2'     : webpUri('art/wash-2.webp'),
+	'--pi-pool-3'     : webpUri('art/wash-3.webp'),
 	'--pi-vine'       : webpUri('art/vine.webp'),
 	'--pi-plaque'     : webpUri('art/plaque.webp'),
 	'--pi-cartouche'  : webpUri('art/cartouche.webp'),

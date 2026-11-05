@@ -96,18 +96,17 @@
 	background-image :
 		var(--pi-burn),
 		var(--pi-stains),
-		var(--pi-foxing),
-		var(--pi-grain),
-		radial-gradient(ellipse 70% 60% at 48% 42%, rgba(255, 250, 235, .35), transparent 70%);
-	background-size     : 100% 100%, 100% 100%, 360px 360px, 400px 400px, 100% 100%;
-	background-repeat   : no-repeat, no-repeat, repeat, repeat, no-repeat;
+		radial-gradient(ellipse 70% 60% at 48% 42%, rgba(255, 250, 235, .35), transparent 70%),
+		var(--pi-paper-tile);
+	background-size     : 100% 100%, 100% 100%, 100% 100%, 512px 512px;
+	background-repeat   : no-repeat, no-repeat, no-repeat, repeat;
 	box-shadow          : none;
 	-webkit-mask        : var(--pi-edge) 0 0 / 100% 100% no-repeat;
 	mask                : var(--pi-edge) 0 0 / 100% 100% no-repeat;
 }
 .page:nth-child(even) {
-	background-size     : 100% 100%, 130% 130%, 360px 360px, 400px 400px, 100% 100%;
-	background-position : 0 0, 100% 100%, 140px 80px, 190px 30px, 0 0;
+	background-size     : 100% 100%, 130% 130%, 100% 100%, 512px 512px;
+	background-position : 0 0, 100% 100%, 0 0, 190px 230px;
 }
 .page.untorn { -webkit-mask : none; mask : none; }
 
@@ -136,12 +135,32 @@
 	width               : auto;
 	height              : auto;
 	pointer-events      : none;
-	background-image    : var(--pi-m-skull), var(--pi-m-skull-sm), var(--pi-m-dagger), var(--pi-m-compass), var(--pi-m-orrery), var(--pi-splat-img);
+	background-image    :
+		var(--pi-m-skull),   var(--pi-m-skull-tone),
+		var(--pi-m-skull-sm), var(--pi-m-skull-sm-tone),
+		var(--pi-m-dagger),  var(--pi-m-dagger-tone),
+		var(--pi-m-compass), var(--pi-m-compass-tone),
+		var(--pi-m-orrery),  var(--pi-m-orrery-tone),
+		var(--pi-splat-img);
 	background-position : var(--pi-marg-pos), var(--pi-splat-pos);
-	background-size     : auto, auto, auto, auto, auto, var(--pi-splat-size);
+	background-size     : auto, 55px 56px, auto, 32px 36px, auto, 43px 110px, auto, 68px 73px, auto, 49px 78px, var(--pi-splat-size);
 	background-repeat   : no-repeat;
-	-webkit-mask        : none;
-	mask                : none;
+}
+
+/* INK TEXTURE  ·  pen ink doesn't lay down flat: it skips over the tooth of
+   the paper and drags in dry streaks. A seamless alpha tile breaks up the
+   titles and every ink overlay the same way, which is most of what makes
+   the reference pages read as drawn rather than printed.               */
+.page::before,
+.page::after,
+.page :is(h1, h2),
+.page .orn {
+	-webkit-mask-image : var(--pi-inkgrain);
+	mask-image         : var(--pi-inkgrain);
+	-webkit-mask-size  : 256px 256px;
+	mask-size          : 256px 256px;
+	-webkit-mask-repeat: repeat;
+	mask-repeat        : repeat;
 }
 .page:nth-child(even)::after { transform : scaleX(-1); }
 .page:is(.plain, .bare)::after { display : none; }
@@ -278,9 +297,9 @@
 	line-height             : .86em;
 	color                   : var(--pi-ink);
 	background-color        : transparent;
-	background-image        : var(--pi-blot);
-	background-position     : center;
-	background-size         : 135% 135%;
+	background-image        : var(--pi-pool-2);
+	background-position     : 45% 50%;
+	background-size         : 128% 128%;
 	background-repeat       : no-repeat;
 	-webkit-background-clip : border-box;
 	background-clip         : border-box;
@@ -499,8 +518,6 @@
 	font-family      : 'BookInsanityRemake', 'EB Garamond', serif;
 	font-size        : .33cm;
 	background-color : var(--pi-wash);
-	background-image : var(--pi-grain);
-	background-size  : 400px 400px;
 	border           : 10px solid transparent;
 	border-image     : var(--pi-inkbox) 22 / 14px / 4px stretch;
 	box-shadow       : none;
@@ -549,8 +566,6 @@
 	box-sizing       : border-box;
 	padding          : .2cm .26cm .24cm;
 	background-color : var(--pi-wash);
-	background-image : var(--pi-grain);
-	background-size  : 400px 400px;
 	border           : 10px solid transparent;
 	border-image     : var(--pi-inkbox) 22 / 14px / 4px stretch;
 	box-shadow       : none;
