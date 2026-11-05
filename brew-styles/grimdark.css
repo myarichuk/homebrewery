@@ -813,11 +813,12 @@
 }
 
 
-/* PRINT  ·  keeps the type and rules, drops the burnt-edge ink */
+/* PRINT ___________________________________________________________
+   Homebrewery pages are fixed US Letter (215.9 x 279.4 mm). Pin the sheet to
+   the same size so the paper choice in the print dialog cannot leave a blank
+   strip under the page background or crop full-bleed art. For A4, change the
+   size below AND set `.page { width: 210mm; height: 297mm; }` (layout reflows). */
+@page { size : 215.9mm 279.4mm; margin : 0; }
 @media print {
-	.page:not(:has(.frontCover, .backCover)) {
-		background-image : var(--gd-grain);
-		background-size  : 420px 420px;
-	}
-	.page.reliquary { background-image : none; }
+	* { -webkit-print-color-adjust : exact; print-color-adjust : exact; }
 }
