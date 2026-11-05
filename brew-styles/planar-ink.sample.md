@@ -1,4 +1,4 @@
-{{kicker THE OUTER PLANES}}
+{{kicker CHAPTER 1 · THE OUTER PLANES}}
 
 # The City of Doors
 
@@ -48,7 +48,9 @@ Recorded by a scribe of the Fated, who asked not to be named.
 
 \page
 
+{{cartouche
 # The Great Wheel
+}}
 
 ![](/assets/roman_theatre.webp){watercolor-mask,wc-float-right,wc-3,--wc-w:68%,--wc-h:6.6cm}
 
@@ -90,7 +92,7 @@ The tavern is a ship's hull turned upside down, its keel blackened by a thousand
 }}
 
 {{note
-##### A Word to the Wise
+##### {{orn ☠}} A Word to the Wise
 Never tell a fiend your true name, and never accept a gift without asking what it cost the giver.
 }}
 

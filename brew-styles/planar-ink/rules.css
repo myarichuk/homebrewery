@@ -28,24 +28,31 @@
      {{plate ... ![](url) }}              block-level masked art (legacy name)
 
    BLOCKS
-     {{kicker SERIES NAME}}   engraved caps + arrow above a title
+     {{kicker SERIES NAME}}   engraved caps on a thorned plaque above a title
      {{intro ...}}            full-width, balanced two-column lead-in
      {{dropcap ...}}          ink-wash initial on its first paragraph
                               (automatic for the paragraph after an H1)
      {{caption ...}}          small italic caption
-     {{rule}}                 hand-inked divider with lozenge
+     {{rule}}                 thorn-vine divider
+     {{cartouche ... }}       thorn-and-leaf title frame (covers, chapter
+                              openers); put an H1 inside
+     {{orn ☠}}                inline ornament from Planar Thorn:
+                                ☠ skull & bones   💀 skull     ⚔ swords
+                                † cross-dagger    ❖ diamonds   ☨ barred cross
+                                ⁘ rosette         U+E002 arrow sigil
 
    NOTE: generated file. Edit planar-ink/rules.css and re-run
          node brew-styles/planar-ink/build.mjs
    ================================================================== */
 
 /* FONTS (must stay first in the sheet) ____________________________ */
-/* Henny Penny  – brush-inked display caps for titles.
+/* Planar Thorn – hand-inked thorny capitals, digits and ornaments for
+                titles and page numbers. Embedded (see build_font.py).
    Cinzel       – engraved capitals for kickers & small headings.
    IM Fell      – old-style roman for drop caps.
    EB Garamond  – fallback body face / captions.
    Body text uses the PHB theme's own BookInsanityRemake.                */
-@import url('https://fonts.googleapis.com/css2?family=Henny+Penny&family=EB+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Cinzel:wght@500;700&family=IM+Fell+English&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Cinzel:wght@500;700&family=IM+Fell+English&display=swap');
 
 
 /* @@ASSETS@@ */
@@ -132,7 +139,7 @@
 	bottom      : 30px;
 	width       : 1.4cm;
 	margin      : 0 auto;
-	font-family : 'Henny Penny', serif;
+	font-family : 'Planar Thorn', 'Cinzel', serif;
 	font-size   : .4cm;
 	line-height : 18px;
 	color       : var(--pi-ink);
@@ -170,7 +177,7 @@
 }
 .page h1 {
 	margin-bottom  : .4cm;
-	font-family    : 'Henny Penny', serif;
+	font-family    : 'Planar Thorn', 'Cinzel', serif;
 	font-size      : 1.36cm;
 	line-height    : 1.06em;
 	letter-spacing : .01em;
@@ -180,7 +187,7 @@
 }
 .page h1 + p::first-line { font-variant : normal; }
 .page h2 {
-	font-family    : 'Henny Penny', serif;
+	font-family    : 'Planar Thorn', 'Cinzel', serif;
 	font-size      : .7cm;
 	line-height    : 1.08em;
 	text-transform : uppercase;
@@ -208,20 +215,26 @@
 	letter-spacing : .1em;
 }
 
-/* KICKER  ·  {{kicker SERIES}} above a title */
+/* KICKER  ·  {{kicker SERIES}} above a title, on the thorned plaque.
+   border-image keeps the plaque's ends intact and stretches its middle
+   to the text, so any length of kicker fits.                          */
 .page .kicker {
 	display        : block;
 	column-span    : all;
-	margin-bottom  : .4cm;
-	padding-bottom : .5cm;
+	width          : fit-content;
+	min-width      : 4cm;
+	margin         : 0 auto .3cm;
+	padding        : .02cm .5cm 0;
 	font-family    : 'Cinzel', serif;
-	font-size      : .95cm;
+	font-size      : .42cm;
 	font-weight    : 700;
-	line-height    : 1em;
-	letter-spacing : .07em;
+	line-height    : 1.1em;
+	letter-spacing : .12em;
 	color          : var(--pi-ink);
 	text-align     : center;
-	background     : var(--pi-arrow) center bottom / 1.4cm .52cm no-repeat;
+	border         : solid transparent;
+	border-width   : .5cm 1.05cm;
+	border-image   : var(--pi-plaque) 40 92 fill / .5cm 1.05cm stretch;
 }
 .page .kicker + h1 { margin-top : 0; }
 
@@ -265,9 +278,39 @@
 /* RULE  ·  {{rule}} */
 .page .rule {
 	display    : block;
-	height     : 14px;
-	margin     : .25cm 0;
-	background : var(--pi-rule) center / 100% 100% no-repeat;
+	height     : 16px;
+	margin     : .3cm 0;
+	background : var(--pi-vine) center / 100% 100% no-repeat;
+}
+
+/* CARTOUCHE  ·  {{cartouche ... }} around a title.
+   Drawn at its own proportions (stretching smears the engraving), so it
+   holds one line: a short title, or an H1 plus a line of Cinzel.        */
+.page .cartouche {
+	display          : flex;
+	flex-direction   : column;
+	justify-content  : center;
+	align-items      : center;
+	column-span      : all;
+	box-sizing       : border-box;
+	width            : calc(100% + 1.2cm);
+	margin           : -.3cm -.6cm .4cm;
+	padding          : 0 16% .1cm;
+	aspect-ratio     : 816 / 198;
+	text-align       : center;
+	background       : var(--pi-cartouche) center / 100% 100% no-repeat;
+}
+.page .cartouche :is(h1, h2) { margin : 0; font-size : 1.2cm; line-height : 1em; white-space : nowrap; }
+.page .cartouche h1 + p::first-letter { all : unset; }
+.page .cartouche p { margin : .05cm 0 0; text-indent : 0; font-family : 'Cinzel', serif; font-size : .34cm; font-weight : 700; letter-spacing : .12em; }
+
+/* ORNAMENT  ·  {{orn ☠}} inline, takes the text colour */
+.page .orn {
+	font-family    : 'Planar Thorn', serif;
+	font-style     : normal;
+	line-height    : 1;
+	vertical-align : -.08em;
+	color          : var(--pi-ink);
 }
 
 /* CAPTION  ·  {{caption ...}} */
@@ -480,7 +523,7 @@
 .page .toc h3 { font-family : 'BookInsanityRemake', serif; font-size : .37cm; font-weight : bold; letter-spacing : 0; background : none; }
 .page .toc h4 { font-family : 'Cinzel', serif; font-weight : 700; font-size : .36cm; }
 .page .toc ul span:first-child::after { border-bottom : .04cm dotted var(--pi-faint); }
-.page .toc ul span:last-child { font-family : 'Henny Penny', serif; color : var(--pi-ink); }
+.page .toc ul span:last-child { font-family : 'Planar Thorn', 'Cinzel', serif; color : var(--pi-ink); }
 .page .toc a { text-decoration : none; }
 
 
@@ -494,7 +537,7 @@
 
 /* STOCK COVERS  ·  re-ink the PHB cover snippets ___________________ */
 .page:has(:is(.frontCover, .insideCover, .backCover)) h1 {
-	font-family         : 'Henny Penny', serif;
+	font-family         : 'Planar Thorn', 'Cinzel', serif;
 	font-size           : 1.9cm;
 	line-height         : 1.02em;
 	color               : var(--pi-ink);

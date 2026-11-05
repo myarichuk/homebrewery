@@ -5,7 +5,11 @@
    sheet needs as CSS custom properties at the @@ASSETS@@ marker:
 
    · art/*.webp – ink line-work and the drop-cap wash, lifted off the
-     asset sheet by extract_marginalia.py. Embedded as base64 WebP.
+     asset sheet by extract_marginalia.py; the engraved thorn ornaments
+     (vine rule, kicker plaque, cartouche) keyed off the blue sheet by
+     extract_ornaments.py. Embedded as base64 WebP.
+   · art/planar-thorn.woff2 – the hand-inked display face, traced by
+     build_font.py. Embedded as a data-URI @font-face.
    · generated SVG – torn page edge, scorched rim, paper textures, the
      watercolour image masks, small rules and the text-box border.
 
@@ -13,6 +17,8 @@
    Homebrewery Style tab. Nothing is fetched except Google Fonts.
 
        python3 brew-styles/planar-ink/extract_marginalia.py <sheet.jpg>   (only if art changes)
+       python3 brew-styles/planar-ink/extract_ornaments.py                (only if art changes)
+       python3 brew-styles/planar-ink/build_font.py                       (only if glyphs change)
        node    brew-styles/planar-ink/build.mjs
 
    Page geometry is fixed: a V3 page is 215.9 x 279.4 mm = 816 x 1056 CSS px.
@@ -51,6 +57,7 @@ const svgUri = (svg)=>{
 		.replace(/\}/g, '%7D');
 	return `url("data:image/svg+xml,${enc}")`;
 };
+const fontUri = (file)=>`url("data:font/woff2;base64,${fs.readFileSync(path.join(here, file)).toString('base64')}") format('woff2')`;
 const webpUri = (file)=>`url("data:image/webp;base64,${fs.readFileSync(path.join(here, file)).toString('base64')}")`;
 
 // `extra` lets callers drop width/height (=> no intrinsic size, stretches to box)
@@ -195,6 +202,9 @@ const assets = {
 	'--pi-grain'      : svgUri(buildGrain()),
 	'--pi-foxing'     : svgUri(buildFoxing()),
 	'--pi-blot'       : webpUri('art/blot.webp'),
+	'--pi-vine'       : webpUri('art/vine.webp'),
+	'--pi-plaque'     : webpUri('art/plaque.webp'),
+	'--pi-cartouche'  : webpUri('art/cartouche.webp'),
 	'--pi-inkbox'     : svgUri(buildInkBox()),
 	'--pi-rule'       : svgUri(buildRule()),
 	'--pi-arrow'      : svgUri(buildArrow())
@@ -202,6 +212,11 @@ const assets = {
 
 const block = [
 	'/* GENERATED ART  ·  do not hand-edit; see planar-ink/build.mjs ______ */',
+	'@font-face {',
+	"\tfont-family  : 'Planar Thorn';",
+	`\tsrc          : ${fontUri('art/planar-thorn.woff2')};`,
+	'\tfont-display : block;',
+	'}',
 	':root {',
 	...Object.entries(assets).map(([k, v])=>`\t${k.padEnd(16)} : ${v};`),
 	'}'
