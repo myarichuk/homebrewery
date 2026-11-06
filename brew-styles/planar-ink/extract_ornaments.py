@@ -23,6 +23,11 @@ Edge pixels are part blue. Undo the mix against the measured backdrop colour
 (c = (obs - (1 - a) * bg) / a), then enforce r >= g >= b, which holds for
 every brown and cream, so no blue or teal fringe survives on the parchment.
 
+Ink only
+--------
+The output keeps the line work and drops the cream face (see to_ink): the
+plaques and the cartouche are drawn on the page, not stuck onto it.
+
 Plaque text
 -----------
 The plaques carry the specimen's labels. The cream face of a plaque is one
@@ -44,6 +49,7 @@ SIZE   = (1920, 1280)
 K0, K1 = 10.0, 70.0
 MUTE   = 0.3          # pull colours this far toward grey: the sheet's cream is
                       # much yellower than the parchment it will sit on
+INK    = (29, 23, 18) # same ink as every other piece (extract_pieces.py)
 
 #                 crop on the sheet          output scale  erase lettering
 ORNAMENTS = {
@@ -79,10 +85,30 @@ def erase_lettering(rgba):
 		return rgba
 	face = lab == (np.argmax(ndimage.sum(cream, lab, range(1, n + 1))) + 1)
 	holes = ndimage.binary_fill_holes(face) & ~face
-	holes = ndimage.binary_dilation(holes, iterations=2) & ndimage.binary_fill_holes(face)
+	holes = ndimage.binary_dilation(holes, iterations=4) & ndimage.binary_fill_holes(face)
 	tone = np.median(rgb[face], axis=0)
 	out = rgba.copy()
 	out[holes, :3] = tone
+	return out
+
+
+def to_ink(rgba):
+	"""Two-tone (brown line, cream face) -> ink only. The cream face was a
+	separate flat surface on the page: a yellow sticker that never matched
+	the mottled paper around it. Here the face's own tone becomes fully
+	transparent and everything darker becomes ink, in proportion, so the
+	page's paper shows through the frame like it does through every other
+	drawing, and the engraved shading survives as translucent ink."""
+	lum = rgba[..., :3].mean(-1)
+	solid = rgba[..., 3] > 250
+	face = np.percentile(lum[solid], 90) - 18            # the cream, less a knee so faint
+	                                                     # residue of the erased lettering drops out
+	dark = np.percentile(lum[solid], 3)                  # the deepest line
+	t = np.clip((face - lum) / (face - dark), 0, 1)
+	a = (rgba[..., 3] / 255) * t ** 0.85
+	out = np.empty_like(rgba)
+	out[..., :3] = INK
+	out[..., 3] = a * 255
 	return out
 
 
@@ -95,11 +121,12 @@ def main():
 		rgba = key(np.asarray(im.crop(o['crop'])))
 		if o['erase']:
 			rgba = erase_lettering(rgba)
+		rgba = to_ink(rgba)
 		out = Image.fromarray((rgba + 0.5).astype(np.uint8), 'RGBA')
 		if o['scale'] != 1:
 			out = out.resize((round(out.width * o['scale']), round(out.height * o['scale'])), Image.LANCZOS)
 		path = os.path.join(HERE, 'art', f'{name}.webp')
-		out.save(path, 'WEBP', quality=90, alpha_quality=100, method=6)
+		out.save(path, 'WEBP', quality=90, alpha_quality=70, method=6)   # colour is flat ink: the alpha is the image
 		print(f'wrote {os.path.relpath(path)}  {out.size}  ({os.path.getsize(path) / 1024:.1f} KiB)')
 
 

@@ -48,7 +48,18 @@
      {{wreath ... }}          oval thorn wreath: heading on the ribbon,
                               optional image in the oval (full sheet only)
      {{marg,ram,top:14cm,left:.5cm}}   place one marginalia drawing by
-                              hand (list under HAND-PLACED MARGINALIA)
+                              hand; options: width:40px  rotate:-12deg  flip
+                              (natural size without a width; see
+                              HAND-PLACED MARGINALIA below)
+                                drawings  skull  skull-sm  skull-a  skull-b
+                                          bull  ram  dagger  compass
+                                          compass2  orrery  bird-a  bird-b
+                                          fairy  mimic  banner-a  banner-b
+                                pendants  pend-hex  pend-moon  pend-skull
+                                          pend-star  (hang from top:6.4cm)
+                                splatter  splat-a  splat-b  splat-c
+                                          sp1 … sp9  specks  stars
+                                washes    pool1 … pool4  pool-1  pool-2  pool-3
      {{orn ☠}}                inline ornament from Planar Thorn:
                                 ☠ skull & bones   💀 skull     ⚔ swords
                                 † cross-dagger    ❖ diamonds   ☨ barred cross
@@ -61,11 +72,14 @@
 /* FONTS (must stay first in the sheet) ____________________________ */
 /* Planar Thorn – hand-inked thorny capitals, digits and ornaments for
                 titles and page numbers. Embedded (see build_font.py).
-   Cinzel       – engraved capitals for kickers & small headings.
-   IM Fell      – old-style roman for drop caps.
-   EB Garamond  – fallback body face / captions.
-   Body text uses the PHB theme's own BookInsanityRemake.                */
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Cinzel:wght@500;700&family=IM+Fell+English&display=swap');
+   IM Fell English     – body text, captions, boxes, drop caps.
+   IM Fell English SC  – small headings, kickers, table heads.
+   The Fell types were digitised from scans of 17th-century printing, so
+   the ink spread, the uneven letterforms and the old-style figures are
+   real: next to the hand-drawn art, a clean digital face (the PHB's own,
+   or Cinzel) reads as typeset on top of the page rather than printed on
+   it. Fell has no bold; bold is synthesised, which prints fine.        */
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap');
 
 
 /* @@ASSETS@@ */
@@ -102,7 +116,7 @@
 	padding          : 3.3cm 3.05cm 2.4cm;
 	column-width     : 7cm;     /* PHB's 8cm minimum won't fit two columns inside the frame */
 	column-gap       : .85cm;
-	font-family      : 'BookInsanityRemake', 'EB Garamond', 'Georgia', serif;
+	font-family      : 'IM Fell English', 'Georgia', serif;
 	font-size        : .34cm;
 	color            : var(--pi-text);
 	background-color : var(--pi-paper);
@@ -203,13 +217,7 @@
      {{marg,skull,top:20cm,left:.6cm,rotate:-12deg,flip}}
 
    Natural size unless you give a width (height follows). flip mirrors it;
-   rotate:… turns it. Pieces:
-     drawings  skull skull-sm dagger compass orrery compass2 bull ram
-               skull-a skull-b bird-a bird-b fairy mimic banner-a banner-b
-     pendants  pend-hex pend-moon pend-skull pend-star  (hang them from a
-               top: near 6.4cm, the bottom of the corner bracket)
-     splatter  splat-a splat-b splat-c sp1 … sp9 specks stars
-     washes    pool1 … pool4 pool-1 pool-2 pool-3                        */
+   rotate:… turns it. The piece names are listed at the top of the sheet. */
 .page .marg {
 	position            : absolute;
 	z-index             : -1;
@@ -252,7 +260,7 @@
 	bottom      : 30px;
 	width       : 1.4cm;
 	margin      : 0 auto;
-	font-family : 'Planar Thorn', 'Cinzel', serif;
+	font-family : 'Planar Thorn', 'IM Fell English SC', serif;
 	font-size   : .4cm;
 	line-height : 18px;
 	color       : var(--pi-ink);
@@ -262,7 +270,7 @@
 	right          : 3.05cm;
 	bottom         : 1.4cm;
 	width          : 8cm;
-	font-family    : 'EB Garamond', serif;
+	font-family    : 'IM Fell English', serif;
 	font-size      : .29cm;
 	font-style     : italic;
 	color          : var(--pi-faint);
@@ -272,6 +280,11 @@
 
 
 /* TYPOGRAPHY ______________________________________________________ */
+/* the PHB sets its sans (ScalySans) on tables, stat blocks and spell
+   lists; in an old printed book those are set in the text face too    */
+.page :is(table, .monster, .spellList) { font-family : 'IM Fell English', 'Georgia', serif; }
+.page .monster :is(h3, h4, h5),
+.page table thead th                     { font-family : 'IM Fell English SC', serif; }
 .page p                { line-height : 1.34em; }
 .page p + p,
 .page ul + p,
@@ -290,7 +303,7 @@
 }
 .page h1 {
 	margin-bottom  : .4cm;
-	font-family    : 'Planar Thorn', 'Cinzel', serif;
+	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
 	font-size      : 1.36cm;
 	line-height    : 1.06em;
 	letter-spacing : .01em;
@@ -299,31 +312,31 @@
 }
 .page h1 + p::first-line { font-variant : normal; }
 .page h2 {
-	font-family    : 'Planar Thorn', 'Cinzel', serif;
+	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
 	font-size      : .7cm;
 	line-height    : 1.08em;
 	text-transform : none;
 }
 .page h3 {
 	padding-bottom : .16cm;
-	font-family    : 'Cinzel', serif;
+	font-family    : 'IM Fell English SC', serif;
 	font-size      : .45cm;
-	font-weight    : 700;
+	font-weight    : normal;
 	line-height    : 1.1em;
 	letter-spacing : .05em;
 	border-bottom  : 0;
 	background     : var(--pi-rule) left bottom / 100% 6px no-repeat;
 }
 .page h4 {
-	font-family    : 'Cinzel', serif;
+	font-family    : 'IM Fell English SC', serif;
 	font-size      : .39cm;
-	font-weight    : 700;
+	font-weight    : normal;
 	letter-spacing : .04em;
 }
 .page h5 {
-	font-family    : 'Cinzel', serif;
+	font-family    : 'IM Fell English SC', serif;
 	font-size      : .33cm;
-	font-weight    : 700;
+	font-weight    : normal;
 	letter-spacing : .1em;
 }
 
@@ -337,9 +350,9 @@
 	min-width      : 4cm;
 	margin         : 0 auto .3cm;
 	padding        : .02cm .5cm 0;
-	font-family    : 'Cinzel', serif;
+	font-family    : 'IM Fell English SC', serif;
 	font-size      : .42cm;
-	font-weight    : 700;
+	font-weight    : normal;
 	line-height    : 1.1em;
 	letter-spacing : .12em;
 	color          : var(--pi-ink);
@@ -401,7 +414,7 @@
 
 /* CARTOUCHE  ·  {{cartouche ... }} around a title.
    Drawn at its own proportions (stretching smears the engraving), so it
-   holds one line: a short title, or an H1 plus a line of Cinzel.        */
+   holds one line: a short title, or an H1 plus a line of small caps.        */
 .page .cartouche {
 	display          : flex;
 	flex-direction   : column;
@@ -418,7 +431,7 @@
 }
 .page .cartouche :is(h1, h2) { margin : 0; font-size : 1.2cm; line-height : 1em; white-space : nowrap; }
 .page .cartouche h1 + p::first-letter { all : unset; }
-.page .cartouche p { margin : .05cm 0 0; text-indent : 0; font-family : 'Cinzel', serif; font-size : .34cm; font-weight : 700; letter-spacing : .12em; }
+.page .cartouche p { margin : .05cm 0 0; text-indent : 0; font-family : 'IM Fell English SC', serif; font-size : .34cm; font-weight : normal; letter-spacing : .12em; }
 
 /* WREATH  ·  {{wreath ... }}  oval thorn wreath with a ribbon.
    The first heading inside goes on the ribbon; an image inside fills the
@@ -492,7 +505,7 @@
 /* CAPTION  ·  {{caption ...}} */
 .page .caption {
 	display     : block;
-	font-family : 'EB Garamond', serif;
+	font-family : 'IM Fell English', serif;
 	font-size   : .28cm;
 	font-style  : italic;
 	line-height : 1.25em;
@@ -658,7 +671,7 @@
 	box-sizing       : border-box;
 	margin-block     : .3cm;
 	padding          : .3cm .38cm;
-	font-family      : 'BookInsanityRemake', 'EB Garamond', serif;
+	font-family      : 'IM Fell English', 'Georgia', serif;
 	font-size        : .33cm;
 	background-color : var(--pi-wash);
 	background-image : none;                 /* the theme's texture is grey on parchment */
@@ -675,7 +688,7 @@
 .page .descriptive {
 	margin-block : .3cm;
 	padding      : .22cm .3cm .22cm .45cm;
-	font-family  : 'EB Garamond', serif;
+	font-family  : 'IM Fell English', serif;
 	font-size    : .36cm;
 	font-style   : italic;
 	background   : linear-gradient(90deg, var(--pi-wash-2), transparent 80%);
@@ -696,9 +709,9 @@
 }
 .page table thead th {
 	padding        : .06cm .1cm .04cm;
-	font-family    : 'Cinzel', serif;
+	font-family    : 'IM Fell English SC', serif;
 	font-size      : .3cm;
-	font-weight    : 700;
+	font-weight    : normal;
 	letter-spacing : .04em;
 	color          : var(--pi-ink);
 	border-bottom  : 1px solid var(--pi-ink);
@@ -738,10 +751,10 @@
 
 /* TABLE OF CONTENTS _______________________________________________ */
 .page .toc h1 { text-align : center; }
-.page .toc h3 { font-family : 'BookInsanityRemake', serif; font-size : .37cm; font-weight : bold; letter-spacing : 0; background : none; }
-.page .toc h4 { font-family : 'Cinzel', serif; font-weight : 700; font-size : .36cm; }
+.page .toc h3 { font-family : 'IM Fell English', serif; font-size : .37cm; font-weight : bold; letter-spacing : 0; background : none; }
+.page .toc h4 { font-family : 'IM Fell English SC', serif; font-weight : normal; font-size : .36cm; }
 .page .toc ul span:first-child::after { border-bottom : .04cm dotted var(--pi-faint); }
-.page .toc ul span:last-child { font-family : 'Planar Thorn', 'Cinzel', serif; color : var(--pi-ink); }
+.page .toc ul span:last-child { font-family : 'Planar Thorn', 'IM Fell English SC', serif; color : var(--pi-ink); }
 .page .toc a { text-decoration : none; }
 
 
@@ -755,15 +768,15 @@
 
 /* STOCK COVERS  ·  re-ink the PHB cover snippets ___________________ */
 .page:has(:is(.frontCover, .insideCover, .backCover)) h1 {
-	font-family         : 'Planar Thorn', 'Cinzel', serif;
+	font-family         : 'Planar Thorn', 'IM Fell English SC', serif;
 	font-size           : 1.9cm;
 	line-height         : 1.02em;
 	color               : var(--pi-ink);
 	-webkit-text-stroke : 0;
 }
 .page:has(:is(.frontCover, .insideCover, .backCover)) h2 {
-	font-family         : 'Cinzel', serif;
-	font-weight         : 700;
+	font-family         : 'IM Fell English SC', serif;
+	font-weight         : normal;
 	color               : var(--pi-ink);
 	-webkit-text-stroke : 0;
 }
@@ -773,7 +786,7 @@
 	filter           : none;
 }
 .page:has(.frontCover) .footnote {
-	font-family         : 'EB Garamond', serif;
+	font-family         : 'IM Fell English', serif;
 	font-style          : italic;
 	color               : var(--pi-text);
 	-webkit-text-stroke : 0;
