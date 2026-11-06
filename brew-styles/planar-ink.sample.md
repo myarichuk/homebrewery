@@ -18,6 +18,8 @@ The streets coil around the inside of a ring that hangs over a spire without end
 *The Spirit of War*, Jasper Francis Cropsey, 1851. Public domain.
 }}
 
+{{marg,pend-moon,top:6.3cm,left:.45cm}} {{marg,skull,top:7.2cm,right:.75cm,width:44px}} {{marg,sp4,bottom:1.5cm,left:7cm,width:24px}} {{marg,sp1,top:3.6cm,right:4.4cm,width:18px}}
+
 {{pageNumber,auto}}
 
 \page {frame-thorn,crest-skull}
@@ -44,6 +46,8 @@ The front line is wherever two fiends meet.
 Recorded by a scribe of the Fated, who asked not to be named.
 }}
 
+{{marg,pend-star,top:6.6cm,left:.5cm}} {{marg,bull,top:10.2cm,left:.3cm,width:54px}} {{marg,skull-b,top:12.4cm,left:.9cm}} {{marg,pool1,top:18.6cm,left:.25cm,width:66px}} {{marg,sp2,top:4.6cm,right:4.2cm,width:22px}} {{marg,sp9,bottom:1.3cm,right:5cm,width:20px}}
+
 {{pageNumber,auto}}
 
 \page {frame-gothic,crest-blades}
@@ -69,6 +73,8 @@ Most travelers never see any of this. They pass through one door, then another, 
 {{watercolor-mask,wc-behind,wc-3,fade-top,position:absolute,bottom:1.2cm,left:1.4cm,width:18.4cm,height:11cm,--wc-opacity:.5,--art-y:62%
 ![The Departure, 1837, by Thomas Cole](/assets/the_departure.webp)
 }}
+
+{{marg,pend-star,top:6.7cm,right:.5cm}} {{marg,ram,top:12.6cm,left:.35cm}} {{marg,dagger,top:13.6cm,right:.6cm,rotate:8deg,width:40px}} {{marg,pool2,top:10.4cm,left:.2cm,width:60px}} {{marg,sp7,top:4.2cm,left:3.6cm,width:22px}}
 
 {{pageNumber,auto}}
 

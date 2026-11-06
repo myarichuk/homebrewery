@@ -15,6 +15,10 @@
 
    PAGE VARIANTS  (on the \page line, e.g.  \page {plain} )
      plain    corners + crest only, no marginalia
+     no-scatter / scatter   turn the automatic marginalia off / force it on
+                            (it switches itself off on pages with wide,
+                            wc-behind or absolutely placed art, and on
+                            pages where you place pieces by hand)
      bare     no ink art at all: just the paper
      untorn   straight page edges (for printers that dislike the mask)
      frame-classic / -thorn / -gothic / -bone / -occult        corner set
@@ -43,6 +47,8 @@
                               openers); put an H1 inside
      {{wreath ... }}          oval thorn wreath: heading on the ribbon,
                               optional image in the oval (full sheet only)
+     {{marg,ram,top:14cm,left:.5cm}}   place one marginalia drawing by
+                              hand (list under HAND-PLACED MARGINALIA)
      {{orn ☠}}                inline ornament from Planar Thorn:
                                 ☠ skull & bones   💀 skull     ⚔ swords
                                 † cross-dagger    ❖ diamonds   ☨ barred cross
@@ -201,6 +207,47 @@
 .page:nth-child(4n+2)::after { translate : 5px -7px; }
 .page:nth-child(4n+3)::after { translate : -4px 6px; }
 .page:nth-child(4n+4)::after { translate : 6px 4px; }
+.page .marg.skull { --marg-img : var(--pi-m-skull), var(--pi-m-skull-tone); --marg-nat : 55px; aspect-ratio : 55 / 56; }
+.page .marg.skull-sm { --marg-img : var(--pi-m-skull-sm), var(--pi-m-skull-sm-tone); --marg-nat : 32px; aspect-ratio : 32 / 36; }
+.page .marg.dagger { --marg-img : var(--pi-m-dagger), var(--pi-m-dagger-tone); --marg-nat : 43px; aspect-ratio : 43 / 110; }
+.page .marg.compass { --marg-img : var(--pi-m-compass), var(--pi-m-compass-tone); --marg-nat : 68px; aspect-ratio : 68 / 73; }
+.page .marg.orrery { --marg-img : var(--pi-m-orrery), var(--pi-m-orrery-tone); --marg-nat : 49px; aspect-ratio : 49 / 78; }
+.page .marg.banner-a { --marg-img : var(--pi-p-banner-a); --marg-nat : 44px; aspect-ratio : 44 / 97.5; }
+.page .marg.banner-b { --marg-img : var(--pi-p-banner-b); --marg-nat : 46px; aspect-ratio : 46 / 98.2; }
+.page .marg.bird-a { --marg-img : var(--pi-p-bird-a); --marg-nat : 54px; aspect-ratio : 54 / 43.4; }
+.page .marg.bird-b { --marg-img : var(--pi-p-bird-b); --marg-nat : 66px; aspect-ratio : 66 / 40.1; }
+.page .marg.bull { --marg-img : var(--pi-p-bull); --marg-nat : 62px; aspect-ratio : 62 / 66.5; }
+.page .marg.compass2 { --marg-img : var(--pi-p-compass2); --marg-nat : 74px; aspect-ratio : 74 / 75; }
+.page .marg.fairy { --marg-img : var(--pi-p-fairy); --marg-nat : 66px; aspect-ratio : 66 / 78.1; }
+.page .marg.mimic { --marg-img : var(--pi-p-mimic); --marg-nat : 60px; aspect-ratio : 60 / 41.2; }
+.page .marg.ram { --marg-img : var(--pi-p-ram); --marg-nat : 62px; aspect-ratio : 62 / 57.4; }
+.page .marg.skull-a { --marg-img : var(--pi-p-skull-a); --marg-nat : 52px; aspect-ratio : 52 / 59.2; }
+.page .marg.skull-b { --marg-img : var(--pi-p-skull-b); --marg-nat : 44px; aspect-ratio : 44 / 53.2; }
+.page .marg.pend-hex { --marg-img : var(--pi-p-pend-hex); --marg-nat : 42px; aspect-ratio : 42 / 120; }
+.page .marg.pend-moon { --marg-img : var(--pi-p-pend-moon); --marg-nat : 50px; aspect-ratio : 50 / 100.5; }
+.page .marg.pend-skull { --marg-img : var(--pi-p-pend-skull); --marg-nat : 54px; aspect-ratio : 54 / 93.9; }
+.page .marg.pend-star { --marg-img : var(--pi-p-pend-star); --marg-nat : 36px; aspect-ratio : 36 / 121.8; }
+.page .marg.splat-a { --marg-img : var(--pi-m-splat-a); --marg-nat : 46px; aspect-ratio : 46 / 56; }
+.page .marg.splat-b { --marg-img : var(--pi-m-splat-b); --marg-nat : 48px; aspect-ratio : 48 / 52; }
+.page .marg.splat-c { --marg-img : var(--pi-m-splat-c); --marg-nat : 42px; aspect-ratio : 42 / 42; }
+.page .marg.sp1 { --marg-img : var(--pi-p-sp1); --marg-nat : 44px; aspect-ratio : 44 / 36.1; }
+.page .marg.sp2 { --marg-img : var(--pi-p-sp2); --marg-nat : 44px; aspect-ratio : 44 / 39.2; }
+.page .marg.sp3 { --marg-img : var(--pi-p-sp3); --marg-nat : 44px; aspect-ratio : 44 / 31.9; }
+.page .marg.sp4 { --marg-img : var(--pi-p-sp4); --marg-nat : 40px; aspect-ratio : 40 / 38.7; }
+.page .marg.sp5 { --marg-img : var(--pi-p-sp5); --marg-nat : 46px; aspect-ratio : 46 / 37.7; }
+.page .marg.sp6 { --marg-img : var(--pi-p-sp6); --marg-nat : 42px; aspect-ratio : 42 / 43.8; }
+.page .marg.sp7 { --marg-img : var(--pi-p-sp7); --marg-nat : 40px; aspect-ratio : 40 / 40.6; }
+.page .marg.sp8 { --marg-img : var(--pi-p-sp8); --marg-nat : 44px; aspect-ratio : 44 / 37.5; }
+.page .marg.sp9 { --marg-img : var(--pi-p-sp9); --marg-nat : 38px; aspect-ratio : 38 / 45; }
+.page .marg.specks { --marg-img : var(--pi-p-specks); --marg-nat : 60px; aspect-ratio : 60 / 63.7; }
+.page .marg.stars { --marg-img : var(--pi-p-stars); --marg-nat : 70px; aspect-ratio : 70 / 51.9; }
+.page .marg.pool1 { --marg-img : var(--pi-p-pool1); --marg-nat : 70px; aspect-ratio : 70 / 73.1; }
+.page .marg.pool2 { --marg-img : var(--pi-p-pool2); --marg-nat : 72px; aspect-ratio : 72 / 69.9; }
+.page .marg.pool3 { --marg-img : var(--pi-p-pool3); --marg-nat : 70px; aspect-ratio : 70 / 64.9; }
+.page .marg.pool4 { --marg-img : var(--pi-p-pool4); --marg-nat : 68px; aspect-ratio : 68 / 63.8; }
+.page .marg.pool-1 { --marg-img : var(--pi-pool-1); --marg-nat : 70px; aspect-ratio : 70 / 70; }
+.page .marg.pool-2 { --marg-img : var(--pi-pool-2); --marg-nat : 70px; aspect-ratio : 70 / 70; }
+.page .marg.pool-3 { --marg-img : var(--pi-pool-3); --marg-nat : 70px; aspect-ratio : 70 / 70; }
 
 
 /* PALETTE _________________________________________________________ */
@@ -314,8 +361,51 @@
 	background-repeat   : no-repeat;
 }
 .page:nth-child(even)::after { transform : scaleX(-1); }
-.page:is(.plain, .bare)::after { display : none; }
+.page:is(.plain, .bare, .no-scatter)::after { display : none; }
 .page.bare::before { display : none; }
+
+/* The scatter is laid out blind: CSS can't see where the art is, so on a
+   page whose art reaches into the margins it would land on (or under) the
+   picture. It stands down by itself on those pages (art that is wide,
+   wc-behind or placed with position:absolute), and on any page where
+   you place pieces by hand (below): once you place one, the page is yours.
+   \page {scatter} brings it back regardless.                          */
+.page:has(.watercolor-mask:is(.wide, .wc-behind, [style*='position:absolute']), .marg)::after { display : none; }
+.page.scatter::after { display : block; }
+
+/* HAND-PLACED MARGINALIA  ·  any drawing from the scatter, placed where you
+   want it, like Homebrewery's watercolour stains:
+
+     {{marg,ram,top:14cm,left:.5cm}}
+     {{marg,pend-moon,top:6.4cm,right:.4cm}}
+     {{marg,sp3,bottom:2cm,left:9cm,width:30px}}
+     {{marg,skull,top:20cm,left:.6cm,rotate:-12deg,flip}}
+
+   Natural size unless you give a width (height follows). flip mirrors it;
+   rotate:… turns it. Pieces:
+     drawings  skull skull-sm dagger compass orrery compass2 bull ram
+               skull-a skull-b bird-a bird-b fairy mimic banner-a banner-b
+     pendants  pend-hex pend-moon pend-skull pend-star  (hang them from a
+               top: near 6.4cm, the bottom of the corner bracket)
+     splatter  splat-a splat-b splat-c sp1 … sp9 specks stars
+     washes    pool1 … pool4 pool-1 pool-2 pool-3                        */
+.page .marg {
+	position            : absolute;
+	z-index             : -1;
+	display             : block;
+	width               : var(--marg-w, var(--marg-nat));
+	height              : auto;
+	margin              : 0;
+	pointer-events      : none;
+	background-image    : var(--marg-img);
+	background-size     : 100% 100%;
+	background-repeat   : no-repeat;
+	-webkit-mask-image  : var(--pi-inkgrain);
+	mask-image          : var(--pi-inkgrain);
+	-webkit-mask-size   : 256px 256px;
+	mask-size           : 256px 256px;
+}
+.page .marg.flip { transform : scaleX(-1); }
 
 /* INK TEXTURE  ·  pen ink doesn't lay down flat: it skips over the tooth of
    the paper and drags in dry streaks. A seamless alpha tile breaks up the
@@ -554,9 +644,9 @@
 }
 .page .wreath :is(h1, h2, h3, h4) {
 	position        : absolute;
-	top             : 47.5%;
-	left            : 33%;
-	right           : 33%;
+	top             : 50%;         /* the ribbon's centre line (measured on the art) */
+	left            : 32%;
+	right           : 32%;
 	margin          : 0;
 	font-size       : var(--wreath-title, .62cm);
 	line-height     : 1;

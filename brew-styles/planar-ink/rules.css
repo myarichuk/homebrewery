@@ -15,6 +15,10 @@
 
    PAGE VARIANTS  (on the \page line, e.g.  \page {plain} )
      plain    corners + crest only, no marginalia
+     no-scatter / scatter   turn the automatic marginalia off / force it on
+                            (it switches itself off on pages with wide,
+                            wc-behind or absolutely placed art, and on
+                            pages where you place pieces by hand)
      bare     no ink art at all: just the paper
      untorn   straight page edges (for printers that dislike the mask)
      frame-classic / -thorn / -gothic / -bone / -occult        corner set
@@ -43,6 +47,8 @@
                               openers); put an H1 inside
      {{wreath ... }}          oval thorn wreath: heading on the ribbon,
                               optional image in the oval (full sheet only)
+     {{marg,ram,top:14cm,left:.5cm}}   place one marginalia drawing by
+                              hand (list under HAND-PLACED MARGINALIA)
      {{orn ☠}}                inline ornament from Planar Thorn:
                                 ☠ skull & bones   💀 skull     ⚔ swords
                                 † cross-dagger    ❖ diamonds   ☨ barred cross
@@ -176,8 +182,51 @@
 	background-repeat   : no-repeat;
 }
 .page:nth-child(even)::after { transform : scaleX(-1); }
-.page:is(.plain, .bare)::after { display : none; }
+.page:is(.plain, .bare, .no-scatter)::after { display : none; }
 .page.bare::before { display : none; }
+
+/* The scatter is laid out blind: CSS can't see where the art is, so on a
+   page whose art reaches into the margins it would land on (or under) the
+   picture. It stands down by itself on those pages (art that is wide,
+   wc-behind or placed with position:absolute), and on any page where
+   you place pieces by hand (below): once you place one, the page is yours.
+   \page {scatter} brings it back regardless.                          */
+.page:has(.watercolor-mask:is(.wide, .wc-behind, [style*='position:absolute']), .marg)::after { display : none; }
+.page.scatter::after { display : block; }
+
+/* HAND-PLACED MARGINALIA  ·  any drawing from the scatter, placed where you
+   want it, like Homebrewery's watercolour stains:
+
+     {{marg,ram,top:14cm,left:.5cm}}
+     {{marg,pend-moon,top:6.4cm,right:.4cm}}
+     {{marg,sp3,bottom:2cm,left:9cm,width:30px}}
+     {{marg,skull,top:20cm,left:.6cm,rotate:-12deg,flip}}
+
+   Natural size unless you give a width (height follows). flip mirrors it;
+   rotate:… turns it. Pieces:
+     drawings  skull skull-sm dagger compass orrery compass2 bull ram
+               skull-a skull-b bird-a bird-b fairy mimic banner-a banner-b
+     pendants  pend-hex pend-moon pend-skull pend-star  (hang them from a
+               top: near 6.4cm, the bottom of the corner bracket)
+     splatter  splat-a splat-b splat-c sp1 … sp9 specks stars
+     washes    pool1 … pool4 pool-1 pool-2 pool-3                        */
+.page .marg {
+	position            : absolute;
+	z-index             : -1;
+	display             : block;
+	width               : var(--marg-w, var(--marg-nat));
+	height              : auto;
+	margin              : 0;
+	pointer-events      : none;
+	background-image    : var(--marg-img);
+	background-size     : 100% 100%;
+	background-repeat   : no-repeat;
+	-webkit-mask-image  : var(--pi-inkgrain);
+	mask-image          : var(--pi-inkgrain);
+	-webkit-mask-size   : 256px 256px;
+	mask-size           : 256px 256px;
+}
+.page .marg.flip { transform : scaleX(-1); }
 
 /* INK TEXTURE  ·  pen ink doesn't lay down flat: it skips over the tooth of
    the paper and drags in dry streaks. A seamless alpha tile breaks up the
@@ -416,9 +465,9 @@
 }
 .page .wreath :is(h1, h2, h3, h4) {
 	position        : absolute;
-	top             : 47.5%;
-	left            : 33%;
-	right           : 33%;
+	top             : 50%;         /* the ribbon's centre line (measured on the art) */
+	left            : 32%;
+	right           : 32%;
 	margin          : 0;
 	font-size       : var(--wreath-title, .62cm);
 	line-height     : 1;

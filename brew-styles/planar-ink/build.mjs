@@ -373,6 +373,20 @@ const scatterCss = ()=>{
 	return out.join('\n');
 };
 
+// Hand-placed pieces: every drawing in the pools as a class on an empty
+// block, placed like Homebrewery's stock watercolour stains:
+//     {{marg,ram,top:14cm,left:.4cm}}
+// Natural size by default; width (or --marg-w) scales it, height follows.
+const placedCss = ()=>{
+	const seen = new Set(), out = [];
+	for (const p of [...MARG_POOL, ...HANG_POOL, ...SPLAT_POOL, ...WASH_POOL]) {
+		if (seen.has(p.name)) continue;
+		seen.add(p.name);
+		out.push(`.page .marg.${p.name} { --marg-img : ${p.layers.join(', ')}; --marg-nat : ${f(p.w)}px; aspect-ratio : ${f(p.w)} / ${f(p.h)}; }`);
+	}
+	return out.join('\n');
+};
+
 /* ---------- emit ---------------------------------------------------------
    Two sheets are written:
      planar-ink.css       everything: 5 corner sets, 5 crests, 4 rules,
@@ -435,7 +449,8 @@ const block = (lite)=>[
 	...Object.entries(buildAssets(lite)).map(([k, v])=>`\t${k.padEnd(18)} : ${v};`),
 	'}',
 	'/* per-page marginalia & splatter variation (generated) */',
-	scatterCss()
+	scatterCss(),
+	placedCss()
 ].join('\n');
 
 const rules = fs.readFileSync(path.join(here, 'rules.css'), 'utf8');
