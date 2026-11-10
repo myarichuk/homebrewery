@@ -829,7 +829,28 @@
 .page ul + p,
 .page ol + p           { text-indent : 1.3em; }
 .page p + p            { margin-top : .08cm; }      /* paragraphs are marked by the indent, as in the mockups, not by a gap */
-.page strong           { color : var(--pi-ink); }
+/* BOLD. The Fell types have no bold, so the browser fakes one by smearing
+   the letters: the one thing on the page that looks machine-made. Bold is
+   lettered in the thorn hand instead (as the headings are), at text
+   height: a run-in label such as  ***Multiattack.***  or  **Armor Class**
+   reads as the scribe switching to his display pen, not as a font weight.
+   Set  .page { --pi-bold-font : inherit; --pi-bold-weight : bold; }  to
+   get the faked bold back.                                               */
+:root { --pi-bold-font : 'Planar Thorn', 'IM Fell English SC', serif; --pi-bold-weight : normal; }
+/* .page.page: the theme restyles bold per block (.page .monster strong,
+   .page .note strong: heavier, tracked in); this has to outrank those.   */
+.page.page :is(strong, b) {
+	font-family    : var(--pi-bold-font);
+	font-size      : 1.12em;
+	font-style     : normal;
+	font-weight    : var(--pi-bold-weight);
+	line-height    : 1;
+	letter-spacing : .03em;
+	color          : var(--pi-ink);
+}
+.page.page :is(strong, b) em,
+.page.page em :is(strong, b) { font-style : normal; }
+.page.page :is(strong, b) :is(strong, b) { font-size : 1em; }
 .page a                { color : var(--pi-ink); text-decoration : underline dotted; text-underline-offset : 2px; }
 
 .page ul               { list-style-type : '–  '; }
