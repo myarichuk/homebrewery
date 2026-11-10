@@ -62,7 +62,7 @@ The streets coil around the inside of a ring that hangs over a spire without end
 ![The Spirit of War, 1851, by Jasper Francis Cropsey](/assets/the_spirit_of_war.webp)
 }}
 
-\page {roman,frame-bone,crest-beetle}
+\page {frame-bone,crest-beetle}
 
 ## Gate-Town Rumors
 

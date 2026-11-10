@@ -125,9 +125,10 @@
 
 	/* The mockups set running text in a faded italic. It is the look, but it
 	   is slower to read over a whole book; for upright text put
-	       .page { --pi-text-style : normal; --pi-text : #2b231c; }
+	       .page { --pi-text-style : normal; --pi-em-style : italic; --pi-text : #2b231c; }
 	   in the Style tab, or  \page {roman}  on single pages.               */
 	--pi-text-style : italic;
+	--pi-em-style   : normal;                /* emphasis inside tables and stat blocks: the opposite of the text style */
 	--pi-wash    : rgba(91, 83, 72, .11);    /* boxes, table zebra         */
 	--pi-wash-2  : rgba(91, 83, 72, .2);
 
@@ -174,7 +175,7 @@
 	background-position : 0 0, 100% 100%, 0 0, 190px 230px;
 }
 .page.untorn { -webkit-mask : none; mask : none; }
-.page.roman  { --pi-text-style : normal; --pi-text : #2b231c; }
+.page.roman  { --pi-text-style : normal; --pi-em-style : italic; --pi-text : #2b231c; }
 
 /* corners and crest: one overlay underneath the text.
 
@@ -341,8 +342,7 @@
 /* the PHB sets its sans (ScalySans) on tables, stat blocks and spell
    lists; in an old printed book those are set in the text face too    */
 .page :is(table, .monster, .spellList) { font-family : 'IM Fell English', 'Georgia', serif; }
-.page .monster h5,
-.page table thead th                     { font-family : 'IM Fell English SC', serif; }
+.page .monster h5                        { font-family : 'IM Fell English SC', serif; }
 .page p                { line-height : 1.42em; }
 .page p + p,
 .page ul + p,
@@ -382,7 +382,13 @@
 	text-transform : none;
 	-webkit-text-stroke : .3px var(--pi-ink);
 }
-.page :is(h3, h4, h5, h6, table, .monster, .note, .toc, .kicker, .pageNumber, code) { font-style : normal; }
+.page :is(h3, h4, h5, h6, .toc, .kicker, .pageNumber, code) { font-style : normal; }
+/* Tables, stat blocks and notes are written in the same hand as the running text
+   (the faded Fell italic), not typeset upright inside it. Emphasis inside
+   them flips to upright, so *Melee Weapon Attack* still stands out.       */
+.page :is(table, .monster, .note) { font-style : var(--pi-text-style); color : var(--pi-text); }
+.page :is(table, .monster, .note) em { font-style : var(--pi-em-style); }
+.page :is(table, .monster, .note) :is(h1, h2, h3, h4, h5, th) { font-style : normal; }
 /* H3 and H4 are lettered in the same thorned hand as the titles, a size
    down each time, so the whole heading ladder is one pen: H1 the brush, H2
    the pen, H3 the pen over a thorn rule, H4 the pen alone at text height.
@@ -855,39 +861,43 @@
 
 
 /* TABLES __________________________________________________________
-   Hand-ruled: a pen stroke above and below (drawn, not a CSS border, so
-   it wobbles and overshoots like the art frames), a lighter one under the
-   head, and a pass of grey wash on every other row in place of flat
-   stripes. Three washes rotate so neighbouring stripes differ.           */
+   Hand-ruled and hand-written: a pen stroke above and below (drawn, not a
+   CSS border, so it wobbles and overshoots like the art frames), a lighter
+   one under the head, and a pass of grey wash on every other row in place
+   of flat stripes. Three washes rotate so neighbouring stripes differ.
+   The column heads are lettered in the thorn hand, like the headings; the
+   cells are in the text hand.                                            */
 .page table {
-	font-size         : .32cm;
-	line-height       : 1.22em;
+	font-size         : .33cm;
+	line-height       : 1.24em;
 	border            : 0;
 	border-collapse   : collapse;
 	background        :
-		var(--pi-stroke-1) center top    / calc(100% + 10px) 8px no-repeat,
-		var(--pi-stroke-2) center bottom / calc(100% + 10px) 8px no-repeat;
+		var(--pi-stroke-1) center top    / calc(100% + 12px) 12px no-repeat,
+		var(--pi-stroke-2) center bottom / calc(100% + 12px) 12px no-repeat;
 }
 .page table thead th {
-	padding           : .14cm .1cm .08cm;
-	font-family       : 'IM Fell English SC', serif;
-	font-size         : .31cm;
+	padding           : .18cm .1cm .2cm;
+	font-family       : 'Planar Thorn', 'IM Fell English SC', serif;
+	font-size         : .42cm;
 	font-weight       : normal;
-	letter-spacing    : .05em;
+	line-height       : 1.05em;
+	letter-spacing    : .03em;
+	text-transform    : none;
 	color             : var(--pi-ink);
 	border-bottom     : 0;
-	background        : var(--pi-stroke-2) center bottom / 100% 5px no-repeat;
+	background        : var(--pi-stroke-3) center bottom / 100% 8px no-repeat;
 }
 .page table tbody td { padding : .05cm .12cm; vertical-align : top; }
 .page table tbody tr:first-child td { padding-top : .09cm; }
-.page table tbody tr:last-child  td { padding-bottom : .14cm; }
+.page table tbody tr:last-child  td { padding-bottom : .2cm; }
 .page table tbody tr:nth-child(odd)  { background : none; }
 .page table tbody tr:nth-child(odd)  { background : var(--pi-row-1) 0 0 / 100% 100% no-repeat; }
 .page table tbody tr:nth-child(4n+3) { background-image : var(--pi-row-2); }
 .page table tbody tr:nth-child(6n+5) { background-image : var(--pi-row-3); }
 /* a table whose first column is a die roll: the numbers in the thorn hand */
 .page table td:first-child:is([align='center']),
-.page table td:first-child[style*='center'] { font-family : 'Planar Thorn', 'IM Fell English', serif; font-size : .36cm; color : var(--pi-ink); }
+.page table td:first-child[style*='center'] { font-family : 'Planar Thorn', 'IM Fell English', serif; font-size : .38cm; font-style : normal; color : var(--pi-ink); }
 
 
 /* MONSTER STAT BLOCK ______________________________________________
@@ -901,12 +911,12 @@
 .page .monster h2 + p { font-size : .31cm; color : var(--pi-faint); }
 .page .monster h3 {
 	margin         : .16cm 0 .1cm;
-	padding-bottom : .06cm;
+	padding-bottom : .14cm;
 	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
 	font-size      : .5cm;
 	letter-spacing : .02em;
 	text-transform : none;
-	background     : var(--pi-stroke-2) left bottom / 100% 5px no-repeat;
+	background     : var(--pi-stroke-3) left bottom / 100% 9px no-repeat;
 	border-bottom  : 0;
 }
 .page .monster :is(dt, strong) { color : var(--pi-ink); }
@@ -915,13 +925,13 @@
 .page .monster p + p { margin-top : .12cm; }
 /* the ability scores: a ruled line of six, not a zebra table */
 .page .monster table { background : none; }
-.page .monster table thead th { padding-top : .02cm; background-size : 100% 4px; }
+.page .monster table thead th { padding : .02cm .04cm 0; font-size : .36cm; background : none; }     /* the dividers above and below already rule it */
 .page .monster table tbody tr:nth-child(n) { background : none; }
 .page .monster table tbody td,
 .page .monster table td:first-child { padding : .03cm .04cm; font-family : inherit; font-size : inherit; color : inherit; }
 .page .monster hr {
-	height            : 8px;
-	margin            : .08cm 0;
+	height            : 11px;
+	margin            : .05cm 0;
 	visibility        : visible;
 	background        : var(--pi-stroke-1) center / 100% 100% no-repeat;
 	border            : 0;

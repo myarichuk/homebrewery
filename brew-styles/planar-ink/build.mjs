@@ -265,23 +265,29 @@ const spillSet = (seed)=>{
    so its two parts are redrawn by hand:
 
    stroke   the rule above and below: two or three overlapping pen strokes
-            that wobble, vary in weight and overshoot the ends, the same
-            hand as the art frames. Stretches along its length only.
+            that drift, shake, vary in weight and stop short of each other,
+            the same hand as the art frames. Stretched to the table's
+            width and drawn 9-12px deep, so the drift is a couple of
+            pixels on the page: visibly freehand, still a rule.
    row wash the zebra stripe: one pass of a loaded brush, its long edges
             uneven and its ends ragged, instead of a grey rectangle.
    Plain paths, no filters; both stretch to whatever they are given.      */
-const buildStroke = (seed)=>{
-	const L = 600, T = 10;
+const buildStroke = (seed, weight = 1)=>{
+	const L = 600, T = 16;
 	const r = mulberry32(seed);
-	const wob = fbm(seed + 3, [[70, 1.2], [19, .5], [6, .2]]);
+	// a line ruled freehand: it drifts off true over its length (the long
+	// wave), shakes a little all the way (the short ones), and is gone over
+	// two or three times, never quite in the same place
+	const wob = fbm(seed + 3, [[210, 4.2], [58, 1.6], [17, .6], [6, .25]]);
+	const mean = (4.2 + 1.6 + .6 + .25) / 2;
 	const strokes = [];
-	const n = 2 + Math.floor(r() * 1.5);
+	const n = 2 + Math.floor(r() * 1.6);
 	for (let j = 0; j < n; j++) {
-		const a = j === 0 ? 2 : 4 + r() * 30, b = j === 0 ? L - 2 : L - 4 - r() * 30;
-		const off = j === 0 ? 0 : (r() - .5) * 2.6;
+		const a = j === 0 ? 2 : 4 + r() * 40, b = j === 0 ? L - 2 : L - 4 - r() * 40;
+		const off = j === 0 ? 0 : (r() - .5) * 3.4;
 		const pts = [];
-		for (let x = a; x <= b; x += 6) pts.push([x, T / 2 + wob(j * 400 + x) - .95 + off]);
-		strokes.push(`<path d="M${pts.map(([x, y])=>`${f(x)} ${f(y)}`).join('L')}" stroke-width="${f(j === 0 ? 1.9 + r() * .5 : .8 + r() * .7)}" stroke-opacity="${f(j === 0 ? .92 : .5 + r() * .3)}"/>`);
+		for (let x = a; x <= b; x += 5) pts.push([x, Math.max(1.5, Math.min(T - 1.5, T / 2 + (wob(x) - mean) * .8 + (wob(j * 400 + x * 1.7) - mean) * .35 + off))]);
+		strokes.push(`<path d="M${pts.map(([x, y])=>`${f(x)} ${f(y)}`).join('L')}" stroke-width="${f((j === 0 ? 2 + r() * .6 : .8 + r() * .8) * weight)}" stroke-opacity="${f(j === 0 ? .92 : .5 + r() * .3)}"/>`);
 	}
 	return svg(L, T, `<g fill="none" stroke="${INK}" stroke-linecap="round" stroke-linejoin="round">${strokes.join('')}</g>`, 'preserveAspectRatio="none"', false);
 };
@@ -706,6 +712,7 @@ const buildAssets = (lite)=>({
 	'--pi-cartouche'  : webpUri('art/cartouche.webp'),
 	'--pi-stroke-1'   : svgUri(buildStroke(211)),
 	'--pi-stroke-2'   : svgUri(buildStroke(223)),
+	'--pi-stroke-3'   : svgUri(buildStroke(239, .7)),         // lighter: under a table head, under a stat block heading
 	'--pi-row-1'      : svgUri(buildRowWash(301)),
 	'--pi-row-2'      : svgUri(buildRowWash(317)),
 	'--pi-row-3'      : svgUri(buildRowWash(331)),
