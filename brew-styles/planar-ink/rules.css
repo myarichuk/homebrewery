@@ -3,8 +3,9 @@
    Drop-in replacement for the Style tab (theme: 5e PHB, V3 renderer).
 
    A 90s planar-sketchbook look: parchment with torn, browned edges;
-   hand-inked gothic corner brackets and crest; a few skulls and sigils in
-   the margins; artwork that bleeds into the paper through uneven
+   hand-inked gothic corner brackets and crest; skulls, sigils, relics and
+   runes scattered differently down the margins and along the foot of
+   every page; artwork that bleeds into the paper through uneven
    watercolour masks instead of sitting in boxes.
 
    · Self-contained. Ink art is lifted off an asset sheet and embedded as
@@ -18,7 +19,13 @@
      no-scatter / scatter   turn the automatic marginalia off / force it on
                             (it switches itself off on pages where you
                             place pieces by hand)
-     mirror   flip the marginalia scheme (for left-hand pages)
+     roll-1 … roll-13       deal the page a different set of marginalia
+                            (every page is dealt its own; this re-deals it,
+                            e.g. when a drawing lands on your artwork)
+     no-left / no-right / no-foot / no-splatter
+                            leave out one layer of the marginalia: a
+                            margin, the strip under the text, the ink spots
+     mirror   swap the two margins
      roman    upright, darker body text instead of the faded italic
      bare     no ink art at all: just the paper
      untorn   straight page edges (for printers that dislike the mask)
@@ -53,16 +60,35 @@
                               hand; options: width:40px  rotate:-12deg  flip
                               (natural size without a width; see
                               HAND-PLACED MARGINALIA below)
-                                drawings  skull  skull-sm  skull-a  skull-b
-                                          bull  ram  dagger  compass
-                                          compass2  orrery  bird-a  bird-b
-                                          fairy  mimic  banner-a  banner-b
+                                bones     skull  skull-sm  skull-a … skull-d
+                                          skull-horn  bull  ram  bird-a
+                                          bird-b  bone  ribs  bones-v
+                                          antler  bonecrest
+                                occult    compass  compass2  orrery
+                                          circle-a/-b/-c  rose-a  rose-b
+                                          star-ring  sun  sigil-a  burst-a
+                                          burst-b  stars-c
+                                relics    dagger  sword  crown-a/-b/-c
+                                          shield-a  shield-b  book-a/-b/-c
+                                          book-open  vial  staff  beetle
+                                          hand-a  hand-b  eye-wing
+                                          eye-wings  fairy  mimic
+                                          banner-a  banner-b
+                                planar    portal-a/-b/-c  moons  script
+                                          arrow-a/-b/-c  arrow-h  runes-a
+                                          runes-b
                                 pendants  pend-hex  pend-moon  pend-skull
-                                          pend-star  (hang from top:6.4cm)
-                                glyphs    g1 … g19  (planetary signs, runes)
+                                          pend-star  pend-owl  pend-shield
+                                          pend-disc  pend-keys
+                                          (hang from top:6.4cm)
+                                glyphs    g1 … g32  (planetary signs, runes,
+                                          sigils)
                                 splatter  splat-a  splat-b  splat-c
                                           sp1 … sp9  specks  stars
                                 washes    pool1 … pool4  pool-1  pool-2  pool-3
+                                (planar-ink-lite.css has the first two
+                                 sheets' drawings only: no pack pieces,
+                                 glyphs up to g19)
      {{orn ☠}}                inline ornament from Planar Thorn:
                                 ☠ skull & bones   💀 skull     ⚔ swords
                                 † cross-dagger    ❖ diamonds   ☨ barred cross
@@ -191,13 +217,22 @@
 	opacity             : .88;      /* the frame is fine pen work: a shade under the title's black */
 }
 
-/* marginalia and ink splatter: a second overlay, laid out per page.
-   Every page carries the reference scheme: skulls top left, compass and
-   orrery top right, a column of signs and runes down each margin, the
-   dagger sigil low on the left. The layers come from the generated block
-   above (7 layouts that differ in which glyphs are drawn and by a few
-   pixels of drift, 5 splatter sets: no two pages in 35 alike).
-   \page {mirror} flips the scheme for a left-hand page.                  */
+/* marginalia and ink splatter: a second overlay, dealt per page.
+   Four layers, each on its own cycle (see the generated block above):
+
+     left margin · right margin · foot of the page · ink splatter
+
+   A margin holds anything from nothing to four things: a drawing, the
+   pair of skulls, a column of signs and runes, a hanging charm, wherever
+   they fall between the corner brackets. The foot gets a flat drawing or a
+   row of signs beside the page number on five pages in seven. The cycles
+   are 11, 13, 7 and 9 long, so no two pages in 9009 are dealt the same.
+
+   On the \page line:
+     roll-1 … roll-13   deal this page a different hand
+     no-left / no-right / no-foot / no-splatter   leave one layer out
+     mirror             swap the margins
+     plain / no-scatter leave them all out                                */
 .page::after {
 	content             : '';
 	display             : block;
@@ -207,21 +242,27 @@
 	width               : auto;
 	height              : auto;
 	pointer-events      : none;
-	background-image    : var(--pi-marg-img), var(--pi-splat-img);
-	background-position : var(--pi-marg-pos), var(--pi-splat-pos);
-	background-size     : var(--pi-marg-size), var(--pi-splat-size);
+	background-image    : var(--pi-l-img), var(--pi-r-img), var(--pi-b-img), var(--pi-splat-img);
+	background-position : var(--pi-l-pos), var(--pi-r-pos), var(--pi-b-pos), var(--pi-splat-pos);
+	background-size     : var(--pi-l-size), var(--pi-r-size), var(--pi-b-size), var(--pi-splat-size);
 	background-repeat   : no-repeat;
 }
 .page:nth-child(even)::after { transform : none; }      /* the PHB theme flips its footer accent on even pages */
 .page.mirror::after { transform : scaleX(-1); }
 .page:is(.plain, .bare, .no-scatter)::after { display : none; }
 .page.bare::before { display : none; }
+.page.no-left     { --pi-l-img : none; --pi-l-pos : 0 0; --pi-l-size : 0 0; }
+.page.no-right    { --pi-r-img : none; --pi-r-pos : 0 0; --pi-r-size : 0 0; }
+.page.no-splatter { --pi-splat-img : none; --pi-splat-pos : 0 0; --pi-splat-size : 0 0; }
+/* a footnote sits in the same strip as the foot marginalia: it wins */
+.page.no-foot,
+.page:has(.footnote) { --pi-b-img : none; --pi-b-pos : 0 0; --pi-b-size : 0 0; }
 
-/* The scheme lives in the outer 3.4cm of the page, which the text never
-   enters, and (as on the references) it is drawn over any art that bleeds
-   out that far. It stands down only on a page where you place pieces by
-   hand (below): once you place one, the page is yours.
-   \page {scatter} brings it back regardless.                          */
+/* The scatter lives in the outer 3.4cm of the page and the strip under the
+   text, which the text never enters, and (as on the references) it is drawn
+   over any art that bleeds out that far. It stands down only on a page
+   where you place pieces by hand (below): once you place one, the page is
+   yours. \page {scatter} brings it back regardless.                     */
 .page:has(.marg)::after { display : none; }
 .page.scatter::after { display : block; }
 
@@ -300,7 +341,7 @@
 /* the PHB sets its sans (ScalySans) on tables, stat blocks and spell
    lists; in an old printed book those are set in the text face too    */
 .page :is(table, .monster, .spellList) { font-family : 'IM Fell English', 'Georgia', serif; }
-.page .monster :is(h3, h4, h5),
+.page .monster h5,
 .page table thead th                     { font-family : 'IM Fell English SC', serif; }
 .page p                { line-height : 1.42em; }
 .page p + p,
@@ -342,21 +383,33 @@
 	-webkit-text-stroke : .3px var(--pi-ink);
 }
 .page :is(h3, h4, h5, h6, table, .monster, .note, .toc, .kicker, .pageNumber, code) { font-style : normal; }
+/* H3 and H4 are lettered in the same thorned hand as the titles, a size
+   down each time, so the whole heading ladder is one pen: H1 the brush, H2
+   the pen, H3 the pen over a thorn rule, H4 the pen alone at text height.
+   (A typeset small-cap face here read as a label stuck on a drawn page.)
+   H5 stays in Fell small caps: it is the run-in label of notes and boxes. */
 .page h3 {
-	padding-bottom : .16cm;
-	font-family    : 'IM Fell English SC', serif;
-	font-size      : .45cm;
+	margin-top     : .34cm;
+	padding-bottom : .2cm;
+	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
+	font-size      : .6cm;
 	font-weight    : normal;
-	line-height    : 1.1em;
-	letter-spacing : .05em;
+	line-height    : 1.05em;
+	letter-spacing : .02em;
+	text-transform : none;
 	border-bottom  : 0;
 	background     : var(--pi-rule) left bottom / 100% 6px no-repeat;
+	-webkit-text-stroke : .2px var(--pi-ink);
 }
 .page h4 {
-	font-family    : 'IM Fell English SC', serif;
-	font-size      : .39cm;
+	margin-top     : .26cm;
+	margin-bottom  : .04cm;
+	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
+	font-size      : .47cm;
 	font-weight    : normal;
-	letter-spacing : .04em;
+	line-height    : 1.1em;
+	letter-spacing : .03em;
+	text-transform : none;
 }
 .page h5 {
 	font-family    : 'IM Fell English SC', serif;
@@ -741,21 +794,44 @@
 
 /* NOTE  ·  sketched box ___________________________________________ */
 /* border-box sizing keeps the drawn border inside the column            */
-.page .note {
+/* A box is two things drawn separately, as on a real page: a pen frame
+   (strokes that cross at the corners) and a grey wash laid inside it that
+   doesn't quite keep to the line. The wash is a pseudo-element under the
+   text with a torn-edge mask; the frame is the box's own border-image and
+   is not masked, so its corners overshoot and nothing clips its lines.    */
+.page .note,
+.page .monster.frame {
+	position         : relative;
 	box-sizing       : border-box;
-	margin-block     : .3cm;
-	padding          : .3cm .38cm;
-	font-family      : 'IM Fell English', 'Georgia', serif;
-	font-size        : .33cm;
-	background-color : var(--pi-wash);
-	background-image : none;                 /* the theme's texture is grey on parchment */
-	border           : 14px solid transparent;
-	border-image     : var(--pi-box-frame) 40 / 16px / 2px stretch;
+	background       : none;                 /* the theme's fill and texture are grey on parchment */
+	border           : 8px solid transparent;
+	border-image     : var(--pi-box-frame) 40 / 16px / 5px stretch;
 	box-shadow       : none;
+}
+.page .note > :first-child,
+.page .monster.frame > :first-child { margin-top : 0; }
+.page .note::before,
+.page .monster.frame::before {
+	content          : '';
+	position         : absolute;
+	inset            : -5px;
+	z-index          : -1;
+	pointer-events   : none;
+	background       :
+		radial-gradient(ellipse 60% 45% at 22% 18%, var(--pi-wash), transparent 70%),
+		radial-gradient(ellipse 55% 50% at 80% 78%, var(--pi-wash), transparent 72%),
+		var(--pi-wash);
 	-webkit-mask     : var(--pi-box-edge) 0 0 / 100% 100% no-repeat;
 	mask             : var(--pi-box-edge) 0 0 / 100% 100% no-repeat;
 }
-.page .note h5 { margin-bottom : .08cm; }
+.page .note {
+	margin-block     : .34cm;
+	padding          : .12cm .2cm .16cm;
+	font-family      : 'IM Fell English', 'Georgia', serif;
+	font-size        : .33cm;
+}
+.page .note h5 { margin-bottom : .08cm; font-size : .36cm; }
+.page .note :is(h3, h4) { margin-top : 0; }
 .page .note p  { text-indent : 0; }
 
 /* DESCRIPTIVE  ·  read-aloud: the one place italics belong ________ */
@@ -766,60 +842,92 @@
 	font-size    : .36cm;
 	font-style   : italic;
 	background   : linear-gradient(90deg, var(--pi-wash-2), transparent 80%);
-	border       : 0;
-	border-left  : 3px double var(--pi-ink);
-	border-image : none;
+	box-sizing   : border-box;
+	width        : auto;
+	margin-inline : 0;
+	background-clip : padding-box;
+	border       : 0 solid transparent;
+	border-left-width : 10px;
+	border-image : var(--pi-box-frame) 40 / 0 0 0 16px / 0 0 0 4px stretch;      /* the frame's left-hand pen strokes only */
 	box-shadow   : none;
 }
 .page .descriptive p { line-height : 1.32em; }
 
 
-/* TABLES __________________________________________________________ */
+/* TABLES __________________________________________________________
+   Hand-ruled: a pen stroke above and below (drawn, not a CSS border, so
+   it wobbles and overshoots like the art frames), a lighter one under the
+   head, and a pass of grey wash on every other row in place of flat
+   stripes. Three washes rotate so neighbouring stripes differ.           */
 .page table {
-	font-size     : .32cm;
-	line-height   : 1.22em;
-	border-top    : 1.5px solid var(--pi-ink);
-	border-bottom : 1.5px solid var(--pi-ink);
+	font-size         : .32cm;
+	line-height       : 1.22em;
+	border            : 0;
+	border-collapse   : collapse;
+	background        :
+		var(--pi-stroke-1) center top    / calc(100% + 10px) 8px no-repeat,
+		var(--pi-stroke-2) center bottom / calc(100% + 10px) 8px no-repeat;
 }
 .page table thead th {
-	padding        : .06cm .1cm .04cm;
-	font-family    : 'IM Fell English SC', serif;
-	font-size      : .3cm;
-	font-weight    : normal;
-	letter-spacing : .04em;
-	color          : var(--pi-ink);
-	border-bottom  : 1px solid var(--pi-ink);
+	padding           : .14cm .1cm .08cm;
+	font-family       : 'IM Fell English SC', serif;
+	font-size         : .31cm;
+	font-weight       : normal;
+	letter-spacing    : .05em;
+	color             : var(--pi-ink);
+	border-bottom     : 0;
+	background        : var(--pi-stroke-2) center bottom / 100% 5px no-repeat;
 }
-.page table tbody td { padding : .04cm .1cm; }
-.page table tbody tr:nth-child(odd) { background-color : var(--pi-wash); }
+.page table tbody td { padding : .05cm .12cm; vertical-align : top; }
+.page table tbody tr:first-child td { padding-top : .09cm; }
+.page table tbody tr:last-child  td { padding-bottom : .14cm; }
+.page table tbody tr:nth-child(odd)  { background : none; }
+.page table tbody tr:nth-child(odd)  { background : var(--pi-row-1) 0 0 / 100% 100% no-repeat; }
+.page table tbody tr:nth-child(4n+3) { background-image : var(--pi-row-2); }
+.page table tbody tr:nth-child(6n+5) { background-image : var(--pi-row-3); }
+/* a table whose first column is a die roll: the numbers in the thorn hand */
+.page table td:first-child:is([align='center']),
+.page table td:first-child[style*='center'] { font-family : 'Planar Thorn', 'IM Fell English', serif; font-size : .36cm; color : var(--pi-ink); }
 
 
-/* MONSTER STAT BLOCK ______________________________________________ */
+/* MONSTER STAT BLOCK ______________________________________________
+   Frame and wash: see NOTE above.                                      */
 .page .monster.frame {
-	box-sizing       : border-box;
-	padding          : .2cm .26cm .24cm;
-	background-color : var(--pi-wash);
-	background-image : none;                 /* the theme's texture is grey on parchment */
-	border           : 14px solid transparent;
-	border-image     : var(--pi-box-frame) 40 / 16px / 2px stretch;
-	box-shadow       : none;
-	-webkit-mask     : var(--pi-box-edge) 0 0 / 100% 100% no-repeat;
-	mask             : var(--pi-box-edge) 0 0 / 100% 100% no-repeat;
+	width            : auto;
+	margin           : .3cm 0 .4cm;
+	padding          : .06cm .16cm .12cm;
 }
-.page .monster h2 { font-size : .64cm; }
+.page .monster h2 { font-size : .7cm; margin-bottom : .02cm; }
+.page .monster h2 + p { font-size : .31cm; color : var(--pi-faint); }
 .page .monster h3 {
-	font-size      : .42cm;
-	background     : none;
-	border-bottom  : 1.5px solid var(--pi-ink);
-	padding-bottom : .03cm;
+	margin         : .16cm 0 .1cm;
+	padding-bottom : .06cm;
+	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
+	font-size      : .5cm;
+	letter-spacing : .02em;
+	text-transform : none;
+	background     : var(--pi-stroke-2) left bottom / 100% 5px no-repeat;
+	border-bottom  : 0;
 }
 .page .monster :is(dt, strong) { color : var(--pi-ink); }
+.page .monster p + p,
+.page .monster :is(ul, ol, dl, table, hr, h3) + p { text-indent : 0; }
+.page .monster p + p { margin-top : .12cm; }
+/* the ability scores: a ruled line of six, not a zebra table */
+.page .monster table { background : none; }
+.page .monster table thead th { padding-top : .02cm; background-size : 100% 4px; }
+.page .monster table tbody tr:nth-child(n) { background : none; }
+.page .monster table tbody td,
+.page .monster table td:first-child { padding : .03cm .04cm; font-family : inherit; font-size : inherit; color : inherit; }
 .page .monster hr {
-	height            : 2px;
-	background        : var(--pi-ink);
-	opacity           : .85;
-	-webkit-clip-path : polygon(0 0, 100% 50%, 0 100%);
-	clip-path         : polygon(0 0, 100% 50%, 0 100%);
+	height            : 8px;
+	margin            : .08cm 0;
+	visibility        : visible;
+	background        : var(--pi-stroke-1) center / 100% 100% no-repeat;
+	border            : 0;
+	opacity           : .8;
+	-webkit-clip-path : none;
+	clip-path         : none;
 }
 
 

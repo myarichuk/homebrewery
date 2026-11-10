@@ -77,20 +77,21 @@ The gate-towns are the best place to buy a portal key and the worst place to ask
 | 5 | The well water tastes of salt and smoke. |
 | 6 | A modron was seen asking for directions. |
 
+### Asking Around
+
+A night of listening costs the price of the drinks. A night of asking costs more, and somebody always notices who asked.
+
+#### In the Taproom
+
+Buy a round and roll once on the table. Buy the house a round and roll twice, keeping the rumor that is true.
+
+#### In the Back Room
+
+The barkeep knows which rumor is true. The barkeep also knows what that is worth.
+
 {{descriptive
 The tavern is a ship's hull turned upside down, its keel blackened by a thousand pipe-fires. A tiefling at the bar is drawing a door on the counter in spilled wine, very slowly, and the lines are starting to glow.
 }}
-
-{{note
-##### {{orn ☠}} A Word to the Wise
-Never tell a fiend your true name, and never accept a gift without asking what it cost the giver.
-}}
-
-{{rule}}
-
-{{rule,knot}}
-
-{{rule,barbed}}
 
 \column
 
@@ -118,6 +119,11 @@ ___
 ***Slam.*** *Melee Weapon Attack:* +5 to hit, reach 5 ft., one target. *Hit:* 8 (1d10 + 3) bludgeoning damage.
 
 ***Close the Door (Recharge 5–6).*** One creature the doorwarden can see within 30 feet must succeed on a DC 13 Charisma saving throw or be banished to a harmless demiplane until the end of its next turn.
+}}
+
+{{note
+##### {{orn ☠}} A Word to the Wise
+Never tell a fiend your true name, and never accept a gift without asking what it cost the giver.
 }}
 
 {{pageNumber,auto}}
