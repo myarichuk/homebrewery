@@ -102,8 +102,9 @@
 /* Planar Thorn – hand-inked thorny capitals, digits and ornaments for
                 titles and page numbers. Embedded (see build_font.py).
    IM Fell English     – body text, captions, boxes, drop caps.
-   IM Fell English SC  – small headings, table heads.
-   Cinzel 900          – the kicker line only (the mockup's heavy capitals).
+   IM Fell English SC  – fallback for Planar Thorn only.
+   Cinzel 900          – loaded but unused by default: the mockup's kicker
+                         capitals, opt-in via --pi-kicker-font.
    The Fell types were digitised from scans of 17th-century printing, so
    the ink spread, the uneven letterforms and the old-style figures are
    real: next to the hand-drawn art, a clean digital face (the PHB's own,
@@ -468,10 +469,9 @@
 
 	/* The mockups set running text in a faded italic. It is the look, but it
 	   is slower to read over a whole book; for upright text put
-	       .page { --pi-text-style : normal; --pi-em-style : italic; --pi-text : #2b231c; }
+	       .page { --pi-text-style : normal; --pi-text : #2b231c; }
 	   in the Style tab, or  \page {roman}  on single pages.               */
 	--pi-text-style : italic;
-	--pi-em-style   : normal;                /* emphasis inside tables and stat blocks: the opposite of the text style */
 	--pi-wash    : rgba(91, 83, 72, .11);    /* boxes, table zebra         */
 	--pi-wash-2  : rgba(91, 83, 72, .2);
 
@@ -518,7 +518,7 @@
 	background-position : 0 0, 100% 100%, 0 0, 190px 230px;
 }
 .page.untorn { -webkit-mask : none; mask : none; }
-.page.roman  { --pi-text-style : normal; --pi-em-style : italic; --pi-text : #2b231c; }
+.page.roman  { --pi-text-style : normal; --pi-text : #2b231c; }
 
 /* corners and crest: one overlay underneath the text.
 
@@ -685,7 +685,6 @@
 /* the PHB sets its sans (ScalySans) on tables, stat blocks and spell
    lists; in an old printed book those are set in the text face too    */
 .page :is(table, .monster, .spellList) { font-family : 'IM Fell English', 'Georgia', serif; }
-.page .monster h5                        { font-family : 'IM Fell English SC', serif; }
 .page p                { line-height : 1.42em; }
 .page p + p,
 .page ul + p,
@@ -746,12 +745,17 @@
 	text-transform : none;
 	-webkit-text-stroke : .3px var(--pi-ink);
 }
-.page :is(h3, h4, h5, h6, .toc, .kicker, .pageNumber, code) { font-style : normal; }
-/* Tables, stat blocks and notes are written in the same hand as the running text
-   (the faded Fell italic), not typeset upright inside it. Emphasis inside
-   them flips to upright, so *Melee Weapon Attack* still stands out.       */
-.page :is(table, .monster, .note) { font-style : var(--pi-text-style); color : var(--pi-text); }
-.page :is(table, .monster, .note) em { font-style : var(--pi-em-style); }
+.page :is(h3, h4, h5, h6, .kicker, .pageNumber) { font-style : normal; }
+/* Tables, stat blocks and notes are written in the same hand as the
+   running text (the faded Fell italic), not typeset upright inside it.
+   Emphasis can't lean any further, so it is written darker instead: full
+   ink against the faded text, the way a scribe bears down on a word.     */
+.page :is(table, .monster, .note, .descriptive) { font-style : var(--pi-text-style); color : var(--pi-text); }
+.page.page :is(table, .monster, .note, .descriptive, .quote, .spellList, .classTable) :is(em, td, dd, li, p, .attribution) { font-style : var(--pi-text-style); }
+.page em { color : var(--pi-ink); }
+.page.page.roman em { font-style : italic; }
+/* the theme opens a quote in upright small capitals */
+.page.page .quote > p:first-child::first-line { font-size : inherit; font-style : inherit; font-variant : normal; }
 .page :is(table, .monster, .note) :is(h1, h2, h3, h4, h5, th) { font-style : normal; }
 /* H3 and H4 are lettered in the same thorned hand as the titles, a size
    down each time, so the whole heading ladder is one pen: H1 the brush, H2
@@ -781,13 +785,21 @@
 	letter-spacing : .03em;
 	text-transform : none;
 }
-.page h5 {
-	font-family    : 'IM Fell English SC', serif;
-	font-size      : .33cm;
+/* H5 / H6: the run-in label of notes, boxes, spell lists and class tables.
+   The same pen again, at text height.                                    */
+.page.page :is(h5, h6) {
+	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
+	font-size      : .42cm;
 	font-weight    : normal;
-	letter-spacing : .1em;
+	line-height    : 1.1em;
+	letter-spacing : .03em;
+	text-transform : none;
 }
 
+/* (The mockup set this line in a typeset bold roman. It is lettered in the
+   thorn hand here like everything else; for the mockup's capitals put
+       .page { --pi-kicker-font : 'Cinzel'; --pi-kicker-weight : 900; }
+   in the Style tab.)                                                     */
 /* KICKER  ·  {{kicker SERIES}} above a title: heavy spaced capitals over
    a small diamond rule, as on the third mockup.
    {{kicker,plaque SERIES}} sets it on the thorned plaque instead
@@ -800,12 +812,13 @@
 	min-width      : 4cm;
 	margin         : 0 auto .12cm;
 	padding        : 0 .2cm .26cm;
-	font-family    : 'Cinzel', 'IM Fell English SC', serif;
-	font-size      : .66cm;
-	font-weight    : 900;
+	font-family    : var(--pi-kicker-font, 'Planar Thorn', 'IM Fell English SC', serif);
+	font-size      : .74cm;
+	font-weight    : var(--pi-kicker-weight, normal);
 	line-height    : 1.05em;
-	letter-spacing : .1em;
+	letter-spacing : .12em;
 	text-transform : uppercase;
+	-webkit-text-stroke : .4px var(--pi-ink);
 	color          : var(--pi-ink);
 	text-align     : center;
 	background     : var(--pi-rule) center bottom / 3.4cm 7px no-repeat;
@@ -813,8 +826,8 @@
 .page .kicker.plaque {
 	margin         : 0 auto .3cm;
 	padding        : .02cm .5cm 0;
-	font-family    : 'IM Fell English SC', serif;
-	font-size      : .42cm;
+	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
+	font-size      : .46cm;
 	font-weight    : normal;
 	line-height    : 1.1em;
 	letter-spacing : .12em;
@@ -823,6 +836,7 @@
 	border         : solid transparent;
 	border-width   : .5cm 1.05cm;
 	border-image   : var(--pi-plaque) 40 92 fill / .5cm 1.05cm stretch;
+	-webkit-text-stroke : 0;
 }
 .page .kicker + h1 { margin-top : 0; }
 
@@ -846,10 +860,12 @@
 	float                   : left;
 	margin                  : -.02cm .12cm -.1cm -.2cm;
 	padding                 : .14cm .2cm .06cm .2cm;
-	font-family             : 'IM Fell English', serif;
+	/* a thorn capital in the blot. The mockups used an upright bold serif
+	   here; for that:  .page { --pi-cap-font : 'IM Fell English'; --pi-cap-weight : bold; } */
+	font-family             : var(--pi-cap-font, 'Planar Thorn', 'IM Fell English', serif);
 	font-size               : 1.5cm;
 	font-style              : normal;
-	font-weight             : bold;
+	font-weight             : var(--pi-cap-weight, normal);
 	line-height             : .86em;
 	color                   : var(--pi-cap);
 	background-color        : transparent;
@@ -896,7 +912,7 @@
 }
 .page .cartouche :is(h1, h2) { margin : 0; font-size : 1.2cm; line-height : 1em; white-space : nowrap; }
 .page .cartouche h1 + p::first-letter { all : unset; }
-.page .cartouche p { margin : .05cm 0 0; text-indent : 0; font-family : 'IM Fell English SC', serif; font-size : .34cm; font-weight : normal; letter-spacing : .12em; }
+.page .cartouche p { margin : .05cm 0 0; text-indent : 0; font-family : 'IM Fell English', serif; font-size : .38cm; font-style : italic; font-weight : normal; letter-spacing : .02em; }
 
 /* WREATH  ·  {{wreath ... }}  oval thorn wreath with a ribbon.
    The first heading inside goes on the ribbon; an image inside fills the
@@ -1170,6 +1186,8 @@
    text with a torn-edge mask; the frame is the box's own border-image and
    is not masked, so its corners overshoot and nothing clips its lines.    */
 .page .note,
+.page .classTable.frame,
+.page .runeTable.frame,
 .page .monster.frame {
 	position         : relative;
 	box-sizing       : border-box;
@@ -1181,8 +1199,16 @@
 .page .note > :first-child,
 .page .monster.frame > :first-child { margin-top : 0; }
 .page .note::before,
+.page.page .classTable.frame::before,
+.page.page .runeTable.frame::before,
 .page .monster.frame::before {
 	content          : '';
+	width            : auto;
+	height           : auto;
+	border           : 0;
+	border-image     : none;
+	filter           : none;
+	transform        : none;
 	position         : absolute;
 	inset            : -5px;
 	z-index          : -1;
@@ -1200,7 +1226,7 @@
 	font-family      : 'IM Fell English', 'Georgia', serif;
 	font-size        : .33cm;
 }
-.page .note h5 { margin-bottom : .08cm; font-size : .36cm; }
+.page .note h5 { margin-bottom : .08cm; }
 .page .note :is(h3, h4) { margin-top : 0; }
 .page .note p  { text-indent : 0; }
 
@@ -1260,8 +1286,8 @@
 .page table tbody tr:nth-child(4n+3) { background-image : var(--pi-row-2); }
 .page table tbody tr:nth-child(6n+5) { background-image : var(--pi-row-3); }
 /* a table whose first column is a die roll: the numbers in the thorn hand */
-.page table td:first-child:is([align='center']),
-.page table td:first-child[style*='center'] { font-family : 'Planar Thorn', 'IM Fell English', serif; font-size : .38cm; font-style : normal; color : var(--pi-ink); }
+.page.page.page table td:first-child:is([align='center']),
+.page.page.page table td:first-child[style*='center'] { font-family : 'Planar Thorn', 'IM Fell English', serif; font-size : .38cm; font-style : normal; color : var(--pi-ink); }
 
 
 /* MONSTER STAT BLOCK ______________________________________________
@@ -1292,7 +1318,7 @@
 .page .monster table thead th { padding : .02cm .04cm 0; font-size : .36cm; background : none; }     /* the dividers above and below already rule it */
 .page .monster table tbody tr:nth-child(n) { background : none; }
 .page .monster table tbody td,
-.page .monster table td:first-child { padding : .03cm .04cm; font-family : inherit; font-size : inherit; color : inherit; }
+.page.page.page .monster table td:first-child { padding : .03cm .04cm; font-family : inherit; font-size : inherit; font-style : inherit; color : inherit; }
 .page .monster hr {
 	height            : 11px;
 	margin            : .05cm 0;
@@ -1307,32 +1333,42 @@
 
 /* TABLE OF CONTENTS _______________________________________________ */
 .page .toc h1 { text-align : center; }
-.page .toc h3 { font-family : 'IM Fell English', serif; font-size : .37cm; font-weight : bold; letter-spacing : 0; background : none; }
-.page .toc h4 { font-family : 'IM Fell English SC', serif; font-weight : normal; font-size : .36cm; }
+.page.page .toc h3 { margin-top : .1cm; padding-bottom : 0; font-family : 'Planar Thorn', 'IM Fell English SC', serif; font-size : .5cm; font-weight : normal; letter-spacing : .02em; background : none; -webkit-text-stroke : 0; }
+.page.page .toc h4 { font-family : 'Planar Thorn', 'IM Fell English SC', serif; font-weight : normal; font-size : .42cm; }
+.page.page .toc, .page.page .toc :is(li, a, span) { font-style : var(--pi-text-style); }
+.page.page .toc :is(h3, h4) :is(a, span), .page.page .toc ul span:last-child { font-style : normal; }
 .page .toc ul span:first-child::after { border-bottom : .04cm dotted var(--pi-faint); }
 .page .toc ul span:last-child { font-family : 'Planar Thorn', 'IM Fell English SC', serif; color : var(--pi-ink); }
 .page .toc a { text-decoration : none; }
 
 
 /* CODE ____________________________________________________________ */
-.page code {
-	font-size        : .32cm;
+/* A monospaced face is a typewriter on a manuscript page. Code is written
+   in the text hand on a wash; a block keeps its line breaks and indents. */
+.page.page :is(code, pre, pre code) {
+	font-family      : 'IM Fell English', 'Georgia', serif;
+	font-size        : .33cm;
+	font-style       : var(--pi-text-style);
 	color            : var(--pi-ink);
-	background-color : var(--pi-wash-2);
 }
+.page code { padding : 0 .1cm; background-color : var(--pi-wash-2); border-radius : 0; }
+.page pre  { padding : .12cm .2cm; background-color : var(--pi-wash); border : 0; }
+.page pre code { padding : 0; background : none; }
 
 
 /* STOCK COVERS  ·  re-ink the PHB cover snippets ___________________ */
-.page:has(:is(.frontCover, .insideCover, .backCover)) h1 {
+.page.page:has(:is(.frontCover, .insideCover, .backCover, .partCover)) h1 {
 	font-family         : 'Planar Thorn', 'IM Fell English SC', serif;
 	font-size           : 1.9cm;
 	line-height         : 1.02em;
 	color               : var(--pi-ink);
 	-webkit-text-stroke : 0;
 }
-.page:has(:is(.frontCover, .insideCover, .backCover)) h2 {
-	font-family         : 'IM Fell English SC', serif;
+.page.page:has(:is(.frontCover, .insideCover, .backCover, .partCover)) h2 {
+	font-family         : 'Planar Thorn', 'IM Fell English SC', serif;
+	font-style          : normal;
 	font-weight         : normal;
+	text-transform      : none;
 	color               : var(--pi-ink);
 	-webkit-text-stroke : 0;
 }
@@ -1348,6 +1384,30 @@
 	-webkit-text-stroke : 0;
 }
 .page:has(:is(.frontCover, .backCover)) .pageNumber { display : none; }
+/* stock covers carry their own art: no scatter over it (the inside cover
+   is a plain page and keeps it); the back cover's title sits on black */
+.page:has(:is(.frontCover, .backCover, .partCover))::after { display : none; }
+.page.page:has(.backCover) :is(h1, h2) { color : var(--pi-paper); }
+/* the rest of the cover furniture: banner, back-cover blurb, logo line */
+.page.page :is(.banner, .logo, .logo p) {
+	font-family         : 'Planar Thorn', 'IM Fell English SC', serif;
+	font-style          : normal;
+	font-weight         : normal;
+	-webkit-text-stroke : 0;
+}
+.page.page:has(:is(.backCover, .partCover, .insideCover)) p:not(.logo p) {
+	font-family         : 'IM Fell English', 'Georgia', serif;
+	font-style          : italic;
+}
+
+/* ARTIST CREDIT  ·  {{artist ...}}: the theme's marker-pen face → ours */
+.page.page .artist,
+.page.page .artist :is(p, a) { font-family : 'IM Fell English', serif; font-style : italic; color : var(--pi-faint); }
+.page.page .artist h5 { font-family : 'Planar Thorn', 'IM Fell English SC', serif; font-size : .36cm; color : var(--pi-ink); }
+
+/* RUNE TABLES keep their script faces in the cells (that is the point of
+   them); the column heads are lettered like every other table's.          */
+.page.page .runeTable table thead th { font-family : 'Planar Thorn', 'IM Fell English SC', serif; font-style : normal; }
 
 
 /* PRINT ___________________________________________________________
