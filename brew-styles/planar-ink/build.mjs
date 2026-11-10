@@ -203,6 +203,56 @@ const buildInkFrame = (seed)=>{
 	return svg(S, S, `<g fill="none" stroke="${INK}" stroke-linecap="round" stroke-linejoin="round">${strokes.join('')}</g>`);
 };
 
+/* ---------- paint edge for framed art ----------------------------------
+   On the reference panels the watercolour doesn't stop at the ruled line:
+   here it runs a few pixels past, there it stops short and leaves a sliver
+   of paper inside the frame. So the picture's mask edge has to wander
+   around the line, in page pixels, whatever the size of the panel.
+
+   A single stretched mask can't do that (its wobble would scale with the
+   box). Instead the mask is five layers, which CSS unions: a plain
+   rectangle for the middle, and one strip per side. A strip is THICK px
+   deep at a fixed size and stretches only along its length, so its ragged
+   outer edge stays in real pixels: the line sits LINE px in from the box
+   edge, and the paint edge runs from about 9px past the line to 8px
+   short of it. Mostly it hugs the line; now and then it lunges.
+   Each strip returns to the line at both ends so the corners meet.       */
+const SPILL_THICK = 26, SPILL_LINE = 11.7;
+const buildSpillStrip = (seed, vertical)=>{
+	const L = 1000, T = SPILL_THICK;
+	const small = fbm(seed, [[90, 1.6], [28, .9], [9, .4]]);              // hugging the line
+	const lunge = fbm(seed + 50, [[240, 1], [110, .6]]);                   // where it breaks away
+	const edge = (x, extra)=>{
+		const l = lunge(x) - .8;                                           // about -.8 .. .8
+		const far = Math.sign(l) * Math.max(0, Math.abs(l) - .14) * 13;    // dead zone: mostly on the line
+		const taper = Math.min(1, x / 30, (L - x) / 30);
+		// rest position a pixel outside the line: paint laid up to a line overlaps it
+		return Math.max(2.5, Math.min(T - 6, SPILL_LINE + ((small(x) - 1.45) * 1.3 - 1 + far) * taper + extra));
+	};
+	// two nested shapes: a thin wash that reaches a little further, then the body
+	const shape = (extra, op)=>{
+		const pts = [];
+		for (let x = 0; x <= L; x += 4) pts.push([x, edge(x, extra)]);
+		pts.push([L, T], [0, T]);
+		const d = pts.map(([a, b])=>(vertical ? `${f(b)} ${f(a)}` : `${f(a)} ${f(b)}`)).join('L');
+		return `<path d="M${d}Z"${op < 1 ? ` fill-opacity="${op}"` : ''}/>`;
+	};
+	const body = shape(-1.3, .5) + shape(0, 1);
+	return vertical ? svg(T, L, body, 'preserveAspectRatio="none"', false) : svg(L, T, body, 'preserveAspectRatio="none"', false);
+};
+// the same strip serves the opposite side, flipped
+const flipSvg = (inner, w, h, vertical)=>svg(w, h, `<g transform="${vertical ? `translate(${w} 0) scale(-1 1)` : `translate(0 ${h}) scale(1 -1)`}">${inner}</g>`, 'preserveAspectRatio="none"', false);
+const spillSet = (seed)=>{
+	const inner = (s_)=>s_.replace(/^<svg[^>]*>/, '').replace(/<\/svg>$/, '');
+	const T = SPILL_THICK, L = 1000;
+	return {
+		t : svgUri(buildSpillStrip(seed, false)),
+		b : svgUri(flipSvg(inner(buildSpillStrip(seed + 1, false)), L, T, false)),
+		l : svgUri(buildSpillStrip(seed + 2, true)),
+		r : svgUri(flipSvg(inner(buildSpillStrip(seed + 3, true)), T, L, true))
+	};
+};
+
 /* ---------- small pieces ------------------------------------------------- */
 
 const buildRule = ()=>svg(600, 18, `
@@ -428,6 +478,8 @@ const buildAssets = (lite)=>({
 	'--pi-wc-3'       : webpUri('art/bleed.webp'),
 	// subtle tear for text boxes: just enough to lose the ruler-straight edge
 	'--pi-box-edge'   : svgUri(buildArtMask({ seed: 57, amp: .45, layers: [[1, 0]], tears: 3, tearDepth: [4, 9] })),
+	...Object.fromEntries(Object.entries(spillSet(401)).map(([k, v])=>[`--pi-spill-${k}`, v])),
+	...Object.fromEntries(Object.entries(spillSet(477)).map(([k, v])=>[`--pi-spill2-${k}`, v])),
 	'--pi-ink-frame'  : svgUri(buildInkFrame(71)),
 	'--pi-box-frame'  : svgUri(buildInkFrame(83)),
 	'--pi-edge'       : svgUri(buildEdgeMask()),

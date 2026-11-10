@@ -660,19 +660,42 @@
 .page .plate p { margin : 0; }
 
 /* INK FRAME  ·  add  ink-frame  to a block-form mask for the framed panel
-   of the references: the art fills a ruled pen border, edge to edge, the
-   lines crossing at the corners. (No torn rim: the frame is the edge.
-   add  torn  to get the ragged rim back inside the frame.)               */
+   of the references: the art fills a ruled pen border, the lines crossing
+   at the corners, and the paint doesn't quite respect the line: in places
+   it runs a few pixels past it, in others it stops short and a sliver of
+   paper shows inside the frame.
+
+   The mask is five layers, unioned: a rectangle for the middle and a
+   26px strip per side whose ragged edge wanders around the line (which
+   sits 11.7px inside the box, leaving the paint room to spill). The strips have a fixed depth and stretch only along
+   their length, so the wander is the same few pixels on any panel size.
+     + wc-2   a second set of edges, so two panels on a spread differ
+     + clean  paint stops dead on the line all round
+     + torn   the ragged torn-paper rim inside the frame instead        */
 .page :is(div, span).watercolor-mask.ink-frame:not(.torn) img {
+	--sp-t : var(--pi-spill-t); --sp-r : var(--pi-spill-r); --sp-b : var(--pi-spill-b); --sp-l : var(--pi-spill-l);
+	-webkit-mask-image    : linear-gradient(#000, #000), var(--sp-t), var(--sp-r), var(--sp-b), var(--sp-l);
+	mask-image            : linear-gradient(#000, #000), var(--sp-t), var(--sp-r), var(--sp-b), var(--sp-l);
+	-webkit-mask-size     : calc(100% - 48px) calc(100% - 48px), calc(100% - 23.4px) 26px, 26px calc(100% - 23.4px), calc(100% - 23.4px) 26px, 26px calc(100% - 23.4px);
+	mask-size             : calc(100% - 48px) calc(100% - 48px), calc(100% - 23.4px) 26px, 26px calc(100% - 23.4px), calc(100% - 23.4px) 26px, 26px calc(100% - 23.4px);
+	-webkit-mask-position : center, 11.7px 0, 100% 11.7px, 11.7px 100%, 0 11.7px;
+	mask-position         : center, 11.7px 0, 100% 11.7px, 11.7px 100%, 0 11.7px;
+	-webkit-mask-repeat   : no-repeat;
+	mask-repeat           : no-repeat;
+}
+.page :is(div, span).watercolor-mask.ink-frame.wc-2:not(.torn) img {
+	--sp-t : var(--pi-spill2-t); --sp-r : var(--pi-spill2-r); --sp-b : var(--pi-spill2-b); --sp-l : var(--pi-spill2-l);
+}
+.page :is(div, span).watercolor-mask.ink-frame.clean img {
 	-webkit-mask-image : none;
 	mask-image         : none;
-	-webkit-clip-path  : inset(7.5px);
-	clip-path          : inset(7.5px);
+	-webkit-clip-path  : inset(11.7px);
+	clip-path          : inset(11.7px);
 }
 .page :is(div, span).watercolor-mask.ink-frame::after {
 	content        : '';
 	position       : absolute;
-	inset          : 0;
+	inset          : 4px;
 	z-index        : 1;
 	box-sizing     : border-box;
 	border         : 22px solid transparent;
