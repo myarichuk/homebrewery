@@ -16,13 +16,14 @@
    PAGE VARIANTS  (on the \page line, e.g.  \page {plain} )
      plain    corners + crest only, no marginalia
      no-scatter / scatter   turn the automatic marginalia off / force it on
-                            (it switches itself off on pages with wide,
-                            wc-behind or absolutely placed art, and on
-                            pages where you place pieces by hand)
+                            (it switches itself off on pages where you
+                            place pieces by hand)
+     mirror   flip the marginalia scheme (for left-hand pages)
+     roman    upright, darker body text instead of the faded italic
      bare     no ink art at all: just the paper
      untorn   straight page edges (for printers that dislike the mask)
      frame-classic / -thorn / -gothic / -bone / -occult        corner set
-     crest-compass / crest-classic / crest-skull / crest-blades /
+     crest-classic / crest-compass / crest-skull / crest-blades /
      crest-beetle / crest-none                                 page-top crest
      (set them for the whole book with  .page { --pi-frame : var(--pi-frame-thorn); }
       see "corners and crest" below)
@@ -37,7 +38,8 @@
      {{plate ... ![](url) }}              block-level masked art (legacy name)
 
    BLOCKS
-     {{kicker SERIES NAME}}   engraved caps on a thorned plaque above a title
+     {{kicker SERIES NAME}}   heavy spaced capitals above a title;
+                              {{kicker,plaque …}} for the thorned plaque
      {{intro ...}}            full-width, balanced two-column lead-in
      {{dropcap ...}}          ink-wash initial on its first paragraph
                               (automatic for the paragraph after an H1)
@@ -57,6 +59,7 @@
                                           fairy  mimic  banner-a  banner-b
                                 pendants  pend-hex  pend-moon  pend-skull
                                           pend-star  (hang from top:6.4cm)
+                                glyphs    g1 … g19  (planetary signs, runes)
                                 splatter  splat-a  splat-b  splat-c
                                           sp1 … sp9  specks  stars
                                 washes    pool1 … pool4  pool-1  pool-2  pool-3
@@ -73,13 +76,14 @@
 /* Planar Thorn – hand-inked thorny capitals, digits and ornaments for
                 titles and page numbers. Embedded (see build_font.py).
    IM Fell English     – body text, captions, boxes, drop caps.
-   IM Fell English SC  – small headings, kickers, table heads.
+   IM Fell English SC  – small headings, table heads.
+   Cinzel 900          – the kicker line only (the mockup's heavy capitals).
    The Fell types were digitised from scans of 17th-century printing, so
    the ink spread, the uneven letterforms and the old-style figures are
    real: next to the hand-drawn art, a clean digital face (the PHB's own,
    or Cinzel) reads as typeset on top of the page rather than printed on
    it. Fell has no bold; bold is synthesised, which prints fine.        */
-@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=IM+Fell+English+SC&family=Cinzel:wght@900&display=swap');
 
 
 /* @@ASSETS@@ */
@@ -87,16 +91,23 @@
 
 /* PALETTE _________________________________________________________ */
 :root {
-	--pi-paper   : #efe0bd;                  /* page base                  */
+	--pi-paper   : #f4e9d8;                  /* page base                  */
 	--pi-ink     : #1d1712;                  /* titles, rules, line art    */
-	--pi-text    : #2b231c;                  /* body text                  */
-	--pi-faint   : #6c6051;                  /* captions, footers          */
+	--pi-text    : #54483e;                  /* body text: faded brown-grey, as in the mockups */
+	--pi-faint   : #8a7b6b;                  /* captions, footers          */
+	--pi-cap     : #3b3531;                  /* drop-cap letter: charcoal, sunk into its blot */
+
+	/* The mockups set running text in a faded italic. It is the look, but it
+	   is slower to read over a whole book; for upright text put
+	       .page { --pi-text-style : normal; --pi-text : #2b231c; }
+	   in the Style tab, or  \page {roman}  on single pages.               */
+	--pi-text-style : italic;
 	--pi-wash    : rgba(91, 83, 72, .11);    /* boxes, table zebra         */
 	--pi-wash-2  : rgba(91, 83, 72, .2);
 
 	/* artwork is multiplied into the paper so whites take on the parchment
 	   and it reads as watercolour; set to  none / normal  to show it raw   */
-	--pi-art-grade : sepia(.3) saturate(.72) contrast(1.02) brightness(1.04);
+	--pi-art-grade : sepia(.1) saturate(.94) contrast(1.02) brightness(1.03);
 	--pi-art-blend : multiply;
 
 	--HB_Color_Background            : var(--pi-paper);
@@ -113,11 +124,12 @@
 
 /* PAGE SURFACE ____________________________________________________ */
 .page {
-	padding          : 3.3cm 3.05cm 2.4cm;
-	column-width     : 7cm;     /* PHB's 8cm minimum won't fit two columns inside the frame */
-	column-gap       : .85cm;
+	padding          : 3.2cm 3.7cm 2.4cm;      /* wide side margins: they carry the marginalia */
+	column-width     : 6cm;     /* PHB's 8cm minimum won't fit two columns inside the frame */
+	column-gap       : .8cm;
 	font-family      : 'IM Fell English', 'Georgia', serif;
-	font-size        : .34cm;
+	font-size        : .33cm;
+	font-style       : var(--pi-text-style);
 	color            : var(--pi-text);
 	background-color : var(--pi-paper);
 	background-image :
@@ -136,6 +148,7 @@
 	background-position : 0 0, 100% 100%, 0 0, 190px 230px;
 }
 .page.untorn { -webkit-mask : none; mask : none; }
+.page.roman  { --pi-text-style : normal; --pi-text : #2b231c; }
 
 /* corners and crest: one overlay underneath the text.
 
@@ -144,14 +157,14 @@
    or per page on the \page line:   \page {frame-thorn, crest-skull}
 
    frames  classic · thorn · gothic · bone · occult (four different corners)
-   crests  compass (default) · classic · skull · blades · beetle · none
+   crests  classic (default) · compass · skull · blades · beetle · none
    (planar-ink-lite.css carries only the classic frame and the compass
     and classic crests.)                                                  */
 :root {
 	--pi-frame      : var(--pi-frame-classic);
-	--pi-crest      : var(--pi-p-crest-compass);
-	--pi-crest-size : 400px 114px;
-	--pi-crest-top  : 8px;
+	--pi-crest      : var(--pi-crest-classic);
+	--pi-crest-size : 246px 52px;
+	--pi-crest-top  : 44px;
 }
 .page.frame-classic  { --pi-frame : var(--pi-frame-classic); }
 .page.frame-thorn    { --pi-frame : var(--pi-frame-thorn); }
@@ -159,7 +172,7 @@
 .page.frame-bone     { --pi-frame : var(--pi-frame-bone); }
 .page.frame-occult   { --pi-frame : var(--pi-frame-occult); }
 .page.crest-compass  { --pi-crest : var(--pi-p-crest-compass); --pi-crest-size : 400px 114px; --pi-crest-top : 8px; }
-.page.crest-classic  { --pi-crest : var(--pi-crest-classic);   --pi-crest-size : 313px 66px;  --pi-crest-top : 14px; }
+.page.crest-classic  { --pi-crest : var(--pi-crest-classic);   --pi-crest-size : 246px 52px;  --pi-crest-top : 44px; }
 .page.crest-skull    { --pi-crest : var(--pi-p-crest-skull);   --pi-crest-size : 420px 78px;  --pi-crest-top : 22px; }
 .page.crest-blades   { --pi-crest : var(--pi-p-crest-blades);  --pi-crest-size : 400px 89px;  --pi-crest-top : 16px; }
 .page.crest-beetle   { --pi-crest : var(--pi-p-crest-beetle);  --pi-crest-size : 260px 113px; --pi-crest-top : 6px; }
@@ -175,12 +188,16 @@
 	background-position : center var(--pi-crest-top), 0 0;
 	background-size     : var(--pi-crest-size), 100% 100%;
 	background-repeat   : no-repeat;
+	opacity             : .88;      /* the frame is fine pen work: a shade under the title's black */
 }
 
 /* marginalia and ink splatter: a second overlay, laid out per page.
-   The layers come from the generated block above (7 layouts, 5 splatter
-   sets, 4 nudges, cycling over pages: no two pages in 140 alike).
-   Facing pages are mirrored so the layout reads from the outer edge.    */
+   Every page carries the reference scheme: skulls top left, compass and
+   orrery top right, a column of signs and runes down each margin, the
+   dagger sigil low on the left. The layers come from the generated block
+   above (7 layouts that differ in which glyphs are drawn and by a few
+   pixels of drift, 5 splatter sets: no two pages in 35 alike).
+   \page {mirror} flips the scheme for a left-hand page.                  */
 .page::after {
 	content             : '';
 	display             : block;
@@ -195,17 +212,17 @@
 	background-size     : var(--pi-marg-size), var(--pi-splat-size);
 	background-repeat   : no-repeat;
 }
-.page:nth-child(even)::after { transform : scaleX(-1); }
+.page:nth-child(even)::after { transform : none; }      /* the PHB theme flips its footer accent on even pages */
+.page.mirror::after { transform : scaleX(-1); }
 .page:is(.plain, .bare, .no-scatter)::after { display : none; }
 .page.bare::before { display : none; }
 
-/* The scatter is laid out blind: CSS can't see where the art is, so on a
-   page whose art reaches into the margins it would land on (or under) the
-   picture. It stands down by itself on those pages (art that is wide,
-   wc-behind or placed with position:absolute), and on any page where
-   you place pieces by hand (below): once you place one, the page is yours.
+/* The scheme lives in the outer 3.4cm of the page, which the text never
+   enters, and (as on the references) it is drawn over any art that bleeds
+   out that far. It stands down only on a page where you place pieces by
+   hand (below): once you place one, the page is yours.
    \page {scatter} brings it back regardless.                          */
-.page:has(.watercolor-mask:is(.wide, .wc-behind, [style*='position:absolute']), .marg)::after { display : none; }
+.page:has(.marg)::after { display : none; }
 .page.scatter::after { display : block; }
 
 /* HAND-PLACED MARGINALIA  ·  any drawing from the scatter, placed where you
@@ -267,7 +284,7 @@
 	text-align  : center;
 }
 .page .footnote {
-	right          : 3.05cm;
+	right          : 3.7cm;
 	bottom         : 1.4cm;
 	width          : 8cm;
 	font-family    : 'IM Fell English', serif;
@@ -276,7 +293,7 @@
 	color          : var(--pi-faint);
 	text-transform : none;
 }
-.page:nth-child(even) .footnote { left : 3.05cm; right : auto; }
+.page:nth-child(even) .footnote { left : 3.7cm; right : auto; }
 
 
 /* TYPOGRAPHY ______________________________________________________ */
@@ -285,10 +302,11 @@
 .page :is(table, .monster, .spellList) { font-family : 'IM Fell English', 'Georgia', serif; }
 .page .monster :is(h3, h4, h5),
 .page table thead th                     { font-family : 'IM Fell English SC', serif; }
-.page p                { line-height : 1.34em; }
+.page p                { line-height : 1.42em; }
 .page p + p,
 .page ul + p,
-.page ol + p           { text-indent : 1.1em; }
+.page ol + p           { text-indent : 1.3em; }
+.page p + p            { margin-top : .08cm; }      /* paragraphs are marked by the indent, as in the mockups, not by a gap */
 .page strong           { color : var(--pi-ink); }
 .page a                { color : var(--pi-ink); text-decoration : underline dotted; text-underline-offset : 2px; }
 
@@ -302,21 +320,28 @@
 	break-after : avoid;
 }
 .page h1 {
-	margin-bottom  : .4cm;
+	margin         : 0 -.3cm .4cm;
 	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
-	font-size      : 1.36cm;
-	line-height    : 1.06em;
-	letter-spacing : .01em;
+	font-size      : var(--pi-title, 1.95cm);      /* \page {--pi-title:1.7cm} to fit a long title on one line */
+	font-style     : normal;
+	line-height    : 1em;
+	letter-spacing : .015em;
 	text-align     : center;
 	text-transform : none;      /* as written: capitals tall, lowercase as small caps */
+	/* the mockup lettering is a loaded brush; the traced face is a pen.
+	   A hairline stroke in the ink colour puts the weight back.           */
+	-webkit-text-stroke : .7px var(--pi-ink);
 }
 .page h1 + p::first-line { font-variant : normal; }
 .page h2 {
 	font-family    : 'Planar Thorn', 'IM Fell English SC', serif;
-	font-size      : .7cm;
+	font-size      : .82cm;
+	font-style     : normal;
 	line-height    : 1.08em;
 	text-transform : none;
+	-webkit-text-stroke : .3px var(--pi-ink);
 }
+.page :is(h3, h4, h5, h6, table, .monster, .note, .toc, .kicker, .pageNumber, code) { font-style : normal; }
 .page h3 {
 	padding-bottom : .16cm;
 	font-family    : 'IM Fell English SC', serif;
@@ -340,14 +365,29 @@
 	letter-spacing : .1em;
 }
 
-/* KICKER  ·  {{kicker SERIES}} above a title, on the thorned plaque.
-   border-image keeps the plaque's ends intact and stretches its middle
-   to the text, so any length of kicker fits.                          */
+/* KICKER  ·  {{kicker SERIES}} above a title: heavy spaced capitals over
+   a small diamond rule, as on the third mockup.
+   {{kicker,plaque SERIES}} sets it on the thorned plaque instead
+   (border-image keeps the plaque's ends intact and stretches its middle
+   to the text, so any length of kicker fits).                          */
 .page .kicker {
 	display        : block;
 	column-span    : all;
 	width          : fit-content;
 	min-width      : 4cm;
+	margin         : 0 auto .12cm;
+	padding        : 0 .2cm .26cm;
+	font-family    : 'Cinzel', 'IM Fell English SC', serif;
+	font-size      : .66cm;
+	font-weight    : 900;
+	line-height    : 1.05em;
+	letter-spacing : .1em;
+	text-transform : uppercase;
+	color          : var(--pi-ink);
+	text-align     : center;
+	background     : var(--pi-rule) center bottom / 3.4cm 7px no-repeat;
+}
+.page .kicker.plaque {
 	margin         : 0 auto .3cm;
 	padding        : .02cm .5cm 0;
 	font-family    : 'IM Fell English SC', serif;
@@ -355,8 +395,8 @@
 	font-weight    : normal;
 	line-height    : 1.1em;
 	letter-spacing : .12em;
-	color          : var(--pi-ink);
-	text-align     : center;
+	text-transform : none;
+	background     : none;
 	border         : solid transparent;
 	border-width   : .5cm 1.05cm;
 	border-image   : var(--pi-plaque) 40 92 fill / .5cm 1.05cm stretch;
@@ -368,7 +408,7 @@
 	display       : block;     /* hbfm blocks are inline-block; column-span ignores those */
 	column-span   : all;
 	columns       : 2;
-	column-gap    : .85cm;
+	column-gap    : .8cm;
 	column-fill   : balance;
 	margin-bottom : .4cm;
 }
@@ -381,16 +421,18 @@
 .page p.drop-cap::first-letter,
 .page .dropcap > p:first-of-type::first-letter {
 	float                   : left;
-	margin                  : .04cm .14cm -.08cm -.08cm;
-	padding                 : .12cm .16cm .04cm .12cm;
+	margin                  : -.02cm .12cm -.1cm -.2cm;
+	padding                 : .14cm .2cm .06cm .2cm;
 	font-family             : 'IM Fell English', serif;
 	font-size               : 1.5cm;
+	font-style              : normal;
+	font-weight             : bold;
 	line-height             : .86em;
-	color                   : var(--pi-ink);
+	color                   : var(--pi-cap);
 	background-color        : transparent;
-	background-image        : var(--pi-pool-2);
-	background-position     : 45% 50%;
-	background-size         : 128% 128%;
+	background-image        : var(--pi-capblot);
+	background-position     : 50% 50%;
+	background-size         : 132% 126%;
 	background-repeat       : no-repeat;
 	-webkit-background-clip : border-box;
 	background-clip         : border-box;
@@ -526,7 +568,9 @@
                       so it prints as sharply as it displays. No intrinsic
                       size: it stretches to the box.
                       wc-1 torn paper · wc-2 rough tear
-                      wc-3 bleed: wide soft watercolour rim, no frame
+                      wc-3 bleed: the paint thins out into the paper over
+                      the outer fifth of the box; no frame (a soft alpha
+                      bitmap, the one mask here that is not a polygon)
        ink-frame      (block form) hand-inked border over the art
        --pi-wc-fade   optional directional fade (fade-left/-right/-top/-bottom)
                       for art that should bleed into the text side.
@@ -616,8 +660,15 @@
 .page .plate p { margin : 0; }
 
 /* INK FRAME  ·  add  ink-frame  to a block-form mask for the framed panel
-   of the references: a rough pen border drawn over the art, with the paint
-   running a little past it. Pair with wc-1 (default) or wc-2.            */
+   of the references: the art fills a ruled pen border, edge to edge, the
+   lines crossing at the corners. (No torn rim: the frame is the edge.
+   add  torn  to get the ragged rim back inside the frame.)               */
+.page :is(div, span).watercolor-mask.ink-frame:not(.torn) img {
+	-webkit-mask-image : none;
+	mask-image         : none;
+	-webkit-clip-path  : inset(7.5px);
+	clip-path          : inset(7.5px);
+}
 .page :is(div, span).watercolor-mask.ink-frame::after {
 	content        : '';
 	position       : absolute;

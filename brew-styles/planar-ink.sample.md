@@ -1,30 +1,4 @@
-{{kicker CHAPTER 1 · THE OUTER PLANES}}
-
-# The City of Doors
-
-{{intro
-{{dropcap
-Every arch in the city is a door to somewhere, if you hold the right key. A bent nail, a sung note, a lie told well: the keys are rarely what a sane traveler would carry. Most who arrive here never learn which doorway brought them in.
-
-The streets coil around the inside of a ring that hangs over a spire without end, and above the rooftops there is no sky, only more city. Locals call it the Cage, and they mean it fondly.
-}}
-}}
-
-{{watercolor-mask,wide,ink-frame,height:14.6cm,margin-top:.3cm,margin-left:-1cm,margin-right:-1cm,--art-y:35%
-![The Spirit of War, 1851, by Jasper Francis Cropsey](/assets/the_spirit_of_war.webp)
-}}
-
-{{caption,position:absolute,bottom:1.75cm,right:2.2cm,text-align:right
-*The Spirit of War*, Jasper Francis Cropsey, 1851. Public domain.
-}}
-
-{{marg,pend-moon,top:6.3cm,left:.45cm}} {{marg,skull,top:7.2cm,right:.75cm,width:44px}} {{marg,sp4,bottom:1.5cm,left:7cm,width:24px}} {{marg,sp1,top:3.6cm,right:4.4cm,width:18px}}
-
-{{pageNumber,auto}}
-
-\page {frame-thorn,crest-skull}
-
-# A Brief History<br>of the Blood War
+# A Brief History of<br>the Blood War
 
 Long before the first mortal learned to pray, the Lower Planes were already at war. Demons boil up from the Abyss in numbers no ledger can hold; devils march out of the Nine Hells in ranks drawn up by contract. Neither side remembers the first blow. Neither side intends to strike the last.
 
@@ -34,51 +8,61 @@ Mercenaries are the war's true currency. Yugoloths sell their blades to both sid
 
 Scholars in the City of Doors keep a running tally of the dead. They gave up counting individuals centuries ago and now measure the war in layers of the Abyss overrun and circles of Hell put to the torch.
 
-{{watercolor-mask,ink-frame,wc-2,position:absolute,top:7.1cm,right:2.2cm,width:8.6cm,height:16.3cm,--art-x:62%
+Every few centuries a prophet rises to announce the war's end, and is hired by one side or the other before the week is out. The war does not end. It only changes hands.
+
+{{watercolor-mask,ink-frame,position:absolute,top:7.6cm,right:2.43cm,width:8.45cm,height:18.2cm,--art-x:62%
 ![Ruined tower](/assets/ruined_tower.webp)
 }}
 
-{{caption,position:absolute,top:23.6cm,right:2.2cm,width:6.4cm,text-align:right
+{{caption,position:absolute,top:13.7cm,right:.5cm,width:1.75cm
 The front line is wherever two fiends meet.
 }}
 
-{{footnote
+{{caption,position:absolute,top:26cm,left:10.9cm,width:4.4cm
 Recorded by a scribe of the Fated, who asked not to be named.
 }}
 
-{{marg,pend-star,top:6.6cm,left:.5cm}} {{marg,bull,top:10.2cm,left:.3cm,width:54px}} {{marg,skull-b,top:12.4cm,left:.9cm}} {{marg,pool1,top:18.6cm,left:.25cm,width:66px}} {{marg,sp2,top:4.6cm,right:4.2cm,width:22px}} {{marg,sp9,bottom:1.3cm,right:5cm,width:20px}}
+\page
 
-{{pageNumber,auto}}
-
-\page {frame-gothic,crest-blades}
-
-{{cartouche
 # The Great Wheel
-}}
 
-![](/assets/roman_theatre.webp){watercolor-mask,wc-float-right,--wc-w:68%,--wc-h:6.6cm}
-
+{{dropcap
 Picture the planes as a wheel. At its hub stands the Outlands, a plain of grey grass with a spire in the middle that reaches higher than sight. On the spire's tip, impossibly, hangs the City of Doors. Around the rim turn the Outer Planes, each one a belief made solid.
 
-The rim is not still. Gate-towns sit at the edge of the Outlands, one for every plane on the rim, and each town drifts a little closer to its neighbor every year. When a town grows too much like the plane it serves, it slides through the gate and is never seen on the Outlands again.
+The rim is not still. Gate-towns sit at the edge of the Outlands, one for every plane on the rim, and each town drifts a little closer to its neighbor every year.
+}}
 
 \column
 
+When a town grows too much like the plane it serves, it slides through the gate and is never seen on the Outlands again.
+
 {{dropcap
 Out past the rim lies the Astral Sea, silver and silent, where the corpses of dead gods drift like islands and githyanki raiders sail between them. Travelers who reach the Astral find that time there is a rumor: they do not age, they do not hunger, and they do not always remember why they came.
-
-Most travelers never see any of this. They pass through one door, then another, and learn the shape of the planes the way a sailor learns the sea, one storm at a time. The doors do not care who walks through them, and the planes do not care who arrives.
 }}
 
-{{watercolor-mask,wc-behind,wc-3,fade-top,position:absolute,bottom:1.2cm,left:1.4cm,width:18.4cm,height:11cm,--wc-opacity:.5,--art-y:62%
+{{watercolor-mask,wc-3,position:absolute,bottom:.5cm,left:.6cm,width:20.4cm,height:17cm,--art-y:60%
 ![The Departure, 1837, by Thomas Cole](/assets/the_departure.webp)
 }}
 
-{{marg,pend-star,top:6.7cm,right:.5cm}} {{marg,ram,top:12.6cm,left:.35cm}} {{marg,dagger,top:13.6cm,right:.6cm,rotate:8deg,width:40px}} {{marg,pool2,top:10.4cm,left:.2cm,width:60px}} {{marg,sp7,top:4.2cm,left:3.6cm,width:22px}}
+\page {crest-none,--pi-title:1.7cm}
 
-{{pageNumber,auto}}
+{{kicker,margin-top:-1.75cm Planescape}}
 
-\page {plain,frame-bone,crest-beetle}
+# The Cage and Beyond
+
+{{intro
+{{dropcap
+Every arch in the city is a door to somewhere, if you hold the right key. A bent nail, a sung note, a lie told well: the keys are rarely what a sane traveler would carry.
+
+The streets coil around the inside of a ring that hangs over a spire without end, and above the rooftops there is no sky, only more city. Locals call it the Cage.
+}}
+}}
+
+{{watercolor-mask,wide,ink-frame,height:17.4cm,margin-top:.1cm,margin-left:-1.5cm,margin-right:-1.5cm,--art-y:35%
+![The Spirit of War, 1851, by Jasper Francis Cropsey](/assets/the_spirit_of_war.webp)
+}}
+
+\page {roman,frame-bone,crest-beetle}
 
 ## Gate-Town Rumors
 
@@ -138,7 +122,7 @@ ___
 
 {{pageNumber,auto}}
 
-\page {frame-occult,crest-classic}
+\page {frame-occult,crest-compass}
 
 {{wreath
 ![Portrait](/assets/catwarrior.jpg)

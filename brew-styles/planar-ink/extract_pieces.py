@@ -7,6 +7,9 @@ PLANAR INK  ·  piece extractor for the second-generation sheets
                                             washes, dividers
     source/headers.jpg        2000 x 1493   page-top crests and the spiked
                                             title banner
+    source/asset-sheet.jpg    1792 x 2400   the two rows of planetary signs
+                                            and runes (the margin glyphs of
+                                            the reference pages)
 
 Every piece is written as one bitmap, art/p-<name>.webp, at RES x its CSS
 size (2.5x = 240 dpi on a printed letter page), alpha carrying the ink tone.
@@ -48,11 +51,13 @@ SHEETS  = {
 	'h' : ('source/headers.jpg', (2000, 1493)),
 	'w' : ('source/wreath.webp', (1500, 1000)),           # transparent, magenta-keyed shading
 	'o' : ('source/corners-occult.webp', (1500, 1000)),   # transparent, magenta-keyed shading
+	'a' : ('source/asset-sheet.jpg', (1792, 2400)),       # the first sheet: only the rune row is taken here
 }
 
 # name: (sheet, crop, css width, role, options)
 #   role  marg   marginalia drawing, placed by the per-page layouts
 #         hang   marginalia that hangs from the top of a margin (pendants)
+#         glyph  planetary sign or rune: the glyph columns down the margins
 #         splat  ink splatter, placed (and resized) per page
 #         pool   grey wash blot, tone only
 #         crest  page-top ornament
@@ -75,6 +80,27 @@ PIECES = {
 	'pend-moon'  : ('m', (1024, 812, 1206, 1178), 50, 'hang'),
 	'pend-hex'   : ('m', (1192, 812, 1332, 1212), 42, 'hang'),
 	'pend-star'  : ('m', (1342, 812, 1462, 1218), 36, 'hang'),
+	# ---------------------------------------------------------- margin glyphs
+	# sun, pluto, mars, sigil, six runes / mercury, saturn, pisces, knot, tally, four runes
+	'g1' : ('a', (786, 1369, 895, 1475), 39, 'glyph'),
+	'g2' : ('a', (907, 1363, 996, 1480), 32, 'glyph'),
+	'g3' : ('a', (1013, 1366, 1115, 1475), 37, 'glyph'),
+	'g4' : ('a', (1136, 1362, 1215, 1478), 28, 'glyph'),
+	'g5' : ('a', (1240, 1367, 1312, 1476), 26, 'glyph'),
+	'g6' : ('a', (1337, 1367, 1406, 1476), 25, 'glyph'),
+	'g7' : ('a', (1422, 1366, 1495, 1473), 26, 'glyph'),
+	'g8' : ('a', (1518, 1367, 1582, 1476), 23, 'glyph'),
+	'g9' : ('a', (1601, 1367, 1675, 1475), 27, 'glyph'),
+	'g10' : ('a', (1692, 1360, 1766, 1475), 27, 'glyph'),
+	'g11' : ('a', (800, 1478, 881, 1603), 29, 'glyph'),
+	'g12' : ('a', (913, 1484, 992, 1594), 28, 'glyph'),
+	'g13' : ('a', (1015, 1489, 1113, 1589), 35, 'glyph'),
+	'g14' : ('a', (1134, 1489, 1222, 1589), 32, 'glyph'),
+	'g15' : ('a', (1239, 1483, 1307, 1591), 24, 'glyph'),
+	'g16' : ('a', (1335, 1485, 1404, 1594), 25, 'glyph'),
+	'g17' : ('a', (1417, 1484, 1486, 1592), 25, 'glyph'),
+	'g18' : ('a', (1510, 1486, 1588, 1589), 28, 'glyph'),
+	'g19' : ('a', (1603, 1486, 1681, 1594), 28, 'glyph'),
 	# ------------------------------------------------------------- splatter
 	'sp1' : ('m', (28, 1550, 172, 1668),  44, 'splat'),
 	'sp2' : ('m', (184, 1545, 322, 1668), 44, 'splat'),
@@ -179,7 +205,7 @@ def smooth(d, lo, hi):
 	return t * t * (3 - 2 * t)
 
 
-PAPER = np.array([239, 224, 189], np.float32)
+PAPER = np.array([244, 233, 216], np.float32)
 
 
 def raster(d, w, h, strength=1.0, res=RES, fill=None):

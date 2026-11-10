@@ -34,8 +34,8 @@ from PIL import Image, ImageDraw, ImageFilter
 from scipy import ndimage
 
 HERE  = os.path.dirname(os.path.abspath(__file__))
-PAPER = np.array([239, 224, 189], np.float32)     # --pi-paper  #efe0bd
-DARK  = np.array([214, 190, 145], np.float32)     # where the paper browns
+PAPER = np.array([244, 233, 216], np.float32)     # --pi-paper  #f4e9d8
+DARK  = np.array([230, 208, 174], np.float32)     # where the paper browns
 WASH  = (93, 84, 74)                              # grey-brown watercolour
 
 
@@ -96,9 +96,9 @@ def stains(w=272, h=352):
 	edge = np.minimum.reduce([xx, w - 1 - xx, yy, h - 1 - yy]) / (min(w, h) / 2)
 	big = noise(1024, 11, 900, 60)[:h, :w]
 	mid = noise(1024, 12, 200, 12)[:h, :w]
-	a = np.clip(0.30 * (1 - edge) ** 2.2 + 0.07 * big + 0.03 * mid - 0.02, 0, 1)
+	a = np.clip(0.17 * (1 - edge) ** 2.6 + 0.04 * big + 0.018 * mid - 0.012, 0, 1)
 	# tide-marks: thin darker contours of the broad noise
-	tide = np.exp(-(((big * 3) % 1) - 0.5) ** 2 / 0.004) * np.clip(big + 0.3, 0, 1) * 0.05
+	tide = np.exp(-(((big * 3) % 1) - 0.5) ** 2 / 0.004) * np.clip(big + 0.3, 0, 1) * 0.03
 	a = a + tide * (1 - edge * 0.6)
 	# foxing: a few small rust spots
 	r = np.random.default_rng(13)
@@ -109,7 +109,7 @@ def stains(w=272, h=352):
 		fox += np.exp(-((xx - cx) ** 2 + (yy - cy) ** 2) / (2 * rad ** 2)) * r.uniform(.08, .2)
 	a = np.clip(a + fox, 0, 0.6)
 	rgba = np.zeros((h, w, 4), np.uint8)
-	rgba[..., :3] = (122, 84, 40)
+	rgba[..., :3] = (150, 104, 58)
 	rgba[..., 3] = (a * 255 + 0.5).astype(np.uint8)
 	return Image.fromarray(rgba, 'RGBA')
 
@@ -151,11 +151,54 @@ def wash_blot(seed, n=200, strength=0.34):
 	return Image.fromarray(rgba, 'RGBA')
 
 
+def cap_blot(n=220):
+	"""The drop-cap blot of the reference pages: charcoal ink dabbed on wet
+	paper. Dark in the middle, smoky at the edge, a couple of lobes and
+	a few flecks thrown off it; the letter sits in it nearly tone on tone."""
+	yy, xx = np.mgrid[0:n, 0:n] / n - 0.5
+	rr = np.hypot(xx * 1.05, yy) * 2
+	shape = (1 - rr) + 0.2 * noise(n, 71, 200, 30) + 0.05 * noise(n, 72, 40, 6)
+	core = np.clip((shape - 0.36) / 0.3, 0, 1)
+	core = core * core * (3 - 2 * core)
+	a = 0.74 * core * (0.86 + 0.1 * noise(n, 73, 70, 8) + 0.05 * noise(n, 74, 9, 1.0))
+	r = np.random.default_rng(75)
+	for _ in range(7):                                # thrown flecks
+		ang, d = r.uniform(0, 2 * np.pi), r.uniform(.33, .44)
+		cx, cy, rad = d * np.cos(ang), d * np.sin(ang), r.uniform(.008, .022)
+		a = np.maximum(a, 0.6 * np.exp(-((xx - cx) ** 2 + (yy - cy) ** 2) / (2 * rad ** 2)))
+	a = ndimage.gaussian_filter(a, 2.2)
+	rgba = np.zeros((n, n, 4), np.uint8)
+	rgba[..., :3] = (62, 58, 56)
+	rgba[..., 3] = (np.clip(a, 0, 1) * 255 + 0.5).astype(np.uint8)
+	return Image.fromarray(rgba, 'RGBA')
+
+
+def bleed_mask(n=360):
+	"""Alpha mask for unframed art (the second reference page): the paint
+	thins out into the paper over the outer fifth of the box, unevenly,
+	with the faint back-runs wet watercolour leaves. A bitmap rather than
+	an SVG filter so it prints; it is all low frequencies, so 360 px
+	stretched over a page-wide picture is still soft, not blocky."""
+	yy, xx = np.mgrid[0:n, 0:n] / (n - 1)
+	edge = np.minimum.reduce([xx, 1 - xx, yy, 1 - yy])           # 0 at the rim
+	wander = 0.034 * noise(n, 81, 300, 40) + 0.014 * noise(n, 82, 70, 10) + 0.005 * noise(n, 83, 18, 3)
+	wander = wander * np.clip(1 - edge / 0.3, 0, 1)                 # the middle of the picture stays whole
+	t = np.clip((edge + wander - 0.02) / 0.17, 0, 1)
+	a = t * t * (3 - 2 * t)
+	a = np.where(edge < 0.012, a * edge / 0.012, a)               # never a hard box edge
+	a = ndimage.gaussian_filter(a, 1.2)
+	rgba = np.zeros((n, n, 4), np.uint8)
+	rgba[..., 3] = (np.clip(a, 0, 1) * 255 + 0.5).astype(np.uint8)
+	return Image.fromarray(rgba, 'RGBA')
+
+
 def main():
 	os.makedirs(os.path.join(HERE, 'art'), exist_ok=True)
 	save(paper_tile(), 'paper.webp', quality=78)
 	save(stains(), 'stains.webp', quality=70, alpha_quality=55)
 	save(ink_grain(), 'inkgrain.webp', quality=80, alpha_quality=40)
+	save(cap_blot(), 'capblot.webp', quality=70, alpha_quality=70)
+	save(bleed_mask(), 'bleed.webp', quality=50, alpha_quality=60)
 	for i, seed in enumerate((31, 47, 63), 1):
 		save(wash_blot(seed), f'wash-{i}.webp', quality=70, alpha_quality=60)
 
